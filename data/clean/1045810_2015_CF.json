@@ -1,0 +1,164 @@
+{
+  "company": "NVIDIA CORP",
+  "ticker": "NVDA",
+  "cik": "0001045810",
+  "statement_type": "CashFlow",
+  "fiscal_year": 2015,
+  "period": "2015-01-25",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Operating activities:",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Net income",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 631,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Share-based compensation",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:ShareBasedCompensation",
+      "value": 158,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Other operating activities, net (residual)",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": 117,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 4,
+      "label": "Net cash from operating activities",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+      "value": 906,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "idx": 5,
+      "label": "Investing activities:",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 6,
+      "label": "Other investing activities, net (residual)",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": -727,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 7,
+      "label": "Net cash from investing activities",
+      "section": "InvestingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+      "value": -727,
+      "kind": "subtotal",
+      "sums": [
+        6
+      ]
+    },
+    {
+      "idx": 8,
+      "label": "Financing activities:",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 9,
+      "label": "Dividends paid",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:PaymentsOfDividendsCommonStock",
+      "value": -186,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 10,
+      "label": "Repurchases of common stock",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "value": -814,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 11,
+      "label": "Other financing activities, net (residual)",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": 166,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 12,
+      "label": "Net cash from financing activities",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+      "value": -834,
+      "kind": "subtotal",
+      "sums": [
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "idx": 13,
+      "label": "Net increase (decrease) in cash",
+      "section": "NetChange",
+      "concept": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "value": -655,
+      "kind": "total",
+      "sums": [
+        4,
+        7,
+        12
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "rhs": [
+        "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+        "us-gaap:NetCashProvidedByUsedInFinancingActivities"
+      ],
+      "name": "cash_rollforward",
+      "tolerant": true
+    }
+  ]
+}

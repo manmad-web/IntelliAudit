@@ -1,0 +1,117 @@
+{
+  "company": "MICROSOFT CORPORATION",
+  "ticker": "MSFT",
+  "cik": "0000789019",
+  "statement_type": "IncomeStatement",
+  "fiscal_year": 2022,
+  "period": "2022-06-30",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "value": 198270,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 1,
+      "label": "Cost of revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:CostOfGoodsAndServicesSold",
+      "value": -62650,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Research and development",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:ResearchAndDevelopmentExpense",
+      "value": -24512,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Selling, general and administrative",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:SellingGeneralAndAdministrativeExpense",
+      "value": -5900,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Other operating expenses, net (residual)",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -21825,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 5,
+      "label": "Operating income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:OperatingIncomeLoss",
+      "value": 83383,
+      "kind": "subtotal",
+      "sums": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "idx": 6,
+      "label": "Other income (expense), net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": 333,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 7,
+      "label": "Income before income taxes",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+      "value": 83716,
+      "kind": "subtotal",
+      "sums": [
+        5,
+        6
+      ]
+    },
+    {
+      "idx": 8,
+      "label": "Income tax (expense) benefit",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeTaxExpenseBenefit",
+      "value": -10978,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 9,
+      "label": "Net income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 72738,
+      "kind": "total",
+      "sums": [
+        7,
+        8
+      ]
+    }
+  ],
+  "identities": []
+}

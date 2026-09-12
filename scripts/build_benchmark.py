@@ -18,8 +18,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
 from edgar_ingest import get_company_facts
-from statement_builder import build_balance_sheet
+from statement_builder import build_balance_sheet, build_income_statement, build_cash_flow
 import injector
+
+BUILDERS = [("BS", build_balance_sheet), ("IS", build_income_statement), ("CF", build_cash_flow)]
 
 
 def main():
@@ -53,26 +55,27 @@ def main():
         except Exception as e:
             print(f"[skip] {co['ticker']}: EDGAR fetch failed: {e}"); continue
         for yr in years:
-            stmt = build_balance_sheet(facts, yr)
-            if not stmt:
-                skipped_year += 1; continue
-            stmt["ticker"] = co["ticker"]
-            if not injector.check_reconciles(stmt):
-                print(f"[warn] {co['ticker']} FY{yr}: clean stmt does not reconcile, skipping"); continue
-            json.dump(stmt, open(os.path.join(clean_dir, f"{co['cik']}_{yr}_BS.json"), "w"), indent=2)
-            built += 1
-            for rule in rulebook["rules"]:
-                if stmt["statement_type"] not in rule["statements"]:
-                    continue
-                for k in range(cfg.get("n_per_rule_per_statement", 1)):
-                    mod, meta = injector.inject(stmt, rule, rng)
-                    if mod is None:
+            for tag, build in BUILDERS:
+                stmt = build(facts, yr)
+                if not stmt:
+                    skipped_year += 1; continue
+                stmt["ticker"] = co["ticker"]
+                if not injector.check_reconciles(stmt):
+                    print(f"[warn] {co['ticker']} FY{yr} {tag}: does not reconcile, skipping"); continue
+                json.dump(stmt, open(os.path.join(clean_dir, f"{co['cik']}_{yr}_{tag}.json"), "w"), indent=2)
+                built += 1
+                for rule in rulebook["rules"]:
+                    if stmt["statement_type"] not in rule["statements"]:
                         continue
-                    sid = f"IA-{co['ticker']}-{yr}-{rule['rule_id']}-{k:02d}"
-                    rec = injector.build_record(stmt, rule, mod, meta, sid)
-                    records.append(rec)
-                    tier[rec["ground_truth_citations"]["citation_tier"]] += 1
-        print(f"  {co['ticker']}: built statements through FY{max(years)}")
+                    for k in range(cfg.get("n_per_rule_per_statement", 1)):
+                        mod, meta = injector.inject(stmt, rule, rng)
+                        if mod is None:
+                            continue
+                        sid = f"IA-{co['ticker']}-{yr}-{tag}-{rule['rule_id']}-{k:02d}"
+                        rec = injector.build_record(stmt, rule, mod, meta, sid)
+                        records.append(rec)
+                        tier[rec["ground_truth_citations"]["citation_tier"]] += 1
+        print(f"  {co['ticker']}: built BS/IS/CF through FY{max(years)}")
 
     with open(os.path.join(bench_dir, "records.jsonl"), "w") as f:
         for r in records:
@@ -81,6 +84,7 @@ def main():
         "companies": [c["ticker"] for c in companies], "years": years,
         "clean_statements_built": built, "company_years_skipped": skipped_year,
         "records": len(records),
+        "statement_type_breakdown": dict(Counter(r["metadata"]["statement_type"] for r in records)),
         "error_type_breakdown": dict(Counter(r["error_type"] for r in records)),
         "citation_tier_breakdown": dict(tier),
         "verifiable_error_pct": round(100 * sum(1 for r in records if r["self_check"]["error_breaks_reconciliation"]) / max(1, len(records)), 1),

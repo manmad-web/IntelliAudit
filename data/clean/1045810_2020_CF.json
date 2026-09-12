@@ -1,0 +1,174 @@
+{
+  "company": "NVIDIA CORP",
+  "ticker": "NVDA",
+  "cik": "0001045810",
+  "statement_type": "CashFlow",
+  "fiscal_year": 2020,
+  "period": "2020-01-26",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Operating activities:",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Net income",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 2796,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Depreciation and amortization",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:DepreciationDepletionAndAmortization",
+      "value": 381,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Share-based compensation",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:ShareBasedCompensation",
+      "value": 844,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Other operating activities, net (residual)",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": 740,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 5,
+      "label": "Net cash from operating activities",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+      "value": 4761,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "idx": 6,
+      "label": "Investing activities:",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 7,
+      "label": "Other investing activities, net (residual)",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": 6145,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 8,
+      "label": "Net cash from investing activities",
+      "section": "InvestingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+      "value": 6145,
+      "kind": "subtotal",
+      "sums": [
+        7
+      ]
+    },
+    {
+      "idx": 9,
+      "label": "Financing activities:",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 10,
+      "label": "Dividends paid",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:PaymentsOfDividendsCommonStock",
+      "value": -390,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 11,
+      "label": "Repurchases of common stock",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "value": 0,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 12,
+      "label": "Other financing activities, net (residual)",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": -402,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 13,
+      "label": "Net cash from financing activities",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+      "value": -792,
+      "kind": "subtotal",
+      "sums": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "idx": 14,
+      "label": "Net increase (decrease) in cash",
+      "section": "NetChange",
+      "concept": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "value": 10114,
+      "kind": "total",
+      "sums": [
+        5,
+        8,
+        13
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "rhs": [
+        "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+        "us-gaap:NetCashProvidedByUsedInFinancingActivities"
+      ],
+      "name": "cash_rollforward",
+      "tolerant": true
+    }
+  ]
+}

@@ -29,38 +29,55 @@ def get_company_facts(cik: str, refresh: bool = False) -> dict:
     return data
 
 
-def concept_value(facts: dict, concept: str, fiscal_year: int, unit: str = "USD"):
+def _days(f):
+    from datetime import date
+    try:
+        s = date.fromisoformat(f["start"]); e = date.fromisoformat(f["end"])
+        return (e - s).days
+    except Exception:
+        return None
+
+
+def concept_value(facts: dict, concept: str, fiscal_year: int, unit: str = "USD", duration: bool = False):
     """
     Return the 10-K value for a us-gaap concept in a fiscal year, or None.
-    Balance-sheet items are 'instant' facts; we take the FY 10-K fact whose period
-    ends latest within that fiscal year.
+      duration=False  -> instant facts (balance sheet): take FY 10-K fact ending latest.
+      duration=True   -> period facts (income stmt / cash flow): take the ANNUAL fact
+                         (period span ~1 year), not a quarter/YTD.
     """
     name = concept.replace("us-gaap:", "")
     node = facts.get("facts", {}).get("us-gaap", {}).get(name)
     if not node:
         return None
-    candidates = []
+    cands = []
     for u, flist in node.get("units", {}).items():
         if unit and u != unit:
             continue
         for f in flist:
-            form = f.get("form", "")
-            if not form.startswith("10-K"):
+            if not f.get("form", "").startswith("10-K"):
                 continue
             if f.get("fy") == fiscal_year and f.get("fp") == "FY":
-                candidates.append(f)
-    if not candidates:
-        # fallback: any 10-K fact whose 'end' year matches
+                if duration and "start" not in f:
+                    continue
+                if duration:
+                    d = _days(f)
+                    if d is None or d < 330 or d > 380:   # keep only ~annual periods
+                        continue
+                cands.append(f)
+    if not cands:  # relaxed fallback by end-year
         for u, flist in node.get("units", {}).items():
             if unit and u != unit:
                 continue
             for f in flist:
                 if f.get("form", "").startswith("10-K") and str(f.get("end", "")).startswith(str(fiscal_year)):
-                    candidates.append(f)
-    if not candidates:
+                    if duration and (("start" not in f) or (_days(f) or 0) < 330 or (_days(f) or 999) > 380):
+                        continue
+                    cands.append(f)
+    if not cands:
         return None
-    best = max(candidates, key=lambda f: f.get("end", ""))
-    return {"value": best["val"], "end": best["end"], "accn": best.get("accn"), "form": best.get("form")}
+    best = max(cands, key=lambda f: (f.get("end", ""), _days(f) or 0))
+    return {"value": best["val"], "end": best["end"], "start": best.get("start"),
+            "accn": best.get("accn"), "form": best.get("form")}
 
 
 def company_meta(facts: dict) -> dict:

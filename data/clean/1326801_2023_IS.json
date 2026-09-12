@@ -1,0 +1,117 @@
+{
+  "company": "Meta Platforms, Inc.",
+  "ticker": "META",
+  "cik": "0001326801",
+  "statement_type": "IncomeStatement",
+  "fiscal_year": 2023,
+  "period": "2023-12-31",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "value": 134902,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 1,
+      "label": "Cost of revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:CostOfGoodsAndServicesSold",
+      "value": -25959,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Research and development",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:ResearchAndDevelopmentExpense",
+      "value": -38483,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Selling, general and administrative",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:SellingGeneralAndAdministrativeExpense",
+      "value": -11408,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Other operating expenses, net (residual)",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -12301,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 5,
+      "label": "Operating income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:OperatingIncomeLoss",
+      "value": 46751,
+      "kind": "subtotal",
+      "sums": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "idx": 6,
+      "label": "Other income (expense), net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": 677,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 7,
+      "label": "Income before income taxes",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+      "value": 47428,
+      "kind": "subtotal",
+      "sums": [
+        5,
+        6
+      ]
+    },
+    {
+      "idx": 8,
+      "label": "Income tax (expense) benefit",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeTaxExpenseBenefit",
+      "value": -8330,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 9,
+      "label": "Net income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 39098,
+      "kind": "total",
+      "sums": [
+        7,
+        8
+      ]
+    }
+  ],
+  "identities": []
+}

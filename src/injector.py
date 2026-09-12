@@ -14,6 +14,7 @@ citation_resolver so you can verify it:
 """
 import copy, json, os, random
 from render import to_auditbench_text, to_xbrl_json
+from transactions import generate_for_statement
 
 try:
     from citation_resolver import CitationResolver
@@ -33,6 +34,8 @@ def check_reconciles(stmt):
             if r["value"] != sum(idx[c]["value"] for c in r["sums"] if idx[c].get("value") is not None):
                 return False
     for ident in stmt.get("identities", []):
+        if ident.get("tolerant"):   # e.g. cash roll-forward (subtotal tree already checks it)
+            continue
         lhs = next((x["value"] for x in stmt["rows"] if x["concept"] == ident["lhs"]), None)
         rhs = sum(next((x["value"] for x in stmt["rows"] if x["concept"] == c), 0) for c in ident["rhs"])
         if lhs != rhs:
@@ -74,7 +77,10 @@ def inject(stmt, rule, rng):
         if not cands or not to_section:
             return None, "no eligible concept / no target section"
         row = rng.choice(cands)
-        src = row["section"]; row["section"] = to_section
+        src = row["section"]
+        if src == to_section:
+            return None, "no-op move (source == target section)"
+        row["section"] = to_section
         m["rows"].remove(row)
         pos = max(i for i, r in enumerate(m["rows"]) if r.get("section") == to_section) + 1
         m["rows"].insert(pos, row)
@@ -162,6 +168,7 @@ def build_record(clean, rule, mod, meta, sid):
         "ground_truth_citations": _citation_gt(rule, clean["statement_type"], concept),
         "modified_statement_text": to_auditbench_text(mod),
         "gt_table_text": to_auditbench_text(clean),
+        "gt_transaction_data": generate_for_statement(clean, seed=clean["fiscal_year"]),
         "gt_xbrl_json": to_xbrl_json(clean),
         "self_check": {"clean_reconciles": check_reconciles(clean),
                        "error_breaks_reconciliation": not check_reconciles(mod)},

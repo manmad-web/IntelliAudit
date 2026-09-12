@@ -126,14 +126,23 @@ is the contribution.
 
 1. **Statement builder** uses a fixed concept template + residual plug lines;
    full **presentation-linkbase** fidelity (exact company line ordering) is a TODO.
-2. **Balance sheet only** so far; income statement + cash flow builders are next
-   (needed for ASC 606 / 230 rules to fire on real data).
-3. **DQC ids are `verified:false`** — cross-check against the official XBRL-US DQC
+2. **DQC ids are `verified:false`** — cross-check against the official XBRL-US DQC
    ruleset before publishing them as ground truth.
-4. **`expert-authored` citations need human validation** (recognition/classification
-   standards the linkbase doesn't attach to the line).
-5. Overlapping-concept residuals can go negative (e.g. lease liab inside "other");
+3. **`expert-authored` citations need human validation** (recognition/classification
+   standards the linkbase doesn't attach to the line). Note `linkbase_verified` is
+   checked at **subtopic** granularity (e.g. ASC 606-10), so a rule citing 606-10-25
+   verifies against a linkbase 606-10-50 disclosure ref — tighten to paragraph if needed.
+4. Overlapping-concept residuals can go negative (e.g. lease liab inside "other");
    a concept-overlap check is a refinement.
+5. **R10 (lease op↔finance relabel)** recipe not yet implemented (needs a
+   `relabel_concept` op + lease-terms datum).
+
+## Dataset scale (current build: BS + IS + CF)
+
+1,089 records over 223 real statements (8 companies × 10 years × 3 statements).
+Each record carries `gt_transaction_data` (synthetic transactions summing to the
+real line values). Breakdown: BalanceSheet 577 / IncomeStatement 282 / CashFlow 230;
+citation tiers 675 linkbase-verified / 271 expert-authored / 143 unresolved.
 
 ## Provenance vs. the three baseline papers
 

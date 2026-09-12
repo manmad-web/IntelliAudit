@@ -118,17 +118,17 @@
 <text x="960" y="1112" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0f9d58" text-anchor="start">~95% (deterministic)</text>
 <rect x="40" y="1166" width="1040" height="120" rx="10" fill="#ffffff" stroke="#d3dae6" stroke-width="1.4"/>
 <text x="58" y="1196" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="14.5" font-weight="800" fill="#1a2233" text-anchor="start">Current build</text>
-<text x="58" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">580</text>
+<text x="58" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">1,089</text>
 <text x="58" y="1250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#5b6b82" text-anchor="start">records</text>
-<text x="268" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">68</text>
-<text x="268" y="1250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#5b6b82" text-anchor="start">real 10-K statements</text>
+<text x="268" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">223</text>
+<text x="268" y="1250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#5b6b82" text-anchor="start">real statements (BS/IS/CF)</text>
 <text x="478" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">8×10</text>
 <text x="478" y="1250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#5b6b82" text-anchor="start">companies × years</text>
-<text x="688" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">328 / 184</text>
+<text x="688" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">675 / 271</text>
 <text x="688" y="1250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#5b6b82" text-anchor="start">linkbase-verified / expert</text>
-<text x="898" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">12</text>
-<text x="898" y="1250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#5b6b82" text-anchor="start">rules (9 active)</text>
-<text x="58" y="1274" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="500" fill="#33445c" text-anchor="start">Provenance:  values = SEC EDGAR companyfacts (real)   ·   citations = official US-GAAP 2023 linkbase (sha256 b48fbb7b…, 17,800 concepts)   ·   transactions = synthetic</text>
+<text x="898" y="1228" font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="800" fill="#1a56db" text-anchor="start">11</text>
+<text x="898" y="1250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#5b6b82" text-anchor="start">rules active</text>
+<text x="58" y="1274" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#33445c" text-anchor="start">Provenance:  values = SEC EDGAR companyfacts (real BS+IS+CF)   ·   citations = official US-GAAP 2023 linkbase (sha256 b48fbb7b…, 17,800 concepts)   ·   transactions = synthetic (sum to real lines)</text>
 <rect x="40" y="1316" width="1040" height="110" rx="12" fill="#1a2233" stroke="#1a2233" stroke-width="0"/>
 <text x="58" y="1348" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="15" font-weight="800" fill="#ffffff" text-anchor="start">Why it’s novel</text>
 <text x="58" y="1372" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.8" font-weight="400" fill="#c9d4e6" text-anchor="start">AuditBench: has a citation task but broken GT (GPT-4 prose, 26%, unreleased retriever) — not XBRL, not deterministic.</text>

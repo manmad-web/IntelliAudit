@@ -1,0 +1,117 @@
+{
+  "company": "Apple Inc.",
+  "ticker": "AAPL",
+  "cik": "0000320193",
+  "statement_type": "IncomeStatement",
+  "fiscal_year": 2023,
+  "period": "2023-09-30",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "value": 383285,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 1,
+      "label": "Cost of revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:CostOfGoodsAndServicesSold",
+      "value": -214137,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Research and development",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:ResearchAndDevelopmentExpense",
+      "value": -29915,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Selling, general and administrative",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:SellingGeneralAndAdministrativeExpense",
+      "value": -24932,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Other operating expenses, net (residual)",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": 0,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 5,
+      "label": "Operating income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:OperatingIncomeLoss",
+      "value": 114301,
+      "kind": "subtotal",
+      "sums": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "idx": 6,
+      "label": "Other income (expense), net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -565,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 7,
+      "label": "Income before income taxes",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+      "value": 113736,
+      "kind": "subtotal",
+      "sums": [
+        5,
+        6
+      ]
+    },
+    {
+      "idx": 8,
+      "label": "Income tax (expense) benefit",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeTaxExpenseBenefit",
+      "value": -16741,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 9,
+      "label": "Net income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 96995,
+      "kind": "total",
+      "sums": [
+        7,
+        8
+      ]
+    }
+  ],
+  "identities": []
+}

@@ -1,0 +1,118 @@
+{
+  "company": "WALMART INC.",
+  "ticker": "WMT",
+  "cik": "0000104169",
+  "statement_type": "IncomeStatement",
+  "fiscal_year": 2017,
+  "period": "2017-01-31",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "value": 481317,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 1,
+      "label": "Cost of revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:CostOfGoodsAndServicesSold",
+      "value": -361256,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Selling, general and administrative",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:SellingGeneralAndAdministrativeExpense",
+      "value": -101853,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Other operating expenses, net (residual)",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": 4556,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 4,
+      "label": "Operating income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:OperatingIncomeLoss",
+      "value": 22764,
+      "kind": "subtotal",
+      "sums": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "idx": 5,
+      "label": "Other income (expense), net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -2267,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 6,
+      "label": "Income before income taxes",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+      "value": 20497,
+      "kind": "subtotal",
+      "sums": [
+        4,
+        5
+      ]
+    },
+    {
+      "idx": 7,
+      "label": "Income tax (expense) benefit",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeTaxExpenseBenefit",
+      "value": -6204,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 8,
+      "label": "Other, net (residual)",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -650,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 9,
+      "label": "Net income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 13643,
+      "kind": "total",
+      "sums": [
+        6,
+        7,
+        8
+      ]
+    }
+  ],
+  "identities": []
+}

@@ -121,12 +121,12 @@ for i,(lab,val,frac,col) in enumerate(bars):
 # ---- dataset scale + provenance
 dy=1166; box(40,dy,W-80,120,C["card"],C["line"])
 txt(58,dy+30,"Current build",14.5,C["ink"],"800")
-scale=[("580","records"),("68","real 10-K statements"),("8×10","companies × years"),
-       ("328 / 184","linkbase-verified / expert"),("12","rules (9 active)")]
+scale=[("1,089","records"),("223","real statements (BS/IS/CF)"),("8×10","companies × years"),
+       ("675 / 271","linkbase-verified / expert"),("11","rules active")]
 sx=58
 for n,l in scale:
     txt(sx,dy+62,n,20,C["blue"],"800",mono=True); txt(sx,dy+84,l,11.5,C["sub"]); sx+=210
-txt(58,dy+108,"Provenance:  values = SEC EDGAR companyfacts (real)   ·   citations = official US-GAAP 2023 linkbase (sha256 b48fbb7b…, 17,800 concepts)   ·   transactions = synthetic",11.5,C["ink2"],"500")
+txt(58,dy+108,"Provenance:  values = SEC EDGAR companyfacts (real BS+IS+CF)   ·   citations = official US-GAAP 2023 linkbase (sha256 b48fbb7b…, 17,800 concepts)   ·   transactions = synthetic (sum to real lines)",11,C["ink2"],"500")
 
 # ---- footer novelty
 fy=1316; box(40,fy,W-80,110,C["ink"],C["ink"],12,0)

@@ -1,0 +1,185 @@
+{
+  "company": "MICROSOFT CORPORATION",
+  "ticker": "MSFT",
+  "cik": "0000789019",
+  "statement_type": "CashFlow",
+  "fiscal_year": 2024,
+  "period": "2024-06-30",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Operating activities:",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Net income",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 88136,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Share-based compensation",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:ShareBasedCompensation",
+      "value": 10734,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Other operating activities, net (residual)",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": 19678,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 4,
+      "label": "Net cash from operating activities",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+      "value": 118548,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "idx": 5,
+      "label": "Investing activities:",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 6,
+      "label": "Purchases of property, plant and equipment",
+      "section": "InvestingActivities",
+      "concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+      "value": -44477,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 7,
+      "label": "Other investing activities, net (residual)",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": -52493,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 8,
+      "label": "Net cash from investing activities",
+      "section": "InvestingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+      "value": -96970,
+      "kind": "subtotal",
+      "sums": [
+        6,
+        7
+      ]
+    },
+    {
+      "idx": 9,
+      "label": "Financing activities:",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 10,
+      "label": "Dividends paid",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:PaymentsOfDividendsCommonStock",
+      "value": -21771,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 11,
+      "label": "Repurchases of common stock",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "value": -17254,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 12,
+      "label": "Other financing activities, net (residual)",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": 1268,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 13,
+      "label": "Net cash from financing activities",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+      "value": -37757,
+      "kind": "subtotal",
+      "sums": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "idx": 14,
+      "label": "Effect of exchange rate changes",
+      "section": "NetChange",
+      "concept": null,
+      "value": -210,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 15,
+      "label": "Net increase (decrease) in cash",
+      "section": "NetChange",
+      "concept": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "value": -16389,
+      "kind": "total",
+      "sums": [
+        4,
+        8,
+        13,
+        14
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "rhs": [
+        "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+        "us-gaap:NetCashProvidedByUsedInFinancingActivities"
+      ],
+      "name": "cash_rollforward",
+      "tolerant": true
+    }
+  ]
+}
