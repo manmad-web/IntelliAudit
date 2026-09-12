@@ -155,7 +155,12 @@ def _citation_gt(rule, stmt_type, concept):
 
 def build_record(clean, rule, mod, meta, sid):
     concept = meta.get("row_concept")
-    pe = next((r["idx"] for r in mod["rows"] if r.get("concept") == concept and r.get("label") == meta.get("row_label")), None)
+    label = meta.get("row_label")
+    # gap #7 fix: injection shifts row numbers. Store BOTH indices and the
+    # label/concept key so scoring can match on identity, not a volatile row id.
+    pre = next((r["idx"] for r in clean["rows"] if r.get("concept") == concept and r.get("label") == label), None)
+    post = next((r["idx"] for r in mod["rows"] if r.get("concept") == concept and r.get("label") == label), None)
+    pe = post if post is not None else pre
     return {
         "sample_id": sid,
         "metadata": {"company": clean["company"], "cik": clean.get("cik"), "fiscal_year": clean["fiscal_year"],
@@ -163,7 +168,9 @@ def build_record(clean, rule, mod, meta, sid):
                      "unit": clean["unit"], "source": clean["source"]},
         "general_judgement": "Incorrect",
         "rule_id": rule["rule_id"], "error_type": rule["error_type"],
-        "error_identification": {"error_type": rule["error_type"], "problematic_entry": pe, "affected_xbrl_concept": concept},
+        "error_identification": {"error_type": rule["error_type"], "problematic_entry": pe,
+                                 "affected_xbrl_concept": concept, "affected_label": label,
+                                 "pre_inject_row": pre, "post_inject_row": post},
         "injection_detail": meta,
         "ground_truth_citations": _citation_gt(rule, clean["statement_type"], concept),
         "modified_statement_text": to_auditbench_text(mod),

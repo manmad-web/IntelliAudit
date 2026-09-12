@@ -58,13 +58,28 @@ def score_citation(pred_text, gt_citations, credit_linkbase_set=True):
 
 
 def score_detection(pred, record):
-    """Basic detection EM: general judgment, error-type, problematic-entry."""
+    """
+    Detection EM: general judgment, error-type, problematic-entry.
+    Entry matches on IDENTITY (gap #7): credit if the prediction names the affected
+    concept/label, OR gives a row id equal to either the pre- or post-injection index
+    (row numbers shift when rows are added/deleted, so a single id is not reliable).
+    """
+    ei = record["error_identification"]
     gj = float(str(pred.get("General Judgment", pred.get("general_judgement", ""))).strip().lower()
                == record["general_judgement"].lower())
     et = float(str(pred.get("error_type", "")).strip().lower() == record["error_type"].lower())
+    # entry match
+    en = 0.0
+    valid_rows = {ei.get("pre_inject_row"), ei.get("post_inject_row"), ei.get("problematic_entry")} - {None}
     pe_pred = pred.get("problematic_entry")
-    pe_gt = record["error_identification"]["problematic_entry"]
-    en = float(pe_pred is not None and pe_gt is not None and int(re.search(r"\d+", str(pe_pred)).group()) == pe_gt)
+    if pe_pred is not None:
+        m = re.search(r"\d+", str(pe_pred))
+        if m and int(m.group()) in valid_rows:
+            en = 1.0
+    # or identity match on concept / label
+    txt = f"{pred.get('affected_xbrl_concept','')} {pred.get('affected_label','')} {pred.get('problematic_entry','')}".lower()
+    if (ei.get("affected_xbrl_concept") or "§").lower() in txt or (ei.get("affected_label") or "§").lower() in txt:
+        en = 1.0
     return {"em_general_judgment": gj, "em_error_type": et, "em_error_entry": en}
 
 
