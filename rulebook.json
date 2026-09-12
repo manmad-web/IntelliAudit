@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "name": "IntelliAudit Citation Rulebook v0.1",
+    "purpose": "Rule-FIRST error injection. Each rule pre-specifies the violated standard so the citation ground truth is deterministic and independent of any LLM. The generator applies a rule's injection recipe to a concept-tagged clean statement and emits the rule's citation as ground truth.",
+    "citation_ground_truth_policy": "asc_primary. The ASC code is the canonical citation label. dqc_rule is a SECONDARY machine-checkable label and every dqc_id below is marked verified=false until cross-checked against the official XBRL-US DQC ruleset (https://xbrl.us/data-rule/). Do NOT publish dqc ids as ground truth until verified.",
+    "scoring": "Exact match on ASC code at three granularities: topic (606), subtopic (606-10), full (606-10-25-1). Report EM@topic / EM@subtopic / EM@full. This replaces AuditBench's fuzzy Top-K-over-vague-prose metric.",
+    "auditbench_compat_error_types": ["Missing Row", "Numerical Error", "Redundant Row", "Misclassification"]
+  },
+  "rules": [
+    {
+      "rule_id": "R01_current_noncurrent_asset_misclass",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": ["BalanceSheet"],
+      "eligible_concepts": ["us-gaap:AccountsReceivableNetCurrent", "us-gaap:InventoryNet", "us-gaap:OtherAssetsCurrent", "us-gaap:PrepaidExpenseAndOtherAssetsCurrent"],
+      "injection": {"op": "move_row", "from_section": "CurrentAssets", "to_section": "NoncurrentAssets"},
+      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "rationale": "Current assets are cash and other assets expected to be realized within one year / operating cycle; a current item placed under non-current assets misstates the current/non-current classification."},
+      "dqc_rule": {"dqc_id": "DQC_0015", "verified": false, "note": "0015 is non-negative-values; classification may instead surface via calc-linkbase parenting. Verify."},
+      "detection_predicate": "row.concept is a *Current concept but row.section == NoncurrentAssets",
+      "difficulty": "medium"
+    },
+    {
+      "rule_id": "R02_current_noncurrent_liab_misclass",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": ["BalanceSheet"],
+      "eligible_concepts": ["us-gaap:AccountsPayableCurrent", "us-gaap:AccruedLiabilitiesCurrent", "us-gaap:DeferredRevenueCurrent"],
+      "injection": {"op": "move_row", "from_section": "CurrentLiabilities", "to_section": "NoncurrentLiabilities"},
+      "citation": {"asc": "ASC 210-10-45-5", "topic": "210", "subtopic": "210-10", "rationale": "A current liability due within one year classified as non-current understates current liabilities and misstates liquidity."},
+      "dqc_rule": {"dqc_id": null, "verified": false},
+      "detection_predicate": "row.concept is a *Current liability but row.section == NoncurrentLiabilities",
+      "difficulty": "medium"
+    },
+    {
+      "rule_id": "R03_debt_current_refinance_misclass",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": ["BalanceSheet"],
+      "eligible_concepts": ["us-gaap:LongTermDebtCurrent", "us-gaap:LongTermDebtNoncurrent"],
+      "injection": {"op": "move_row", "from_section": "NoncurrentLiabilities", "to_section": "CurrentLiabilities"},
+      "citation": {"asc": "ASC 470-10-45", "topic": "470", "subtopic": "470-10", "rationale": "Classification of debt between current and non-current, including short-term obligations expected to be refinanced, is governed by ASC 470-10-45."},
+      "dqc_rule": {"dqc_id": null, "verified": false},
+      "detection_predicate": "long-term debt concept under wrong current/non-current section",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R04_missing_line_item",
+      "family": "completeness",
+      "error_type": "Missing Row",
+      "statements": ["BalanceSheet", "IncomeStatement", "CashFlow"],
+      "eligible_concepts": ["*non_subtotal_non_total"],
+      "injection": {"op": "delete_row", "protect": ["subtotal", "total"]},
+      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "rationale": "Omission of a required line item breaks completeness of statement presentation; the enclosing subtotal no longer reconciles to its components.", "citation_by_statement": {"IncomeStatement": "ASC 220-10-45", "CashFlow": "ASC 230-10-45"}},
+      "dqc_rule": {"dqc_id": "DQC_0004", "verified": false, "note": "subtotal != sum(children) is a calculation-consistency signal."},
+      "detection_predicate": "subtotal.value != sum(children present)",
+      "difficulty": "easy"
+    },
+    {
+      "rule_id": "R05_numerical_error_value",
+      "family": "arithmetic_consistency",
+      "error_type": "Numerical Error",
+      "statements": ["BalanceSheet", "IncomeStatement", "CashFlow"],
+      "eligible_concepts": ["*non_subtotal_non_total"],
+      "injection": {"op": "perturb_value", "pct_range": [0.05, 0.4], "keep_totals": true},
+      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "rationale": "A line value inconsistent with its supporting transactions/components; primarily an arithmetic-consistency (calculation linkbase) violation rather than a recognition standard. Citation is presentation-level.", "citation_by_statement": {"IncomeStatement": "ASC 220-10-45", "CashFlow": "ASC 230-10-45"}, "weak_citation": true},
+      "dqc_rule": {"dqc_id": "DQC_0004", "verified": false},
+      "detection_predicate": "row.value != value_implied_by_transactions",
+      "difficulty": "easy",
+      "note": "Numerical errors are a DETECTION test, not a citation test. Flagged weak_citation. Do not over-weight these when scoring citation accuracy."
+    },
+    {
+      "rule_id": "R06_redundant_fabricated_row",
+      "family": "existence",
+      "error_type": "Redundant Row",
+      "statements": ["BalanceSheet", "IncomeStatement"],
+      "injection": {"op": "insert_row", "fabricated_labels": ["Software Licenses", "Deferred Revenue", "Goodwill Reserve", "Brand Value"], "value_pct_of_subtotal": [0.02, 0.08]},
+      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "rationale": "A fabricated line item with no supporting transactions overstates its section and violates existence/occurrence; the enclosing subtotal is inflated."},
+      "dqc_rule": {"dqc_id": null, "verified": false},
+      "detection_predicate": "row.concept has no supporting transactions AND is absent from clean statement",
+      "difficulty": "medium"
+    },
+    {
+      "rule_id": "R07_balance_sheet_identity_break",
+      "family": "arithmetic_consistency",
+      "error_type": "Numerical Error",
+      "statements": ["BalanceSheet"],
+      "eligible_concepts": ["us-gaap:StockholdersEquity", "us-gaap:RetainedEarningsAccumulatedDeficit"],
+      "injection": {"op": "perturb_value", "pct_range": [0.03, 0.15], "target": "equity_component", "keep_totals": false},
+      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "rationale": "Assets must equal Liabilities + Equity. A break in the accounting equation is the clearest deterministic violation.", "identity": "Assets = LiabilitiesAndStockholdersEquity"},
+      "dqc_rule": {"dqc_id": "DQC_0004", "verified": false, "note": "DQC_0004 Element Values Are Equal — canonical Assets == Liabilities+Equity check."},
+      "detection_predicate": "Assets != Liabilities + Equity",
+      "difficulty": "easy"
+    },
+    {
+      "rule_id": "R08_cashflow_section_misclass",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": ["CashFlow"],
+      "eligible_concepts": ["us-gaap:PaymentsToAcquirePropertyPlantAndEquipment", "us-gaap:Proceeds*", "us-gaap:PaymentsOfDividends"],
+      "injection": {"op": "move_row", "sections": ["OperatingActivities", "InvestingActivities", "FinancingActivities"]},
+      "citation": {"asc": "ASC 230-10-45", "topic": "230", "subtopic": "230-10", "rationale": "Cash flow items must be classified as operating, investing, or financing per ASC 230-10-45; e.g., capex is investing, dividends paid are financing."},
+      "dqc_rule": {"dqc_id": null, "verified": false},
+      "detection_predicate": "cash-flow concept under a section inconsistent with its ASC 230 classification",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R09_revenue_recognition_timing",
+      "family": "recognition",
+      "error_type": "Numerical Error",
+      "statements": ["IncomeStatement"],
+      "eligible_concepts": ["us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax"],
+      "injection": {"op": "perturb_value", "direction": "overstate", "pct_range": [0.05, 0.2], "narrative": "prematurely recognized revenue for goods/services not yet transferred"},
+      "citation": {"asc": "ASC 606-10-25-1", "topic": "606", "subtopic": "606-10", "rationale": "Revenue is recognized when control of goods/services transfers to the customer (performance obligation satisfied). Premature recognition violates ASC 606-10-25."},
+      "dqc_rule": {"dqc_id": null, "verified": false},
+      "detection_predicate": "revenue overstated relative to satisfied performance obligations in transactions",
+      "difficulty": "hard",
+      "requires": "income statement seed + transaction narratives encoding obligation timing"
+    },
+    {
+      "rule_id": "R10_lease_operating_finance_misclass",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": ["BalanceSheet"],
+      "eligible_concepts": ["us-gaap:OperatingLeaseRightOfUseAsset", "us-gaap:FinanceLeaseRightOfUseAsset", "us-gaap:OperatingLeaseLiabilityNoncurrent", "us-gaap:FinanceLeaseLiabilityNoncurrent"],
+      "injection": {"op": "relabel_concept", "swap": [["Operating", "Finance"]]},
+      "citation": {"asc": "ASC 842-10-25-2", "topic": "842", "subtopic": "842-10", "rationale": "Lessee lease classification (finance vs operating) follows ASC 842-10-25-2 criteria; mislabeling changes recognition and presentation of ROU assets and lease liabilities."},
+      "dqc_rule": {"dqc_id": null, "verified": false},
+      "detection_predicate": "lease concept operating/finance label inconsistent with lease terms",
+      "difficulty": "hard",
+      "requires": "lease footnote / terms in seed"
+    },
+    {
+      "rule_id": "R11_inventory_no_nrv_writedown",
+      "family": "measurement",
+      "error_type": "Numerical Error",
+      "statements": ["BalanceSheet"],
+      "eligible_concepts": ["us-gaap:InventoryNet"],
+      "injection": {"op": "overstate_vs_market", "pct_range": [0.1, 0.3], "narrative": "inventory carried above net realizable value; required write-down omitted"},
+      "citation": {"asc": "ASC 330-10-35-1B", "topic": "330", "subtopic": "330-10", "rationale": "Inventory is measured at the lower of cost and net realizable value; omitting a required NRV write-down overstates inventory (ASC 330-10-35)."},
+      "dqc_rule": {"dqc_id": null, "verified": false},
+      "detection_predicate": "inventory carrying value > NRV given in facts",
+      "difficulty": "hard",
+      "requires": "NRV/market datum in seed"
+    },
+    {
+      "rule_id": "R12_negative_value_on_nonnegative_element",
+      "family": "sign",
+      "error_type": "Numerical Error",
+      "statements": ["BalanceSheet", "IncomeStatement"],
+      "eligible_concepts": ["us-gaap:InventoryNet", "us-gaap:CashAndCashEquivalentsAtCarryingValue", "us-gaap:AssetsCurrent"],
+      "injection": {"op": "flip_sign"},
+      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "rationale": "Certain elements (e.g., inventory, cash) cannot be negative; a negative balance is a data-quality violation."},
+      "dqc_rule": {"dqc_id": "DQC_0015", "verified": false, "note": "DQC_0015 Negative Values — the canonical machine check for this class."},
+      "detection_predicate": "row.value < 0 on a non-negative element",
+      "difficulty": "easy"
+    }
+  ]
+}

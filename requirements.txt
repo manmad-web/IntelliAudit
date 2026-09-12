@@ -1,0 +1,3 @@
+# stdlib only (python 3.9+). Optional accelerators:
+# lxml        # faster/robust linkbase parsing (ElementTree used by default)
+# anthropic   # for LLM transaction narratives / baseline auditor

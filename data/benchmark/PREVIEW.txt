@@ -1,0 +1,65 @@
+########################################################################
+SAMPLE: IA-AAPL-2023-R01_current_noncurrent_asset_misclass-00
+company/year : Apple Inc. FY2023  (source: SEC EDGAR companyfacts (real 10-K))
+error_type   : Misclassification   |   affected concept: us-gaap:AccountsReceivableNetCurrent
+injection    : {'row_concept': 'us-gaap:AccountsReceivableNetCurrent', 'row_label': 'Accounts receivable, net', 'from_section': 'CurrentAssets', 'to_section': 'NoncurrentAssets'}
+GROUND TRUTH CITATION: ASC 210-10-45-1   [tier: expert-authored, linkbase_verified=False]
+  linkbase reference set for concept: ['ASC 310-10-45-2', 'ASC 310-10-45-9']
+  rationale: Current assets are cash and other assets expected to be realized within one year / operating cycle; a current item placed under non-current assets misstates the current/non-current classification.
+  self_check: {'clean_reconciles': True, 'error_breaks_reconciliation': False}
+--- modified_statement_text (first 10 rows) ---
+[Time]: 2023-09-30 [SEP]
+[row 0]: Current assets: [SEP]
+[row 1]: Cash and cash equivalents | $29,965 [SEP]
+[row 2]: Inventories | $6,331 [SEP]
+[row 3]: Other current assets | $14,695 [SEP]
+[row 4]: Other current assets, net (residual) | $63,067 [SEP]
+[row 5]: Total current assets | $143,566 [SEP]
+[row 6]: Non-current assets: [SEP]
+[row 7]: Property, plant and equipment, net | $43,715 [SEP]
+[row 8]: Operating lease right-of-use assets | $10,661 [SEP]
+[row 9]: Other non-current assets | $64,758 [SEP]
+
+########################################################################
+SAMPLE: IA-AAPL-2023-R03_debt_current_refinance_misclass-00
+company/year : Apple Inc. FY2023  (source: SEC EDGAR companyfacts (real 10-K))
+error_type   : Misclassification   |   affected concept: us-gaap:LongTermDebtCurrent
+injection    : {'row_concept': 'us-gaap:LongTermDebtCurrent', 'row_label': 'Long-term debt, current', 'from_section': 'CurrentLiabilities', 'to_section': 'CurrentLiabilities'}
+GROUND TRUTH CITATION: ASC 470-10-45   [tier: expert-authored, linkbase_verified=False]
+  linkbase reference set for concept: ['ASC 210-10-S99-1((SX 210.5-02(20)))']
+  rationale: Classification of debt between current and non-current, including short-term obligations expected to be refinanced, is governed by ASC 470-10-45.
+  self_check: {'clean_reconciles': True, 'error_breaks_reconciliation': False}
+--- modified_statement_text (first 10 rows) ---
+[Time]: 2023-09-30 [SEP]
+[row 0]: Current assets: [SEP]
+[row 1]: Cash and cash equivalents | $29,965 [SEP]
+[row 2]: Accounts receivable, net | $29,508 [SEP]
+[row 3]: Inventories | $6,331 [SEP]
+[row 4]: Other current assets | $14,695 [SEP]
+[row 5]: Other current assets, net (residual) | $63,067 [SEP]
+[row 6]: Total current assets | $143,566 [SEP]
+[row 7]: Non-current assets: [SEP]
+[row 8]: Property, plant and equipment, net | $43,715 [SEP]
+[row 9]: Operating lease right-of-use assets | $10,661 [SEP]
+
+########################################################################
+SAMPLE: IA-AAPL-2023-R07_balance_sheet_identity_break-00
+company/year : Apple Inc. FY2023  (source: SEC EDGAR companyfacts (real 10-K))
+error_type   : Numerical Error   |   affected concept: us-gaap:RetainedEarningsAccumulatedDeficit
+injection    : {'row_concept': 'us-gaap:RetainedEarningsAccumulatedDeficit', 'row_label': 'Retained earnings', 'original_value': -214, 'erroneous_value': -198}
+GROUND TRUTH CITATION: ASC 210-10-45-1   [tier: linkbase-verified, linkbase_verified=True]
+  linkbase reference set for concept: ['ASC 852-10-55-10', 'ASC 944-40-65-2((g)(2)(i))', 'ASC 944-40-65-2((h)(2))', 'ASC 946-20-50-11', 'ASC 944-210-S99-1((SX 210.7-03(a)(23)(a)(4)))', 'ASC 946-210-S99-1((SX 210.6-04(17)))', 'ASC 505-10-S99-1((SX 210.3-04))', 'ASC 210-10-S99-1((SX 210.5-02(30)(a)(3)))']
+  rationale: Assets must equal Liabilities + Equity. A break in the accounting equation is the clearest deterministic violation.
+  self_check: {'clean_reconciles': True, 'error_breaks_reconciliation': True}
+--- modified_statement_text (first 10 rows) ---
+[Time]: 2023-09-30 [SEP]
+[row 0]: Current assets: [SEP]
+[row 1]: Cash and cash equivalents | $29,965 [SEP]
+[row 2]: Accounts receivable, net | $29,508 [SEP]
+[row 3]: Inventories | $6,331 [SEP]
+[row 4]: Other current assets | $14,695 [SEP]
+[row 5]: Other current assets, net (residual) | $63,067 [SEP]
+[row 6]: Total current assets | $143,566 [SEP]
+[row 7]: Non-current assets: [SEP]
+[row 8]: Property, plant and equipment, net | $43,715 [SEP]
+[row 9]: Operating lease right-of-use assets | $10,661 [SEP]

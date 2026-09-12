@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.cache/
+src/.cache/
+data/raw/
+*.zip

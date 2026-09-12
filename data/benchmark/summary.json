@@ -1,0 +1,39 @@
+{
+  "companies": [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "GOOGL",
+    "META",
+    "KO",
+    "JNJ",
+    "WMT"
+  ],
+  "years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "clean_statements_built": 68,
+  "company_years_skipped": 10,
+  "records": 580,
+  "error_type_breakdown": {
+    "Misclassification": 184,
+    "Missing Row": 68,
+    "Numerical Error": 260,
+    "Redundant Row": 68
+  },
+  "citation_tier_breakdown": {
+    "linkbase-verified": 328,
+    "expert-authored": 184,
+    "unresolved": 68
+  },
+  "verifiable_error_pct": 56.0
+}
