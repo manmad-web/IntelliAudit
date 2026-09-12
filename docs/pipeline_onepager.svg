@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="1580" viewBox="0 0 1180 1580">
+<defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#5a6a80"/></marker></defs>
+<rect x="0" y="0" width="1180" height="1580" rx="0" fill="#f5f7fb" stroke="#f5f7fb" stroke-width="0"/>
+<text x="40" y="50" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="28" font-weight="800" fill="#151d2b" text-anchor="start">IntelliAudit — one page</text>
+<text x="40" y="76" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="14.5" font-weight="600" fill="#2c3a4f" text-anchor="start">Can an AI auditor not just FIND an error in a financial statement, but CITE the exact accounting rule it breaks?</text>
+<rect x="40" y="96" width="1100" height="86" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
+<text x="58" y="122" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="15" font-weight="800" fill="#1a56db" text-anchor="start">What we're solving (plain words)</text>
+<text x="58" y="146" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.8" font-weight="400" fill="#151d2b" text-anchor="start">LLMs can often say “this statement looks wrong,” but they can’t reliably name the rule — the FASB ASC codification section — that governs the violation.</text>
+<text x="58" y="166" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.8" font-weight="400" fill="#151d2b" text-anchor="start">There was no fair way to grade that skill. We build the exam (a benchmark with a trustworthy answer key) AND show a rule-grounded auditor can pass it.</text>
+<rect x="40" y="196" width="1100" height="64" rx="10" fill="#efe8f7" stroke="#6b3fa0" stroke-width="1.3"/>
+<text x="58" y="218" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#6b3fa0" text-anchor="start">Domain terms</text>
+<text x="58" y="238" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#6b3fa0" text-anchor="start">XBRL</text>
+<text x="58" y="253" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#2c3a4f" text-anchor="start">machine-readable filing format</text>
+<text x="246" y="238" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#6b3fa0" text-anchor="start">US-GAAP taxonomy</text>
+<text x="246" y="253" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#2c3a4f" text-anchor="start">the dictionary of accounting concepts</text>
+<text x="434" y="238" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#6b3fa0" text-anchor="start">reference linkbase</text>
+<text x="434" y="253" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#2c3a4f" text-anchor="start">concept → ASC citation map</text>
+<text x="622" y="238" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#6b3fa0" text-anchor="start">ASC codification</text>
+<text x="622" y="253" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#2c3a4f" text-anchor="start">the FASB rulebook (e.g. 606 Revenue)</text>
+<text x="810" y="238" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#6b3fa0" text-anchor="start">DQC</text>
+<text x="810" y="253" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#2c3a4f" text-anchor="start">Data Quality Committee machine rules</text>
+<text x="998" y="238" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#6b3fa0" text-anchor="start">concept×violation</text>
+<text x="998" y="253" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#2c3a4f" text-anchor="start">the citation depends on BOTH</text>
+<text x="40" y="276" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="15" font-weight="800" fill="#151d2b" text-anchor="start">The pipeline: two lanes that meet</text>
+<rect x="40" y="290" width="540" height="300" rx="12" fill="#ffffff" stroke="#1a56db" stroke-width="1.6"/>
+<rect x="40" y="290" width="540" height="30" rx="12" fill="#e8effc" stroke="#e8effc" stroke-width="0"/>
+<text x="58" y="311" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13" font-weight="800" fill="#1a56db" text-anchor="start">LANE A · BENCHMARK FACTORY  — makes the exam</text>
+<text x="58" y="329" font-family="ui-monospace,Menlo,monospace" font-size="10.5" font-weight="600" fill="#5a6a80" text-anchor="start">repo: manmad-web/IntelliAudit  (YOURS)</text>
+<text x="58" y="348" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">1  Real 10-K facts</text>
+<text x="300" y="348" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">SEC EDGAR companyfacts (real $)</text>
+<text x="58" y="363" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#1a56db" text-anchor="start">edgar_ingest.py</text>
+<text x="58" y="396" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">2  Canonical statement</text>
+<text x="300" y="396" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">BS / IS / CF that reconciles (A=L+E)</text>
+<text x="58" y="411" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#1a56db" text-anchor="start">statement_builder.py</text>
+<text x="58" y="444" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">3  Inject 1 error, rule-first</text>
+<text x="300" y="444" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">the ASC citation is known BEFORE injection</text>
+<text x="58" y="459" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#1a56db" text-anchor="start">rulebook.json + injector.py</text>
+<text x="58" y="492" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">4  Verify citation</text>
+<text x="300" y="492" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">cross-check vs official linkbase → tiers</text>
+<text x="58" y="507" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#1a56db" text-anchor="start">citation_resolver.py</text>
+<text x="58" y="540" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">5  Records + grader</text>
+<text x="300" y="540" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">records.jsonl + hierarchical EM</text>
+<text x="58" y="555" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#1a56db" text-anchor="start">scorer.py</text>
+<rect x="600" y="290" width="540" height="300" rx="12" fill="#ffffff" stroke="#0f9d58" stroke-width="1.6"/>
+<rect x="600" y="290" width="540" height="30" rx="12" fill="#e6f4ea" stroke="#e6f4ea" stroke-width="0"/>
+<text x="618" y="311" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13" font-weight="800" fill="#0f9d58" text-anchor="start">LANE B · AUDITOR PIPELINE  — takes the exam</text>
+<text x="618" y="329" font-family="ui-monospace,Menlo,monospace" font-size="10.5" font-weight="600" fill="#5a6a80" text-anchor="start">repo: financial-audit-capstone (OLD / team)</text>
+<text x="618" y="348" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">Stage 0  deterministic gate</text>
+<text x="860" y="348" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.0" font-weight="400" fill="#2c3a4f" text-anchor="start">math + accounting identities; 0% false alarms</text>
+<text x="618" y="363" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#0f9d58" text-anchor="start">stage0a/0b.py</text>
+<text x="618" y="396" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">Stage 1  taxonomy citation</text>
+<text x="860" y="396" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.0" font-weight="400" fill="#2c3a4f" text-anchor="start">concept → ASC from FASB linkbase</text>
+<text x="618" y="411" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#0f9d58" text-anchor="start">taxonomy_graph.py</text>
+<text x="618" y="444" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">        subject vs presentation</text>
+<text x="860" y="444" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.0" font-weight="400" fill="#2c3a4f" text-anchor="start">330/470/606 vs 210/220/230 union</text>
+<text x="618" y="459" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#0f9d58" text-anchor="start">concept_citation.py</text>
+<text x="618" y="492" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">Stage 2  focused LLM</text>
+<text x="860" y="492" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.0" font-weight="400" fill="#2c3a4f" text-anchor="start">only on abstains; picks a grounded cite</text>
+<text x="618" y="507" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#0f9d58" text-anchor="start">stage2_llm.py</text>
+<text x="618" y="540" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="700" fill="#151d2b" text-anchor="start">AuditPatch  repair track</text>
+<text x="860" y="540" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.0" font-weight="400" fill="#2c3a4f" text-anchor="start">81.5% exact fix on real DQC filings</text>
+<text x="618" y="555" font-family="ui-monospace,Menlo,monospace" font-size="9.5" font-weight="600" fill="#0f9d58" text-anchor="start">finmr_repair.py</text>
+<rect x="40" y="600" width="1100" height="66" rx="10" fill="#fdf1df" stroke="#b06000" stroke-width="1.3"/>
+<text x="58" y="624" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#b06000" text-anchor="start">WHERE THEY MEET  — the combine (NEW glue)</text>
+<text x="58" y="644" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.3" font-weight="400" fill="#151d2b" text-anchor="start">integration/adapter.py  turns a benchmark record into the item the auditor expects (and hands over the GOLD concept, skipping the weak mapper).</text>
+<text x="58" y="660" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.3" font-weight="400" fill="#151d2b" text-anchor="start">integration/eval_pipeline.py  runs the auditor's citation logic on the records and grades it with the benchmark scorer.</text>
+<line x1="310" y1="600" x2="310" y2="596" stroke="#5a6a80" stroke-width="2.2" marker-end="url(#a)"/>
+<line x1="870" y1="600" x2="870" y2="596" stroke="#5a6a80" stroke-width="2.2" marker-end="url(#a)"/>
+<text x="40" y="682" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="15" font-weight="800" fill="#151d2b" text-anchor="start">Result: the clean answer key breaks the ceiling</text>
+<rect x="40" y="694" width="1100" height="150" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
+<text x="58" y="720" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#151d2b" text-anchor="start">Citation accuracy — same auditor logic, different exam:</text>
+<text x="58" y="752" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#151d2b" text-anchor="start">AuditBench (old exam): correct cite is even IN the candidate set</text>
+<rect x="560" y="737" width="470" height="17" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
+<rect x="560" y="737" width="123" height="17" rx="8" fill="#d93025" stroke="#d93025" stroke-width="0"/>
+<text x="1040" y="752" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="800" fill="#d93025" text-anchor="start">26.2%</text>
+<text x="58" y="786" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#151d2b" text-anchor="start">IntelliAudit-Bench — naive concept-only pick</text>
+<rect x="560" y="771" width="470" height="17" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
+<rect x="560" y="771" width="239" height="17" rx="8" fill="#b06000" stroke="#b06000" stroke-width="0"/>
+<text x="1040" y="786" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="800" fill="#b06000" text-anchor="start">50.9%</text>
+<text x="58" y="820" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#151d2b" text-anchor="start">IntelliAudit-Bench — violation-aware pick / answer-in-candidates</text>
+<rect x="560" y="805" width="470" height="17" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
+<rect x="560" y="805" width="470" height="17" rx="8" fill="#0f9d58" stroke="#0f9d58" stroke-width="0"/>
+<text x="1040" y="820" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="800" fill="#0f9d58" text-anchor="start">100%</text>
+<text x="58" y="828" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.8" font-weight="600" fill="#2c3a4f" text-anchor="start">Reading: on our data the right citation is recoverable; the 26% ceiling was AuditBench’s inconsistent labels, not the method.</text>
+<rect x="40" y="862" width="560" height="150" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
+<text x="58" y="888" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13.5" font-weight="800" fill="#151d2b" text-anchor="start">Who built what</text>
+<text x="58" y="912" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="800" fill="#1a56db" text-anchor="start">YOURS (new repo)</text>
+<text x="230" y="912" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">the benchmark: real data, injection, citation GT, scorer</text>
+<text x="58" y="942" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="800" fill="#0f9d58" text-anchor="start">OLD (team capstone)</text>
+<text x="230" y="942" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">the auditor: Stage 0–2, taxonomy graph, AuditPatch</text>
+<text x="58" y="972" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="800" fill="#b06000" text-anchor="start">NEW glue</text>
+<text x="230" y="972" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="400" fill="#2c3a4f" text-anchor="start">adapter + eval runner that make them one system</text>
+<rect x="620" y="862" width="520" height="150" rx="12" fill="#151d2b" stroke="#151d2b" stroke-width="0"/>
+<text x="638" y="888" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13.5" font-weight="800" fill="#ffffff" text-anchor="start">Why it’s novel</text>
+<text x="638" y="912" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="700" fill="#7ee2a8" text-anchor="start">First benchmark to score the GOVERNING ASC citation —</text>
+<text x="638" y="929" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="400" fill="#c9d4e6" text-anchor="start">on REAL filings, with a DETERMINISTIC, cross-checkable answer key.</text>
+<text x="638" y="946" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="400" fill="#c9d4e6" text-anchor="start">AuditBench: broken GPT citation labels.  FinAuditing/FinMR: no</text>
+<text x="638" y="963" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="400" fill="#c9d4e6" text-anchor="start">citation output.  AuditFlow: numeric verdict only.</text>
+<text x="638" y="980" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="400" fill="#c9d4e6" text-anchor="start">+ finding: citation = f(concept × violation); taxonomy alone</text>
+<text x="638" y="997" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="400" fill="#c9d4e6" text-anchor="start">under-determines it — which is why LLMs (and naive lookup) miss.</text>
+<text x="40" y="1564" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#5a6a80" text-anchor="start">Provenance: values = SEC EDGAR (real) · citations = US-GAAP 2023 linkbase · transactions = synthetic · 1,089 records, 8 firms × 10 yrs × BS/IS/CF</text>
+</svg>

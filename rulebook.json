@@ -74,7 +74,7 @@
       "error_type": "Redundant Row",
       "statements": ["BalanceSheet", "IncomeStatement"],
       "injection": {"op": "insert_row", "fabricated_labels": ["Software Licenses", "Deferred Revenue", "Goodwill Reserve", "Brand Value"], "value_pct_of_subtotal": [0.02, 0.08]},
-      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "rationale": "A fabricated line item with no supporting transactions overstates its section and violates existence/occurrence; the enclosing subtotal is inflated."},
+      "citation": {"asc": "ASC 210-10-45-1", "topic": "210", "subtopic": "210-10", "citation_by_statement": {"IncomeStatement": "ASC 220-10", "CashFlow": "ASC 230-10-45"}, "rationale": "A fabricated line item with no supporting transactions overstates its section and violates existence/occurrence; the enclosing subtotal is inflated."},
       "dqc_rule": {"dqc_id": null, "verified": false},
       "detection_predicate": "row.concept has no supporting transactions AND is absent from clean statement",
       "difficulty": "medium"

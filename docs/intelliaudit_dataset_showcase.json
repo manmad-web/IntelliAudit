@@ -1,0 +1,824 @@
+{
+  "dataset": "IntelliAudit-Bench",
+  "one_line": "A standards-CITATION benchmark for LLM financial auditing: real 10-K statements, injected errors, and deterministic FASB ASC citation ground truth cross-checked against the official US-GAAP taxonomy.",
+  "authors_note_to_supervisors": "This bundle shows the dataset shape (identical to AuditBench, upgraded with real values + taxonomy-verified citations). Full generator + 1,089 records live in the repo; here are the schema, stats, three full sample records, and the novelty argument.",
+  "what_it_is": {
+    "shape": "Same as AuditBench: each record = one clean statement + one injected error + synthetic transactions + labels.",
+    "substrate": "REAL 10-K balance sheets / income statements / cash flows from SEC EDGAR (values are actual reported facts, never fabricated).",
+    "transactions": "SYNTHETIC (real filings never publish transaction-level ledgers) \u2014 they sum to the real line values.",
+    "ground_truth_citation": "The governing FASB ASC code, chosen rule-first (before injection) and cross-checked against the official US-GAAP 2023 reference linkbase; tagged linkbase-verified vs expert-authored.",
+    "NOT_huge_tables": "Compact single statements (~30 rows, [row n] text) like AuditBench \u2014 NOT FinMR's 17k-167k-char whole-filing dumps."
+  },
+  "record_schema": {
+    "sample_id": "unique id, e.g. IA-AAPL-2023-BS-R01_...",
+    "metadata": "{company, cik, fiscal_year, statement_type, period, unit, source}",
+    "general_judgement": "'Incorrect' (this record has an injected error)",
+    "rule_id / error_type": "which rulebook rule + AuditBench error type",
+    "error_identification": "{error_type, problematic_entry, affected_xbrl_concept, affected_label, pre_inject_row, post_inject_row}",
+    "gt_table_text": "the CLEAN statement ([row n] text)",
+    "modified_statement_text": "the ERROR-INSERTED statement ([row n] text)",
+    "gt_transaction_data": "synthetic transactions summing to real line values",
+    "gt_xbrl_json": "OIM-style fact list (concept, period, unit, value)",
+    "ground_truth_citations": "{asc_full, asc_subtopic, asc_topic, dqc_rule, linkbase_reference_set, linkbase_verified, citation_tier, rationale}",
+    "self_check": "{clean_reconciles, error_breaks_reconciliation}"
+  },
+  "statistics": {
+    "records": 1089,
+    "clean_statements": 223,
+    "companies": [
+      "Alphabet Inc.",
+      "Apple Inc.",
+      "COCA COLA CO",
+      "Johnson & Johnson",
+      "MICROSOFT CORPORATION",
+      "Meta Platforms, Inc.",
+      "NVIDIA CORP",
+      "WALMART INC."
+    ],
+    "fiscal_years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "by_statement_type": {
+      "BalanceSheet": 577,
+      "CashFlow": 230,
+      "IncomeStatement": 282
+    },
+    "by_error_type": {
+      "Misclassification": 251,
+      "Missing Row": 223,
+      "Numerical Error": 472,
+      "Redundant Row": 143
+    },
+    "by_citation_tier": {
+      "linkbase-verified": 675,
+      "expert-authored": 271,
+      "unresolved": 143
+    }
+  },
+  "error_rules": [
+    {
+      "rule_id": "R01_current_noncurrent_asset_misclass",
+      "error_type": "Misclassification",
+      "asc": "ASC 210-10-45-1",
+      "dqc": "DQC_0015",
+      "family": "classification"
+    },
+    {
+      "rule_id": "R02_current_noncurrent_liab_misclass",
+      "error_type": "Misclassification",
+      "asc": "ASC 210-10-45-5",
+      "dqc": null,
+      "family": "classification"
+    },
+    {
+      "rule_id": "R03_debt_current_refinance_misclass",
+      "error_type": "Misclassification",
+      "asc": "ASC 470-10-45",
+      "dqc": null,
+      "family": "classification"
+    },
+    {
+      "rule_id": "R04_missing_line_item",
+      "error_type": "Missing Row",
+      "asc": "ASC 210-10-45-1",
+      "dqc": "DQC_0004",
+      "family": "completeness"
+    },
+    {
+      "rule_id": "R05_numerical_error_value",
+      "error_type": "Numerical Error",
+      "asc": "ASC 210-10-45-1",
+      "dqc": "DQC_0004",
+      "family": "arithmetic_consistency"
+    },
+    {
+      "rule_id": "R06_redundant_fabricated_row",
+      "error_type": "Redundant Row",
+      "asc": "ASC 210-10-45-1",
+      "dqc": null,
+      "family": "existence"
+    },
+    {
+      "rule_id": "R07_balance_sheet_identity_break",
+      "error_type": "Numerical Error",
+      "asc": "ASC 210-10-45-1",
+      "dqc": "DQC_0004",
+      "family": "arithmetic_consistency"
+    },
+    {
+      "rule_id": "R08_cashflow_section_misclass",
+      "error_type": "Misclassification",
+      "asc": "ASC 230-10-45",
+      "dqc": null,
+      "family": "classification"
+    },
+    {
+      "rule_id": "R09_revenue_recognition_timing",
+      "error_type": "Numerical Error",
+      "asc": "ASC 606-10-25-1",
+      "dqc": null,
+      "family": "recognition"
+    },
+    {
+      "rule_id": "R10_lease_operating_finance_misclass",
+      "error_type": "Misclassification",
+      "asc": "ASC 842-10-25-2",
+      "dqc": null,
+      "family": "classification"
+    },
+    {
+      "rule_id": "R11_inventory_no_nrv_writedown",
+      "error_type": "Numerical Error",
+      "asc": "ASC 330-10-35-1B",
+      "dqc": null,
+      "family": "measurement"
+    },
+    {
+      "rule_id": "R12_negative_value_on_nonnegative_element",
+      "error_type": "Numerical Error",
+      "asc": "ASC 210-10-45-1",
+      "dqc": "DQC_0015",
+      "family": "sign"
+    }
+  ],
+  "how_we_are_novel": {
+    "gap": "Detection is covered by prior work; standards CITATION attribution is not.",
+    "vs_AuditBench": "AuditBench (arXiv 2506.17282) has a citation field but it is GPT-4 free text scored ~26% by an unreleased retriever; synthetic companies. We give real data + deterministic, cross-checkable ASC citations.",
+    "vs_FinAuditing": "FinAuditing (arXiv 2510.08886) uses real XBRL + DQC but its tasks are concept-ID / relation-type / value-recompute \u2014 it never outputs an ASC citation.",
+    "vs_FinMR": "FinMR (FinAuditing subtask) outputs two numbers {extracted, calculated} over huge XBRL filings \u2014 no citation, and a long-context task, not ours.",
+    "vs_AuditFlow": "AuditFlow (arXiv 2606.03031) does deterministic taxonomy+XBRL verification but scores a numeric verdict, not citation attribution.",
+    "our_contribution": "The FIRST benchmark that scores 'name the governing ASC codification reference' on real filings with deterministic, cross-checkable ground truth \u2014 plus the measured finding that citation is a function of concept x violation, which the taxonomy linkbase alone under-determines (AR->310 not 210; revenue->606-50 disclosure not 606-25 recognition).",
+    "headline_result": "On AuditBench the correct citation is in the candidate set only 26.2% of the time (measured oracle). On IntelliAudit-Bench it is 100% recoverable; a violation-aware selector reaches 100% and even the naive concept-only pick reaches ~51%. The ~26% ceiling was the data, not the method."
+  },
+  "provenance": {
+    "values": "SEC EDGAR companyfacts (real 10-K)",
+    "citations": "official US-GAAP 2023 reference linkbase (sha256 b48fbb7b..., 17,800 concepts indexed)",
+    "transactions": "synthetic, deterministic (sum to real lines)",
+    "generator": "reproducible: python3 scripts/build_benchmark.py"
+  },
+  "sample_records": [
+    {
+      "sample_id": "IA-AAPL-2015-BS-R01_current_noncurrent_asset_misclass-00",
+      "metadata": {
+        "company": "Apple Inc.",
+        "cik": "0000320193",
+        "fiscal_year": 2015,
+        "statement_type": "BalanceSheet",
+        "period": "2015-09-26",
+        "unit": "USD millions",
+        "source": "SEC EDGAR companyfacts (real 10-K)"
+      },
+      "general_judgement": "Incorrect",
+      "rule_id": "R01_current_noncurrent_asset_misclass",
+      "error_type": "Misclassification",
+      "error_identification": {
+        "error_type": "Misclassification",
+        "problematic_entry": 13,
+        "affected_xbrl_concept": "us-gaap:InventoryNet",
+        "affected_label": "Inventories",
+        "pre_inject_row": 3,
+        "post_inject_row": 13
+      },
+      "injection_detail": {
+        "row_concept": "us-gaap:InventoryNet",
+        "row_label": "Inventories",
+        "from_section": "CurrentAssets",
+        "to_section": "NoncurrentAssets"
+      },
+      "ground_truth_citations": {
+        "asc_full": "ASC 210-10-45-1",
+        "asc_subtopic": "ASC 210-10",
+        "asc_topic": "ASC 210",
+        "dqc_rule": "DQC_0015",
+        "dqc_verified": false,
+        "linkbase_reference_set": [
+          "ASC 852-10-55-10",
+          "ASC 210-10-45-1((b))",
+          "ASC 210-10-S99-1((SX 210.5-02(6)))"
+        ],
+        "linkbase_verified": true,
+        "citation_tier": "linkbase-verified",
+        "weak_citation": false,
+        "rationale": "Current assets are cash and other assets expected to be realized within one year / operating cycle; a current item placed under non-current assets misstates the current/non-current classification."
+      },
+      "modified_statement_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Current assets: [SEP]\n[row 1]: Cash and cash equivalents | $21,120 [SEP]\n[row 2]: Accounts receivable, net | $16,849 [SEP]\n[row 3]: Other current assets | $9,539 [SEP]\n[row 4]: Other current assets, net (residual) | $39,521 [SEP]\n[row 5]: Total current assets | $89,378 [SEP]\n[row 6]: Non-current assets: [SEP]\n[row 7]: Property, plant and equipment, net | $22,471 [SEP]\n[row 8]: Goodwill | $5,116 [SEP]\n[row 9]: Intangible assets, net | $3,893 [SEP]\n[row 10]: Other non-current assets | $5,556 [SEP]\n[row 11]: Other non-current assets, net (residual) | $164,065 [SEP]\n[row 12]: Total non-current assets | $201,101 [SEP]\n[row 13]: Inventories | $2,349 [SEP]\n[row 14]: Total assets | $290,479 [SEP]\n[row 15]: Current liabilities: [SEP]\n[row 16]: Accounts payable | $35,490 [SEP]\n[row 17]: Accrued liabilities | $25,181 [SEP]\n[row 18]: Long-term debt, current | $2,500 [SEP]\n[row 19]: Other current liabilities, net (residual) | $17,439 [SEP]\n[row 20]: Total current liabilities | $80,610 [SEP]\n[row 21]: Non-current liabilities: [SEP]\n[row 22]: Long-term debt, non-current | $53,463 [SEP]\n[row 23]: Other non-current liabilities | $33,427 [SEP]\n[row 24]: Other non-current liabilities, net (residual) | $3,624 [SEP]\n[row 25]: Total non-current liabilities | $90,514 [SEP]\n[row 26]: Total liabilities | $171,124 [SEP]\n[row 27]: Stockholders' equity: [SEP]\n[row 28]: Common stock and additional paid-in capital | $27,416 [SEP]\n[row 29]: Retained earnings | $92,284 [SEP]\n[row 30]: Accumulated other comprehensive income (loss) | ($345) [SEP]\n[row 31]: Total stockholders' equity | $119,355 [SEP]\n[row 32]: Total liabilities and stockholders' equity | $290,479 [SEP]",
+      "gt_table_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Current assets: [SEP]\n[row 1]: Cash and cash equivalents | $21,120 [SEP]\n[row 2]: Accounts receivable, net | $16,849 [SEP]\n[row 3]: Inventories | $2,349 [SEP]\n[row 4]: Other current assets | $9,539 [SEP]\n[row 5]: Other current assets, net (residual) | $39,521 [SEP]\n[row 6]: Total current assets | $89,378 [SEP]\n[row 7]: Non-current assets: [SEP]\n[row 8]: Property, plant and equipment, net | $22,471 [SEP]\n[row 9]: Goodwill | $5,116 [SEP]\n[row 10]: Intangible assets, net | $3,893 [SEP]\n[row 11]: Other non-current assets | $5,556 [SEP]\n[row 12]: Other non-current assets, net (residual) | $164,065 [SEP]\n[row 13]: Total non-current assets | $201,101 [SEP]\n[row 14]: Total assets | $290,479 [SEP]\n[row 15]: Current liabilities: [SEP]\n[row 16]: Accounts payable | $35,490 [SEP]\n[row 17]: Accrued liabilities | $25,181 [SEP]\n[row 18]: Long-term debt, current | $2,500 [SEP]\n[row 19]: Other current liabilities, net (residual) | $17,439 [SEP]\n[row 20]: Total current liabilities | $80,610 [SEP]\n[row 21]: Non-current liabilities: [SEP]\n[row 22]: Long-term debt, non-current | $53,463 [SEP]\n[row 23]: Other non-current liabilities | $33,427 [SEP]\n[row 24]: Other non-current liabilities, net (residual) | $3,624 [SEP]\n[row 25]: Total non-current liabilities | $90,514 [SEP]\n[row 26]: Total liabilities | $171,124 [SEP]\n[row 27]: Stockholders' equity: [SEP]\n[row 28]: Common stock and additional paid-in capital | $27,416 [SEP]\n[row 29]: Retained earnings | $92,284 [SEP]\n[row 30]: Accumulated other comprehensive income (loss) | ($345) [SEP]\n[row 31]: Total stockholders' equity | $119,355 [SEP]\n[row 32]: Total liabilities and stockholders' equity | $290,479 [SEP]",
+      "gt_transaction_data": "Transactions for FY2015 (Apple Inc.):\n[contributing to row 1] Cash and cash equivalents | 21,120 [SEP] cash collected from customers: +12,476 (inflow); proceeds from investment sales: +8,644 (inflow) [Explanation: 21,120 = 12476 + 8644]\n[contributing to row 2] Accounts receivable, net | 16,849 [SEP] invoiced customer sales on credit: +9,369 (inflow); write-off of uncollectible accounts: +7,480 (inflow) [Explanation: 16,849 = 9369 + 7480]\n[contributing to row 3] Inventories | 2,349 [SEP] production added to inventory: +1,624 (inflow); cost of goods sold relief: +725 (inflow) [Explanation: 2,349 = 1624 + 725]\n[contributing to row 4] Other current assets | 9,539 [SEP] business activity contributing to the balance: +9,539 (inflow) [Explanation: 9,539 = 9539]\n[contributing to row 8] Property, plant and equipment, net | 22,471 [SEP] capital expenditure on equipment: +7,916 (inflow); depreciation: +14,555 (inflow) [Explanation: 22,471 = 7916 + 14555]\n[contributing to row 9] Goodwill | 5,116 [SEP] business activity contributing to the balance: +5,116 (inflow) [Explanation: 5,116 = 5116]\n[contributing to row 10] Intangible assets, net | 3,893 [SEP] business activity contributing to the balance: +3,893 (inflow) [Explanation: 3,893 = 3893]\n[contributing to row 11] Other non-current assets | 5,556 [SEP] business activity contributing to the balance: +5,556 (inflow) [Explanation: 5,556 = 5556]\n[contributing to row 16] Accounts payable | 35,490 [SEP] purchases on credit: +19,732 (inflow); payments to vendors: +15,758 (inflow) [Explanation: 35,490 = 19732 + 15758]\n[contributing to row 17] Accrued liabilities | 25,181 [SEP] business activity contributing to the balance: +25,181 (inflow) [Explanation: 25,181 = 25181]\n[contributing to row 18] Long-term debt, current | 2,500 [SEP] business activity contributing to the balance: +2,500 (inflow) [Explanation: 2,500 = 2500]\n[contributing to row 22] Long-term debt, non-current | 53,463 [SEP] issuance of long-term notes: +17,950 (inflow); scheduled principal repayment: +35,513 (inflow) [Explanation: 53,463 = 17950 + 35513]\n[contributing to row 23] Other non-current liabilities | 33,427 [SEP] business activity contributing to the balance: +33,427 (inflow) [Explanation: 33,427 = 33427]\n[contributing to row 28] Common stock and additional paid-in capital | 27,416 [SEP] business activity contributing to the balance: +27,416 (inflow) [Explanation: 27,416 = 27416]\n[contributing to row 29] Retained earnings | 92,284 [SEP] net income for the period: +51,811 (inflow); dividends declared: +40,473 (inflow) [Explanation: 92,284 = 51811 + 40473]\n[contributing to row 30] Accumulated other comprehensive income (loss) | -345 [SEP] business activity contributing to the balance: -345 (outflow) [Explanation: -345 = -345]",
+      "gt_xbrl_json": {
+        "entity": {
+          "name": "Apple Inc.",
+          "cik": "0000320193"
+        },
+        "statement": "BalanceSheet",
+        "fiscalYear": 2015,
+        "facts": [
+          {
+            "concept": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 21120,
+            "decimals": -6,
+            "row": 1,
+            "label": "Cash and cash equivalents"
+          },
+          {
+            "concept": "us-gaap:AccountsReceivableNetCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 16849,
+            "decimals": -6,
+            "row": 2,
+            "label": "Accounts receivable, net"
+          },
+          {
+            "concept": "us-gaap:InventoryNet",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 2349,
+            "decimals": -6,
+            "row": 3,
+            "label": "Inventories"
+          },
+          {
+            "concept": "us-gaap:OtherAssetsCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 9539,
+            "decimals": -6,
+            "row": 4,
+            "label": "Other current assets"
+          },
+          {
+            "concept": "us-gaap:AssetsCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 89378,
+            "decimals": -6,
+            "row": 6,
+            "label": "Total current assets"
+          },
+          {
+            "concept": "us-gaap:PropertyPlantAndEquipmentNet",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 22471,
+            "decimals": -6,
+            "row": 8,
+            "label": "Property, plant and equipment, net"
+          },
+          {
+            "concept": "us-gaap:Goodwill",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 5116,
+            "decimals": -6,
+            "row": 9,
+            "label": "Goodwill"
+          },
+          {
+            "concept": "us-gaap:IntangibleAssetsNetExcludingGoodwill",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 3893,
+            "decimals": -6,
+            "row": 10,
+            "label": "Intangible assets, net"
+          },
+          {
+            "concept": "us-gaap:OtherAssetsNoncurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 5556,
+            "decimals": -6,
+            "row": 11,
+            "label": "Other non-current assets"
+          },
+          {
+            "concept": "us-gaap:AssetsNoncurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 201101,
+            "decimals": -6,
+            "row": 13,
+            "label": "Total non-current assets"
+          },
+          {
+            "concept": "us-gaap:Assets",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 290479,
+            "decimals": -6,
+            "row": 14,
+            "label": "Total assets"
+          },
+          {
+            "concept": "us-gaap:AccountsPayableCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 35490,
+            "decimals": -6,
+            "row": 16,
+            "label": "Accounts payable"
+          },
+          {
+            "concept": "us-gaap:AccruedLiabilitiesCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 25181,
+            "decimals": -6,
+            "row": 17,
+            "label": "Accrued liabilities"
+          },
+          {
+            "concept": "us-gaap:LongTermDebtCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 2500,
+            "decimals": -6,
+            "row": 18,
+            "label": "Long-term debt, current"
+          },
+          {
+            "concept": "us-gaap:LiabilitiesCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 80610,
+            "decimals": -6,
+            "row": 20,
+            "label": "Total current liabilities"
+          },
+          {
+            "concept": "us-gaap:LongTermDebtNoncurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 53463,
+            "decimals": -6,
+            "row": 22,
+            "label": "Long-term debt, non-current"
+          },
+          {
+            "concept": "us-gaap:OtherLiabilitiesNoncurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 33427,
+            "decimals": -6,
+            "row": 23,
+            "label": "Other non-current liabilities"
+          },
+          {
+            "concept": "us-gaap:LiabilitiesNoncurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 90514,
+            "decimals": -6,
+            "row": 25,
+            "label": "Total non-current liabilities"
+          },
+          {
+            "concept": "us-gaap:Liabilities",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 171124,
+            "decimals": -6,
+            "row": 26,
+            "label": "Total liabilities"
+          },
+          {
+            "concept": "us-gaap:CommonStocksIncludingAdditionalPaidInCapital",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 27416,
+            "decimals": -6,
+            "row": 28,
+            "label": "Common stock and additional paid-in capital"
+          },
+          {
+            "concept": "us-gaap:RetainedEarningsAccumulatedDeficit",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 92284,
+            "decimals": -6,
+            "row": 29,
+            "label": "Retained earnings"
+          },
+          {
+            "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": -345,
+            "decimals": -6,
+            "row": 30,
+            "label": "Accumulated other comprehensive income (loss)"
+          },
+          {
+            "concept": "us-gaap:StockholdersEquity",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 119355,
+            "decimals": -6,
+            "row": 31,
+            "label": "Total stockholders' equity"
+          },
+          {
+            "concept": "us-gaap:LiabilitiesAndStockholdersEquity",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 290479,
+            "decimals": -6,
+            "row": 32,
+            "label": "Total liabilities and stockholders' equity"
+          }
+        ]
+      },
+      "self_check": {
+        "clean_reconciles": true,
+        "error_breaks_reconciliation": false
+      }
+    },
+    {
+      "sample_id": "IA-AAPL-2017-IS-R09_revenue_recognition_timing-00",
+      "metadata": {
+        "company": "Apple Inc.",
+        "cik": "0000320193",
+        "fiscal_year": 2017,
+        "statement_type": "IncomeStatement",
+        "period": "2017-09-30",
+        "unit": "USD millions",
+        "source": "SEC EDGAR companyfacts (real 10-K)"
+      },
+      "general_judgement": "Incorrect",
+      "rule_id": "R09_revenue_recognition_timing",
+      "error_type": "Numerical Error",
+      "error_identification": {
+        "error_type": "Numerical Error",
+        "problematic_entry": 0,
+        "affected_xbrl_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "affected_label": "Revenue",
+        "pre_inject_row": 0,
+        "post_inject_row": 0
+      },
+      "injection_detail": {
+        "row_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "row_label": "Revenue",
+        "original_value": 229234,
+        "erroneous_value": 272776
+      },
+      "ground_truth_citations": {
+        "asc_full": "ASC 606-10-25-1",
+        "asc_subtopic": "ASC 606-10",
+        "asc_topic": "ASC 606",
+        "dqc_rule": null,
+        "dqc_verified": false,
+        "linkbase_reference_set": [
+          "ASC 924-10-S99-1((SAB Topic 11.L))",
+          "ASC 606-10-50-5",
+          "ASC 280-10-50-30((a))",
+          "ASC 280-10-50-42",
+          "ASC 280-10-50-22((b))",
+          "ASC 280-10-50-32((b))",
+          "ASC 280-10-50-40",
+          "ASC 280-10-50-22((a))",
+          "ASC 280-10-50-32((a))",
+          "ASC 280-10-50-41((a))",
+          "ASC 606-10-50-4((a))"
+        ],
+        "linkbase_verified": true,
+        "citation_tier": "linkbase-verified",
+        "weak_citation": false,
+        "rationale": "Revenue is recognized when control of goods/services transfers to the customer (performance obligation satisfied). Premature recognition violates ASC 606-10-25."
+      },
+      "modified_statement_text": "[Time]: 2017-09-30 [SEP]\n[row 0]: Revenue | $272,776 [SEP]\n[row 1]: Cost of revenue | ($141,048) [SEP]\n[row 2]: Research and development | ($11,581) [SEP]\n[row 3]: Selling, general and administrative | ($15,261) [SEP]\n[row 4]: Other operating expenses, net (residual) | $0 [SEP]\n[row 5]: Operating income (loss) | $61,344 [SEP]\n[row 6]: Other income (expense), net | $2,745 [SEP]\n[row 7]: Income before income taxes | $64,089 [SEP]\n[row 8]: Income tax (expense) benefit | ($15,738) [SEP]\n[row 9]: Net income (loss) | $48,351 [SEP]",
+      "gt_table_text": "[Time]: 2017-09-30 [SEP]\n[row 0]: Revenue | $229,234 [SEP]\n[row 1]: Cost of revenue | ($141,048) [SEP]\n[row 2]: Research and development | ($11,581) [SEP]\n[row 3]: Selling, general and administrative | ($15,261) [SEP]\n[row 4]: Other operating expenses, net (residual) | $0 [SEP]\n[row 5]: Operating income (loss) | $61,344 [SEP]\n[row 6]: Other income (expense), net | $2,745 [SEP]\n[row 7]: Income before income taxes | $64,089 [SEP]\n[row 8]: Income tax (expense) benefit | ($15,738) [SEP]\n[row 9]: Net income (loss) | $48,351 [SEP]",
+      "gt_transaction_data": "Transactions for FY2017 (Apple Inc.):\n[contributing to row 0] Revenue | 229,234 [SEP] business activity contributing to the balance: +229,234 (inflow) [Explanation: 229,234 = 229234]\n[contributing to row 1] Cost of revenue | -141,048 [SEP] business activity contributing to the balance: -141,048 (outflow) [Explanation: -141,048 = -141048]\n[contributing to row 2] Research and development | -11,581 [SEP] business activity contributing to the balance: -11,581 (outflow) [Explanation: -11,581 = -11581]\n[contributing to row 3] Selling, general and administrative | -15,261 [SEP] business activity contributing to the balance: -15,261 (outflow) [Explanation: -15,261 = -15261]\n[contributing to row 8] Income tax (expense) benefit | -15,738 [SEP] business activity contributing to the balance: -15,738 (outflow) [Explanation: -15,738 = -15738]",
+      "gt_xbrl_json": {
+        "entity": {
+          "name": "Apple Inc.",
+          "cik": "0000320193"
+        },
+        "statement": "IncomeStatement",
+        "fiscalYear": 2017,
+        "facts": [
+          {
+            "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": 229234,
+            "decimals": -6,
+            "row": 0,
+            "label": "Revenue"
+          },
+          {
+            "concept": "us-gaap:CostOfGoodsAndServicesSold",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": -141048,
+            "decimals": -6,
+            "row": 1,
+            "label": "Cost of revenue"
+          },
+          {
+            "concept": "us-gaap:ResearchAndDevelopmentExpense",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": -11581,
+            "decimals": -6,
+            "row": 2,
+            "label": "Research and development"
+          },
+          {
+            "concept": "us-gaap:SellingGeneralAndAdministrativeExpense",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": -15261,
+            "decimals": -6,
+            "row": 3,
+            "label": "Selling, general and administrative"
+          },
+          {
+            "concept": "us-gaap:OperatingIncomeLoss",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": 61344,
+            "decimals": -6,
+            "row": 5,
+            "label": "Operating income (loss)"
+          },
+          {
+            "concept": "us-gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": 64089,
+            "decimals": -6,
+            "row": 7,
+            "label": "Income before income taxes"
+          },
+          {
+            "concept": "us-gaap:IncomeTaxExpenseBenefit",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": -15738,
+            "decimals": -6,
+            "row": 8,
+            "label": "Income tax (expense) benefit"
+          },
+          {
+            "concept": "us-gaap:NetIncomeLoss",
+            "period": {
+              "instant": "2017-09-30"
+            },
+            "unit": "iso4217:USD",
+            "value": 48351,
+            "decimals": -6,
+            "row": 9,
+            "label": "Net income (loss)"
+          }
+        ]
+      },
+      "self_check": {
+        "clean_reconciles": true,
+        "error_breaks_reconciliation": true
+      }
+    },
+    {
+      "sample_id": "IA-AAPL-2015-CF-R08_cashflow_section_misclass-00",
+      "metadata": {
+        "company": "Apple Inc.",
+        "cik": "0000320193",
+        "fiscal_year": 2015,
+        "statement_type": "CashFlow",
+        "period": "2015-09-26",
+        "unit": "USD millions",
+        "source": "SEC EDGAR companyfacts (real 10-K)"
+      },
+      "general_judgement": "Incorrect",
+      "rule_id": "R08_cashflow_section_misclass",
+      "error_type": "Misclassification",
+      "error_identification": {
+        "error_type": "Misclassification",
+        "problematic_entry": 6,
+        "affected_xbrl_concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+        "affected_label": "Purchases of property, plant and equipment",
+        "pre_inject_row": 7,
+        "post_inject_row": 6
+      },
+      "injection_detail": {
+        "row_concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+        "row_label": "Purchases of property, plant and equipment",
+        "from_section": "InvestingActivities",
+        "to_section": "OperatingActivities"
+      },
+      "ground_truth_citations": {
+        "asc_full": "ASC 230-10-45",
+        "asc_subtopic": "ASC 230-10",
+        "asc_topic": "ASC 230",
+        "dqc_rule": null,
+        "dqc_verified": false,
+        "linkbase_reference_set": [
+          "ASC 230-10-45-13((c))"
+        ],
+        "linkbase_verified": true,
+        "citation_tier": "linkbase-verified",
+        "weak_citation": false,
+        "rationale": "Cash flow items must be classified as operating, investing, or financing per ASC 230-10-45; e.g., capex is investing, dividends paid are financing."
+      },
+      "modified_statement_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Operating activities: [SEP]\n[row 1]: Net income | $53,394 [SEP]\n[row 2]: Depreciation and amortization | $9,200 [SEP]\n[row 3]: Share-based compensation | $3,586 [SEP]\n[row 4]: Other operating activities, net (residual) | $15,086 [SEP]\n[row 5]: Net cash from operating activities | $81,266 [SEP]\n[row 6]: Purchases of property, plant and equipment | ($11,247) [SEP]\n[row 7]: Investing activities: [SEP]\n[row 8]: Other investing activities, net (residual) | ($45,027) [SEP]\n[row 9]: Net cash from investing activities | ($56,274) [SEP]\n[row 10]: Financing activities: [SEP]\n[row 11]: Dividends paid | ($11,431) [SEP]\n[row 12]: Repurchases of common stock | ($35,253) [SEP]\n[row 13]: Other financing activities, net (residual) | $28,968 [SEP]\n[row 14]: Net cash from financing activities | ($17,716) [SEP]\n[row 15]: Net increase (decrease) in cash | $7,276 [SEP]",
+      "gt_table_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Operating activities: [SEP]\n[row 1]: Net income | $53,394 [SEP]\n[row 2]: Depreciation and amortization | $9,200 [SEP]\n[row 3]: Share-based compensation | $3,586 [SEP]\n[row 4]: Other operating activities, net (residual) | $15,086 [SEP]\n[row 5]: Net cash from operating activities | $81,266 [SEP]\n[row 6]: Investing activities: [SEP]\n[row 7]: Purchases of property, plant and equipment | ($11,247) [SEP]\n[row 8]: Other investing activities, net (residual) | ($45,027) [SEP]\n[row 9]: Net cash from investing activities | ($56,274) [SEP]\n[row 10]: Financing activities: [SEP]\n[row 11]: Dividends paid | ($11,431) [SEP]\n[row 12]: Repurchases of common stock | ($35,253) [SEP]\n[row 13]: Other financing activities, net (residual) | $28,968 [SEP]\n[row 14]: Net cash from financing activities | ($17,716) [SEP]\n[row 15]: Net increase (decrease) in cash | $7,276 [SEP]",
+      "gt_transaction_data": "Transactions for FY2015 (Apple Inc.):\n[contributing to row 1] Net income | 53,394 [SEP] business activity contributing to the balance: +53,394 (inflow) [Explanation: 53,394 = 53394]\n[contributing to row 2] Depreciation and amortization | 9,200 [SEP] business activity contributing to the balance: +9,200 (inflow) [Explanation: 9,200 = 9200]\n[contributing to row 3] Share-based compensation | 3,586 [SEP] business activity contributing to the balance: +3,586 (inflow) [Explanation: 3,586 = 3586]\n[contributing to row 7] Purchases of property, plant and equipment | -11,247 [SEP] business activity contributing to the balance: -11,247 (outflow) [Explanation: -11,247 = -11247]\n[contributing to row 11] Dividends paid | -11,431 [SEP] business activity contributing to the balance: -11,431 (outflow) [Explanation: -11,431 = -11431]\n[contributing to row 12] Repurchases of common stock | -35,253 [SEP] business activity contributing to the balance: -35,253 (outflow) [Explanation: -35,253 = -35253]",
+      "gt_xbrl_json": {
+        "entity": {
+          "name": "Apple Inc.",
+          "cik": "0000320193"
+        },
+        "statement": "CashFlow",
+        "fiscalYear": 2015,
+        "facts": [
+          {
+            "concept": "us-gaap:NetIncomeLoss",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 53394,
+            "decimals": -6,
+            "row": 1,
+            "label": "Net income"
+          },
+          {
+            "concept": "us-gaap:DepreciationDepletionAndAmortization",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 9200,
+            "decimals": -6,
+            "row": 2,
+            "label": "Depreciation and amortization"
+          },
+          {
+            "concept": "us-gaap:ShareBasedCompensation",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 3586,
+            "decimals": -6,
+            "row": 3,
+            "label": "Share-based compensation"
+          },
+          {
+            "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 81266,
+            "decimals": -6,
+            "row": 5,
+            "label": "Net cash from operating activities"
+          },
+          {
+            "concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": -11247,
+            "decimals": -6,
+            "row": 7,
+            "label": "Purchases of property, plant and equipment"
+          },
+          {
+            "concept": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": -56274,
+            "decimals": -6,
+            "row": 9,
+            "label": "Net cash from investing activities"
+          },
+          {
+            "concept": "us-gaap:PaymentsOfDividendsCommonStock",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": -11431,
+            "decimals": -6,
+            "row": 11,
+            "label": "Dividends paid"
+          },
+          {
+            "concept": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": -35253,
+            "decimals": -6,
+            "row": 12,
+            "label": "Repurchases of common stock"
+          },
+          {
+            "concept": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": -17716,
+            "decimals": -6,
+            "row": 14,
+            "label": "Net cash from financing activities"
+          },
+          {
+            "concept": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 7276,
+            "decimals": -6,
+            "row": 15,
+            "label": "Net increase (decrease) in cash"
+          }
+        ]
+      },
+      "self_check": {
+        "clean_reconciles": true,
+        "error_breaks_reconciliation": false
+      }
+    }
+  ]
+}
