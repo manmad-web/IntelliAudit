@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-========================= PROVENANCE: OLD REPO (vendored) =====================
-This file is VENDORED (copied, read-only) from the capstone auditor pipeline:
+========================= PROVENANCE: OLD REPO (faithful copy) =================
+FAITHFUL copy from the capstone auditor pipeline:
     dakshkashyap/financial-audit-capstone  @ pipeline-stage0-1-2-evals
     approaches/stage1_taxonomy_citation/concept_citation.py
-It is NOT IntelliAudit-Bench original code. It is included here so the
-integration eval can run the pipeline's citation-selection logic against the
-benchmark without cloning the whole capstone repo. Attribution: capstone team
-(daksh / irvin / man-mad). Keep in sync with the source if that repo changes.
+NOT IntelliAudit-Bench original code. Attribution: capstone team (daksh/irvin/man-mad).
+
+IMPORTANT (corrected after review): an earlier version of this file silently
+changed `best_topic` to normalize the presentation fallback to a 3-digit topic,
+which alone moved the reported concept-only number from 15.4% to 50.9%. That was
+mislabelled as a verbatim copy. It is now reverted to match the source exactly;
+the topic-level normalization needed for scoring is done EXPLICITLY in the harness
+(integration/eval_pipeline.py), not by editing this file.
 ==============================================================================
 
 What it does: given a us-gaap concept + statement type, predict the governing
@@ -96,8 +100,11 @@ def presentation_citation(statement_type: Optional[str], section: Optional[str] 
 
 
 def best_topic(concept, statement_type, section=None, taxonomy_best=None) -> Optional[str]:
-    """Single deterministic pick: subject-matter → presentation → taxonomy."""
-    return subject_topic(concept) or topic_of(presentation_citation(statement_type, section)) or taxonomy_best
+    """Single deterministic pick: subject-matter → presentation → taxonomy.
+    Matches the source EXACTLY: subject returns a 3-digit topic, presentation
+    returns the full string (e.g. '210-10-45'). Callers must topic-normalize both
+    sides before comparing (the harness does this)."""
+    return subject_topic(concept) or presentation_citation(statement_type, section) or taxonomy_best
 
 
 def candidate_topics(concept, statement_type, section=None, taxonomy_topics=None) -> List[str]:

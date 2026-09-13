@@ -63,25 +63,26 @@
 <rect x="40" y="600" width="1100" height="66" rx="10" fill="#fdf1df" stroke="#b06000" stroke-width="1.3"/>
 <text x="58" y="624" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#b06000" text-anchor="start">WHERE THEY MEET  — the combine (NEW glue)</text>
 <text x="58" y="644" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.3" font-weight="400" fill="#151d2b" text-anchor="start">integration/adapter.py  turns a benchmark record into the item the auditor expects (and hands over the GOLD concept, skipping the weak mapper).</text>
-<text x="58" y="660" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.3" font-weight="400" fill="#151d2b" text-anchor="start">integration/eval_pipeline.py  runs the auditor's citation logic on the records and grades it with the benchmark scorer.</text>
+<text x="58" y="660" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="400" fill="#151d2b" text-anchor="start">integration/eval_pipeline.py  runs the Stage-1 citation SELECTOR (not the full auditor) as an upper-bound recoverability check — a real end-to-end run is TODO.</text>
 <line x1="310" y1="600" x2="310" y2="596" stroke="#5a6a80" stroke-width="2.2" marker-end="url(#a)"/>
 <line x1="870" y1="600" x2="870" y2="596" stroke="#5a6a80" stroke-width="2.2" marker-end="url(#a)"/>
-<text x="40" y="682" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="15" font-weight="800" fill="#151d2b" text-anchor="start">Result: the clean answer key breaks the ceiling</text>
-<rect x="40" y="694" width="1100" height="150" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
-<text x="58" y="720" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#151d2b" text-anchor="start">Citation accuracy — same auditor logic, different exam:</text>
-<text x="58" y="752" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#151d2b" text-anchor="start">AuditBench (old exam): correct cite is even IN the candidate set</text>
+<text x="40" y="682" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="15" font-weight="800" fill="#151d2b" text-anchor="start">Recoverability: on our data the right citation IS reachable (upper bound)</text>
+<rect x="40" y="694" width="1100" height="164" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
+<text x="58" y="720" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#151d2b" text-anchor="start">Citation topic — selector check (NOT the auditor’s accuracy):</text>
+<text x="58" y="752" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="600" fill="#151d2b" text-anchor="start">AuditBench: correct cite even IN the candidate set (oracle)</text>
 <rect x="560" y="737" width="470" height="17" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
 <rect x="560" y="737" width="123" height="17" rx="8" fill="#d93025" stroke="#d93025" stroke-width="0"/>
 <text x="1040" y="752" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="800" fill="#d93025" text-anchor="start">26.2%</text>
-<text x="58" y="786" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#151d2b" text-anchor="start">IntelliAudit-Bench — naive concept-only pick</text>
+<text x="58" y="786" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="600" fill="#151d2b" text-anchor="start">IntelliAudit-Bench: concept-only heuristic pick</text>
 <rect x="560" y="771" width="470" height="17" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
 <rect x="560" y="771" width="239" height="17" rx="8" fill="#b06000" stroke="#b06000" stroke-width="0"/>
 <text x="1040" y="786" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="800" fill="#b06000" text-anchor="start">50.9%</text>
-<text x="58" y="820" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#151d2b" text-anchor="start">IntelliAudit-Bench — violation-aware pick / answer-in-candidates</text>
+<text x="58" y="820" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="600" fill="#151d2b" text-anchor="start">IntelliAudit-Bench: answer recoverable from taxonomy  [UPPER BOUND, by construction]</text>
 <rect x="560" y="805" width="470" height="17" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
 <rect x="560" y="805" width="470" height="17" rx="8" fill="#0f9d58" stroke="#0f9d58" stroke-width="0"/>
 <text x="1040" y="820" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="800" fill="#0f9d58" text-anchor="start">100%</text>
-<text x="58" y="828" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.8" font-weight="600" fill="#2c3a4f" text-anchor="start">Reading: on our data the right citation is recoverable; the 26% ceiling was AuditBench’s inconsistent labels, not the method.</text>
+<text x="58" y="826" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="700" fill="#d93025" text-anchor="start">The 100% is TRUE BY CONSTRUCTION (rule-first injection makes the citation recoverable) — an upper bound, not a finding.</text>
+<text x="58" y="842" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.3" font-weight="600" fill="#2c3a4f" text-anchor="start">The auditor’s REAL accuracy is a separate experiment: a blind-LLM baseline (expect ~26%) + running the actual staged pipeline.</text>
 <rect x="40" y="862" width="560" height="150" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
 <text x="58" y="888" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13.5" font-weight="800" fill="#151d2b" text-anchor="start">Who built what</text>
 <text x="58" y="912" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11.5" font-weight="800" fill="#1a56db" text-anchor="start">YOURS (new repo)</text>

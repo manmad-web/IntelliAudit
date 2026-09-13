@@ -68,7 +68,7 @@ showcase = {
         "vs_FinMR": "FinMR (FinAuditing subtask) outputs two numbers {extracted, calculated} over huge XBRL filings — no citation, and a long-context task, not ours.",
         "vs_AuditFlow": "AuditFlow (arXiv 2606.03031) does deterministic taxonomy+XBRL verification but scores a numeric verdict, not citation attribution.",
         "our_contribution": "The FIRST benchmark that scores 'name the governing ASC codification reference' on real filings with deterministic, cross-checkable ground truth — plus the measured finding that citation is a function of concept x violation, which the taxonomy linkbase alone under-determines (AR->310 not 210; revenue->606-50 disclosure not 606-25 recognition).",
-        "headline_result": "On AuditBench the correct citation is in the candidate set only 26.2% of the time (measured oracle). On IntelliAudit-Bench it is 100% recoverable; a violation-aware selector reaches 100% and even the naive concept-only pick reaches ~51%. The ~26% ceiling was the data, not the method."
+        "recoverability_note_not_a_result": "A citation-SELECTOR check (Stage-1 logic only, no detection/LLM): on AuditBench the correct citation is in the candidate set only 26.2% of the time (measured oracle); on IntelliAudit-Bench it is recoverable (concept-only heuristic ~51%; upper bound 100%). The 100% is TRUE BY CONSTRUCTION because injection is rule-first, so it is an upper bound, NOT the auditor's accuracy. Real results require a blind-LLM baseline + an actual staged-pipeline run (both TODO)."
     },
 
     "provenance": {

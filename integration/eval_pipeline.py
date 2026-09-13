@@ -1,110 +1,73 @@
 #!/usr/bin/env python3
 """
 ========================= PROVENANCE: NEW (integration glue) ==================
-IntelliAudit-Bench original. The eval runner that combines the two repos.
+IntelliAudit-Bench original.
 ==============================================================================
 
-eval_pipeline.py — run the PIPELINE's citation logic (OLD repo, vendored) on the
-BENCHMARK records (NEW repo) and score with the BENCHMARK scorer (NEW repo).
+eval_pipeline.py — a CITATION-SELECTOR sanity/upper-bound check. NOT a result.
 
-This is the "combined system": it realizes the fix the live capstone pipeline is
-missing — it POPULATES the candidate set (which is dead/empty in
-full_pipeline today) by unioning:
-    subject-matter topic (pipeline_citation)  ∪
-    presentation topic   (pipeline_citation)  ∪
-    real linkbase arcs   (IntelliAudit-Bench citation_resolver, the answer key's
-                          own taxonomy engine, used here read-only as a candidate
-                          source — NOT to peek at labels)
+READ THIS BEFORE QUOTING ANY NUMBER FROM HERE:
 
-Then it scores three pickers against the benchmark ground truth:
-    concept-only      (best_topic)          — what the pipeline does today
-    violation-aware   (uses Stage-0 error type: recognition→subject, else present.)
-    candidate-hit     (is the right ASC anywhere in the union?)   ← the ceiling
+  * This does NOT run the capstone auditor. It runs only the Stage-1 citation
+    *selector* (pipeline_citation, faithfully copied). No Stage 0, no detection,
+    no LLM.
+  * "concept-only" IS a legitimate heuristic number: best_topic given only the
+    gold concept + statement type, topic-normalized on both sides.
+  * "rulebook-oracle" and "candidate-coverage" are UPPER BOUNDS THAT LEAK THE
+    LABEL. Because injection is rule-first, rule_id is the identity of the rule
+    that DEFINES the citation; a picker that branches on rule_id is re-deriving
+    the rulebook, so 100% is guaranteed before any auditing. Likewise the
+    subject∪presentation union covers the rule's topic by construction. These
+    show the answer is RECOVERABLE on this data — they are not findings and must
+    never be reported as the pipeline's accuracy.
 
-Run:  python3 integration/eval_pipeline.py
+The REAL experiments the benchmark enables (not done here):
+  1. Baseline: an independent blind LLM on exam.jsonl  → scripts/cross_check_llm.py
+  2. Method:   the ACTUAL capstone run_pipeline (Stage 0 detect + Stage 1 cite)
+               on exam.jsonl. Note: Stage 0 abstains on classification/fabricated
+               errors (~62%), so it cannot supply the violation signal for most
+               citation-relevant rows today — that gap is the honest open problem.
 """
-import collections
-import json
-import os
-import sys
+import collections, json, os, sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE)
-sys.path.insert(0, os.path.join(ROOT, "src"))
-sys.path.insert(0, HERE)
-
-import pipeline_citation as pc          # OLD repo (vendored)
-from adapter import iab_to_item          # NEW glue
-from scorer import score_citation        # NEW benchmark grader
-
-# recognition/measurement rules → cite the subject-matter standard; else presentation
-SUBJECT_PREF_RULES = {"R03", "R09", "R10", "R11"}
-
+HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
+sys.path.insert(0, os.path.join(ROOT, "src")); sys.path.insert(0, HERE)
+import pipeline_citation as pc
+from adapter import iab_to_item
 RECORDS = os.path.join(ROOT, "data", "benchmark", "records.jsonl")
+LABEL_LEAKING_RULES = {"R03", "R09", "R10", "R11"}   # recognition/measurement → subject
 
 
-def _taxonomy_topics(concept):
-    """Real linkbase arc topics for a concept (uses the benchmark's own resolver,
-    read-only, as an extra candidate source). Returns [] if offline."""
-    try:
-        from citation_resolver import CitationResolver
-        global _RES
-        try:
-            _RES
-        except NameError:
-            _RES = CitationResolver()
-        cites = _RES.citations((concept or "").replace("us-gaap:", ""))
-        return [pc.topic_of(c.replace("ASC ", "")) for c in cites]
-    except Exception:
-        return []
+def norm(x):
+    return pc.family(pc.topic_of(x)) if x else None
 
 
-def main(use_linkbase=True):
+def main():
     recs = [json.loads(l) for l in open(RECORDS)]
-    overall = collections.Counter()
-    bytier = collections.defaultdict(collections.Counter)
-    n = 0
+    agg = collections.Counter(); n = 0
     for r in recs:
-        item = iab_to_item(r)
-        concept, stype = item["gold_concept"], item["statement_type"]
-        g = r["ground_truth_citations"]
-        gt_topic = pc.family(pc.topic_of(g["asc_full"].replace("ASC ", "")))
+        item = iab_to_item(r); concept, stype = item["gold_concept"], item["statement_type"]
+        gt = norm(r["ground_truth_citations"]["asc_full"].replace("ASC ", ""))
 
-        tax = _taxonomy_topics(concept) if use_linkbase else []
-        best = pc.best_topic(concept, stype)                    # pipeline today
-        cands = pc.candidate_topics(concept, stype, taxonomy_topics=tax)  # WIRED candidate set
+        best = norm(pc.best_topic(concept, stype))                       # heuristic, honest
+        cands = {norm(t) for t in pc.candidate_topics(concept, stype)}   # UPPER BOUND (by construction)
+        rid = r["rule_id"].split("_")[0]                                 # <-- LEAKS the label
+        oracle = norm(pc.subject_topic(concept)) if rid in LABEL_LEAKING_RULES \
+            else norm(pc.presentation_citation(stype))
 
-        rid = r["rule_id"].split("_")[0]
-        if rid in SUBJECT_PREF_RULES:
-            va = pc.family(pc.subject_topic(concept)) or pc.family(best)
-        else:
-            va = pc.family(pc.topic_of(pc.presentation_citation(stype)))
-
-        best_hit = int(pc.family(best) == gt_topic)
-        va_hit = int(va == gt_topic)
-        cand_hit = int(gt_topic in {pc.family(t) for t in cands})
-        # also run the benchmark's hierarchical citation scorer on the best pick
-        sc = score_citation(f"ASC {best}" if best else "", g)
-
+        agg["concept_only"] += int(best == gt)
+        agg["rulebook_oracle_LEAKS_LABEL"] += int(oracle == gt)
+        agg["candidate_coverage_UPPER_BOUND"] += int(gt in cands)
         n += 1
-        for bucket in (overall, bytier[g["citation_tier"]]):
-            bucket["best"] += best_hit; bucket["va"] += va_hit; bucket["cand"] += cand_hit
-            bucket["em_topic"] += sc["em_topic"]; bucket["n"] += 1
 
-    def line(c):
-        return (f"concept-only {100*c['best']/c['n']:5.1f}%  |  "
-                f"violation-aware {100*c['va']/c['n']:5.1f}%  |  "
-                f"candidate-hit {100*c['cand']/c['n']:5.1f}%")
-
-    print(f"Combined system: PIPELINE citation logic on {n} BENCHMARK records "
-          f"(gold concept, {'linkbase-unioned' if use_linkbase else 'no-linkbase'} candidates)\n")
-    print(f"OVERALL   : {line(overall)}")
-    print(f"\nReference — same logic on AuditBench: oracle over candidates = 26.2%\n")
-    for tier in ("linkbase-verified", "expert-authored", "unresolved"):
-        if tier in bytier:
-            print(f"  {tier:<18}: {line(bytier[tier])}  (n={bytier[tier]['n']})")
-    return {"n": n, "overall": dict(overall), "by_tier": {k: dict(v) for k, v in bytier.items()}}
+    print(f"CITATION-SELECTOR CHECK on {n} records (NOT the auditor, NOT a result)\n")
+    print(f"  concept-only (honest heuristic)      : {100*agg['concept_only']/n:5.1f}%")
+    print(f"  rulebook-oracle  [LEAKS rule_id]     : {100*agg['rulebook_oracle_LEAKS_LABEL']/n:5.1f}%   <- upper bound, not a finding")
+    print(f"  candidate-coverage [by construction] : {100*agg['candidate_coverage_UPPER_BOUND']/n:5.1f}%   <- upper bound, not a finding")
+    print(f"\n  Interpretation: the correct citation is RECOVERABLE on this data")
+    print(f"  (AuditBench oracle was 26.2%). The pipeline's real accuracy must be")
+    print(f"  measured by running the actual auditor + a blind LLM baseline — see docstring.")
 
 
 if __name__ == "__main__":
-    main(use_linkbase="--no-linkbase" not in sys.argv)
+    main()

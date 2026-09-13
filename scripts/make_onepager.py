@@ -80,23 +80,24 @@ my=ly+320
 box(40,my,W-80,66,C["amberbg"],C["amber"])
 t(58,my+24,"WHERE THEY MEET  — the combine (NEW glue)",12.5,C["amber"],"800")
 t(58,my+44,"integration/adapter.py  turns a benchmark record into the item the auditor expects (and hands over the GOLD concept, skipping the weak mapper).",11.3,C["ink"])
-t(58,my+60,"integration/eval_pipeline.py  runs the auditor's citation logic on the records and grades it with the benchmark scorer.",11.3,C["ink"])
+t(58,my+60,"integration/eval_pipeline.py  runs the Stage-1 citation SELECTOR (not the full auditor) as an upper-bound recoverability check — a real end-to-end run is TODO.",10.6,C["ink"])
 arr(310,my,310,my-4); arr(870,my,870,my-4)
 
 # ---- RESULTS
 ry=my+86
-t(40,ry-4,"Result: the clean answer key breaks the ceiling",15,C["ink"],"800")
-box(40,ry+8,W-80,150,C["card"],C["line"])
-t(58,ry+34,"Citation accuracy — same auditor logic, different exam:",12.5,C["ink"],"600")
-bars=[("AuditBench (old exam): correct cite is even IN the candidate set","26.2%",0.262,C["red"]),
-      ("IntelliAudit-Bench — naive concept-only pick","50.9%",0.509,C["amber"]),
-      ("IntelliAudit-Bench — violation-aware pick / answer-in-candidates","100%",1.0,C["green"])]
+t(40,ry-4,"Recoverability: on our data the right citation IS reachable (upper bound)",15,C["ink"],"800")
+box(40,ry+8,W-80,164,C["card"],C["line"])
+t(58,ry+34,"Citation topic — selector check (NOT the auditor’s accuracy):",12.5,C["ink"],"600")
+bars=[("AuditBench: correct cite even IN the candidate set (oracle)","26.2%",0.262,C["red"]),
+      ("IntelliAudit-Bench: concept-only heuristic pick","50.9%",0.509,C["amber"]),
+      ("IntelliAudit-Bench: answer recoverable from taxonomy  [UPPER BOUND, by construction]","100%",1.0,C["green"])]
 bx=560; bw=470; yy=ry+62
 for lab,val,frac,col in bars:
-    t(58,yy+4,lab,11,C["ink"],"600")
+    t(58,yy+4,lab,10.3,C["ink"],"600")
     box(bx,yy-11,bw,17,"#eef1f7","#eef1f7",8,0); box(bx,yy-11,int(bw*frac),17,col,col,8,0)
     t(bx+bw+10,yy+4,val,12,col,"800"); yy+=34
-t(58,ry+150-8,"Reading: on our data the right citation is recoverable; the 26% ceiling was AuditBench’s inconsistent labels, not the method.",10.8,C["ink2"],"600")
+t(58,ry+164-24,"The 100% is TRUE BY CONSTRUCTION (rule-first injection makes the citation recoverable) — an upper bound, not a finding.",10.3,C["red"],"700")
+t(58,ry+164-8,"The auditor’s REAL accuracy is a separate experiment: a blind-LLM baseline (expect ~26%) + running the actual staged pipeline.",10.3,C["ink2"],"600")
 
 # ---- WHO BUILT WHAT
 wy=ry+176

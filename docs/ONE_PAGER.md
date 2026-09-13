@@ -25,16 +25,16 @@ LLMs can often say *"this statement looks wrong,"* but they cannot reliably name
 - `adapter.py` — turns a benchmark record into the `item` the auditor expects, and hands over the **gold concept** (skipping the auditor's weak concept-mapper).
 - `eval_pipeline.py` — runs the auditor's citation logic on the records and grades it with the benchmark scorer.
 
-## Result: the clean answer key breaks the ceiling
-Same auditor logic, different exam:
+## Recoverability check (NOT the auditor's accuracy — read the caveat)
+A citation-**selector** check (Stage-1 logic only, no detection, no LLM):
 
-| Exam / picker | Citation accuracy |
+| Selector check | Citation topic |
 |---|---|
 | AuditBench — correct cite even *in* the candidate set (oracle) | **26.2%** |
-| IntelliAudit-Bench — naive concept-only pick | **50.9%** |
-| IntelliAudit-Bench — violation-aware pick / answer-in-candidates | **100%** |
+| IntelliAudit-Bench — concept-only heuristic pick | **50.9%** |
+| IntelliAudit-Bench — answer recoverable from taxonomy | **100% [upper bound, by construction]** |
 
-**Reading:** on our data the right citation is recoverable; the ~26% ceiling was AuditBench's inconsistent labels, not the method.
+**Caveat (important):** the 100% is **true by construction** — injection is rule-first, so anything that branches on the rule identity re-derives the citation; it is an *upper bound*, **not a finding**, and must never be reported as the auditor's accuracy. The **real** results are two separate experiments still to run: (1) a **blind independent LLM** baseline on `exam.jsonl` (`scripts/cross_check_llm.py`, expect ~26%), and (2) the **actual staged pipeline** run end-to-end. Note the honest gap: Stage 0 abstains on classification/fabricated errors (~62%), so it cannot yet supply the violation signal for most citation-relevant rows.
 
 ## Why it's novel
 - **First** benchmark to score the **governing ASC citation** — on **real filings**, with a **deterministic, cross-checkable** answer key.
