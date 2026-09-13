@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="1360" viewBox="0 0 1180 1360">
+<defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#5a6a80"/></marker></defs>
+<rect x="0" y="0" width="1180" height="1360" rx="0" fill="#f5f7fb" stroke="#f5f7fb" stroke-width="0"/>
+<text x="40" y="48" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="24" font-weight="800" fill="#141c2b" text-anchor="start">IntelliAudit pipeline — Stage 0 → 1 → 2 as one, and what to expect</text>
+<text x="40" y="72" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13" font-weight="600" fill="#2c3a4f" text-anchor="start">Numbers marked ✓ are measured on the benchmark; ▲ are projected (the runs still to do).</text>
+<rect x="40" y="96" width="220" height="60" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
+<text x="58" y="120" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#5a6a80" text-anchor="start">INPUT</text>
+<text x="58" y="140" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="400" fill="#141c2b" text-anchor="start">exam record: statement + txs</text>
+<line x1="260" y1="126" x2="300" y2="126" stroke="#5a6a80" stroke-width="2.4" marker-end="url(#a)"/>
+<rect x="300" y="96" width="300" height="110" rx="12" fill="#e6f4ea" stroke="#0f9d58" stroke-width="1.6"/>
+<text x="318" y="120" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13" font-weight="800" fill="#0f9d58" text-anchor="start">STAGE 0 · deterministic gate</text>
+<text x="318" y="140" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="400" fill="#141c2b" text-anchor="start">arithmetic + accounting identities</text>
+<text x="318" y="158" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="700" fill="#0f9d58" text-anchor="start">✓ 0% false alarms  ·  fires 44%</text>
+<text x="318" y="176" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="700" fill="#0f9d58" text-anchor="start">✓ cite precision 95% on what it fires</text>
+<text x="318" y="194" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#5a6a80" text-anchor="start">(SymPy checks; no LLM)</text>
+<line x1="600" y1="130" x2="660" y2="130" stroke="#0f9d58" stroke-width="2.4" marker-end="url(#a)"/>
+<text x="608" y="122" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="9.5" font-weight="700" fill="#0f9d58" text-anchor="start">FIRE 44%</text>
+<line x1="450" y1="206" x2="450" y2="250" stroke="#b06000" stroke-width="2.4" marker-end="url(#a)"/>
+<text x="456" y="232" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="9.5" font-weight="700" fill="#b06000" text-anchor="start">ABSTAIN 56%</text>
+<rect x="660" y="96" width="300" height="110" rx="12" fill="#e8effc" stroke="#1a56db" stroke-width="1.6"/>
+<text x="678" y="120" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13" font-weight="800" fill="#1a56db" text-anchor="start">STAGE 1 · taxonomy citation</text>
+<text x="678" y="140" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#141c2b" text-anchor="start">gold/real concept → US-GAAP linkbase → ASC</text>
+<text x="678" y="158" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="700" fill="#1a56db" text-anchor="start">✓ exact ASC for detected errors</text>
+<text x="678" y="176" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#5a6a80" text-anchor="start">deterministic, cannot hallucinate</text>
+<text x="678" y="194" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="600" fill="#1a56db" text-anchor="start">(fires path → ~95% precise citation)</text>
+<line x1="960" y1="150" x2="1010" y2="150" stroke="#1a56db" stroke-width="2.4" marker-end="url(#a)"/>
+<rect x="300" y="250" width="300" height="120" rx="12" fill="#fdf1df" stroke="#b06000" stroke-width="1.6"/>
+<text x="318" y="274" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13" font-weight="800" fill="#b06000" text-anchor="start">STAGE 2 · focused LLM</text>
+<text x="318" y="294" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#141c2b" text-anchor="start">the hard 56%: misclassification,</text>
+<text x="318" y="310" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#141c2b" text-anchor="start">redundant, sign, measurement</text>
+<text x="318" y="328" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#2c3a4f" text-anchor="start">— the concept×violation cases —</text>
+<text x="318" y="346" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="700" fill="#b06000" text-anchor="start">▲ blind LLM ~26%; + taxonomy</text>
+<text x="318" y="362" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="700" fill="#b06000" text-anchor="start">▲ candidates injected → ~40–50% (TODO)</text>
+<line x1="600" y1="300" x2="660" y2="300" stroke="#b06000" stroke-width="2.4" marker-end="url(#a)"/>
+<rect x="660" y="250" width="300" height="120" rx="12" fill="#efe8f7" stroke="#6b3fa0" stroke-width="1.6"/>
+<text x="678" y="274" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="13" font-weight="800" fill="#6b3fa0" text-anchor="start">(optional) AuditPatch · repair</text>
+<text x="678" y="294" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#141c2b" text-anchor="start">deterministic fix + certificate</text>
+<text x="678" y="312" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="700" fill="#6b3fa0" text-anchor="start">✓ 81.5% exact repair (FinMR/DQC)</text>
+<text x="678" y="330" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#5a6a80" text-anchor="start">replace_fact_value → revalidate</text>
+<line x1="960" y1="300" x2="1010" y2="300" stroke="#6b3fa0" stroke-width="2.4" marker-end="url(#a)"/>
+<rect x="1010" y="150" width="150" height="200" rx="12" fill="#141c2b" stroke="#141c2b" stroke-width="0"/>
+<text x="1085" y="180" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12" font-weight="800" fill="#fff" text-anchor="middle">OUTPUT</text>
+<text x="1085" y="206" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#c9d4e6" text-anchor="middle">judgment</text>
+<text x="1085" y="228" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#c9d4e6" text-anchor="middle">error type</text>
+<text x="1085" y="250" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#c9d4e6" text-anchor="middle">+ row</text>
+<text x="1085" y="272" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#c9d4e6" text-anchor="middle">ASC citation</text>
+<text x="1085" y="294" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#c9d4e6" text-anchor="middle">corrected /</text>
+<text x="1085" y="316" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="600" fill="#c9d4e6" text-anchor="middle">repaired</text>
+<text x="40" y="406" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="16" font-weight="800" fill="#141c2b" text-anchor="start">What to expect — combined citation on all 1,089 records</text>
+<rect x="40" y="418" width="1100" height="150" rx="10" fill="#ffffff" stroke="#d5dbe6" stroke-width="1.3"/>
+<text x="58" y="444" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#141c2b" text-anchor="start">Correct citations = deterministic (461) + Stage-2 LLM’s share of the 606 abstains:</text>
+<text x="58" y="476" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="600" fill="#141c2b" text-anchor="start">Deterministic gate alone (✓ measured)</text>
+<rect x="560" y="461" width="470" height="16" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
+<rect x="560" y="461" width="197" height="16" rx="8" fill="#0f9d58" stroke="#0f9d58" stroke-width="0"/>
+<text x="1038" y="476" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="700" fill="#0f9d58" text-anchor="start">461 / 1089  =  42%  citation recall  @  95% precision</text>
+<text x="58" y="506" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="600" fill="#141c2b" text-anchor="start">+ Stage 2 blind LLM on the 606 (▲ ~26% of them)</text>
+<rect x="560" y="491" width="470" height="16" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
+<rect x="560" y="491" width="267" height="16" rx="8" fill="#b06000" stroke="#b06000" stroke-width="0"/>
+<text x="1038" y="506" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="700" fill="#b06000" text-anchor="start">≈ 618 / 1089  ≈  57%  (projected)</text>
+<text x="58" y="536" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="600" fill="#141c2b" text-anchor="start">+ Stage 2 with taxonomy candidates (▲ ~40%)</text>
+<rect x="560" y="521" width="470" height="16" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
+<rect x="560" y="521" width="305" height="16" rx="8" fill="#1a56db" stroke="#1a56db" stroke-width="0"/>
+<text x="1038" y="536" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="700" fill="#1a56db" text-anchor="start">≈ 703 / 1089  ≈  65%  (projected)</text>
+<text x="58" y="566" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.6" font-weight="600" fill="#141c2b" text-anchor="start">AuditBench reference (blind GPT-4)</text>
+<rect x="560" y="551" width="470" height="16" rx="8" fill="#eef1f7" stroke="#eef1f7" stroke-width="0"/>
+<rect x="560" y="551" width="122" height="16" rx="8" fill="#d93025" stroke="#d93025" stroke-width="0"/>
+<text x="1038" y="566" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="700" fill="#d93025" text-anchor="start">26%</text>
+<text x="58" y="552" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10.4" font-weight="700" fill="#d93025" text-anchor="start">So expect the FULL pipeline ~55–65% citation vs a blind LLM’s ~26% — the gap is the contribution. The 100% you saw before was fake (label-leaking).</text>
+<text x="40" y="586" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="16" font-weight="800" fill="#141c2b" text-anchor="start">The result tables the paper needs</text>
+<rect x="40" y="606" width="1100" height="86" rx="10" fill="#ffffff" stroke="#0f9d58" stroke-width="1.2"/>
+<text x="58" y="626" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#0f9d58" text-anchor="start">Table 1 — Detection</text>
+<text x="70" y="646" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• General-Judgment EM on exam + CLEAN statements</text>
+<text x="70" y="666" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• Precision / Recall / F1  ·  false-alarm rate on the 223 clean</text>
+<text x="70" y="686" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• per error-type: which errors Stage 0 catches (arith) vs misses (classif.)</text>
+<rect x="40" y="704" width="1100" height="106" rx="10" fill="#ffffff" stroke="#1a56db" stroke-width="1.2"/>
+<text x="58" y="724" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#1a56db" text-anchor="start">Table 2 — CITATION (headline)</text>
+<text x="70" y="744" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• EM @ topic / subtopic / full-paragraph</text>
+<text x="70" y="764" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• rows: blind-LLM baseline · deterministic gate · FULL pipeline</text>
+<text x="70" y="784" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• split by tier: linkbase-verified vs expert-authored</text>
+<text x="70" y="804" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• citation Precision / Recall / F1  (abstention-aware)</text>
+<rect x="40" y="822" width="1100" height="86" rx="10" fill="#ffffff" stroke="#b06000" stroke-width="1.2"/>
+<text x="58" y="842" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#b06000" text-anchor="start">Table 3 — Ablation (why each piece matters)</text>
+<text x="70" y="862" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• LLM-alone  →  +Stage 0 gate  →  +taxonomy candidates  →  full</text>
+<text x="70" y="882" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• key number: clean-split false alarms 50% → ~29% at fixed model</text>
+<text x="70" y="902" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• −taxonomy / −gate: show each removal hurts</text>
+<rect x="40" y="920" width="1100" height="66" rx="10" fill="#ffffff" stroke="#6b3fa0" stroke-width="1.2"/>
+<text x="58" y="940" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="12.5" font-weight="800" fill="#6b3fa0" text-anchor="start">Table 4 — Repair (optional, AuditPatch)</text>
+<text x="70" y="960" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• exact-repair rate (81.5%) · regressions (0) · coverage (178/332)</text>
+<text x="70" y="980" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="11" font-weight="500" fill="#141c2b" text-anchor="start">• only if you include the repair track / second paper</text>
+<text x="40" y="1344" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="10" font-weight="400" fill="#5a6a80" text-anchor="start">Honest caveats: report precision against the CLEAN set (not the all-error exam); the deterministic gate inverts injection predicates, so validate on held-out / real errors too.</text>
+</svg>
