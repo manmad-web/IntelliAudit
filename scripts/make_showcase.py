@@ -85,3 +85,92 @@ out = os.path.join(ROOT, "docs", "intelliaudit_dataset_showcase.json")
 json.dump(showcase, open(out, "w"), indent=2)
 print(f"wrote {out}")
 print(f"  records={len(recs)}  samples={len(samples)}  size={os.path.getsize(out):,} bytes")
+
+
+# ============================================================================
+#  dataset_card.json — FACTS ONLY. Ships with the benchmark.
+#  Deliberately contains NO novelty claims, NO competitor comparison, and NO
+#  experimental caveats — those belong in the paper, not in a data artifact.
+# ============================================================================
+card = {
+    "name": "IntelliAudit-Bench",
+    "version": "0.1",
+    "description": ("A benchmark for standards-citation attribution in financial-statement auditing. "
+                    "Each record is a real 10-K financial statement containing one deliberately injected "
+                    "accounting error, paired with synthetic supporting transactions and the governing "
+                    "FASB ASC citation as ground truth."),
+    "repository": "https://github.com/manmad-web/IntelliAudit",
+    "domain": "financial auditing / accounting standards / XBRL",
+    "language": "en",
+    "task": ("Given a financial statement with one injected error (and its transactions), "
+             "identify the error and cite the governing FASB ASC codification reference."),
+
+    "license_and_terms": {
+        "financial_values": "Derived from SEC EDGAR filings (US public domain).",
+        "citations": "Derived from the FASB US-GAAP 2023 taxonomy; subject to FASB terms of use.",
+        "generated_content": "Injected errors and synthetic transactions produced by this repository's generator.",
+    },
+
+    "files": {
+        "data/benchmark/exam.jsonl": "1089 rows — statement WITH injected error + transactions. No labels. Input to a system.",
+        "data/benchmark/answer_key.jsonl": "1089 rows — judgement, error identification, and ASC citation. Withheld during evaluation.",
+        "data/benchmark/statements_clean.jsonl": "223 rows — the error-free statements (control set / repair target).",
+        "data/benchmark/records.jsonl": "1089 rows — exam and answer key joined, for convenience.",
+        "data/clean/": "223 files — one clean statement per company x fiscal year x statement type.",
+        "data/benchmark/summary.json": "Aggregate counts.",
+    },
+
+    # schema restated here (not reused from the briefing) so the card stays
+    # free of any comparison to other datasets
+    "record_schema": {**showcase["record_schema"],
+                      "rule_id / error_type": "the rulebook rule that was injected, and its error-type label"},
+    "statistics": showcase["statistics"],
+    "error_rules": showcase["error_rules"],
+
+    "source_data": {
+        "financial_values": "SEC EDGAR companyfacts API — actual reported 10-K facts; values are never fabricated.",
+        "citation_authority": "Official US-GAAP 2023 reference linkbase (xbrl.fasb.org), 17,800 concepts indexed.",
+        "transactions": "Synthetic, deterministic; generated to sum exactly to the real reported line values.",
+    },
+
+    "construction": {
+        "summary": ("Deterministic five-step generator: (1) ingest real 10-K XBRL facts from SEC EDGAR; "
+                    "(2) normalize into canonical reconciling statements; (3) inject one error rule-first "
+                    "from a curated rulebook mapping {error type -> us-gaap concept -> governing ASC citation}; "
+                    "(4) cross-check each citation against the official US-GAAP reference linkbase; "
+                    "(5) synthesize transactions summing to the reported line values."),
+        "reproduce": ["python3 scripts/build_benchmark.py", "python3 scripts/split_dataset.py"],
+        "llm_used_in_construction": False,
+        "details": "See docs/DATASHEET.md",
+    },
+
+    "ground_truth_confidence": {
+        "linkbase-verified": "Citation confirmed present in the concept's official FASB linkbase reference set.",
+        "expert-authored": "Governing standard not tagged on that line by the linkbase (recognition/classification judgment); requires human validation.",
+        "unresolved": "Fabricated line items with no corresponding us-gaap concept.",
+        "counts": showcase["statistics"]["by_citation_tier"],
+    },
+
+    "known_limitations": [
+        "Single-error: exactly one injected error per record; no multi-error split.",
+        "Sector concentration: 5 of 8 companies are technology; no financial-sector, energy, or industrial filers.",
+        "Compact single statements (~30 rows), not multi-document long-context filings.",
+        "Errors are injected rather than naturally occurring.",
+        "DQC rule identifiers are provisional (dqc_verified=false) pending cross-check against the official XBRL-US ruleset.",
+        "Statement layout follows a canonical concept template with residual balancing lines, not each filer's exact presentation linkbase ordering.",
+    ],
+
+    "evaluation": {
+        "scorer": "scripts/score_predictions.py",
+        "metrics": "Citation exact-match at ASC topic / subtopic / full-paragraph, reported as precision (of answered), recall (of all records), and abstention rate; plus error-type and row exact-match.",
+        "prediction_format": {"sample_id": "str", "predicted_asc": "str or null to abstain",
+                              "predicted_error_type": "str (optional)", "predicted_row": "int (optional)"},
+    },
+
+    "sample_records": samples,
+}
+
+card_out = os.path.join(ROOT, "data", "dataset_card.json")
+json.dump(card, open(card_out, "w"), indent=2)
+print(f"wrote {card_out}")
+print(f"  facts-only card: {os.path.getsize(card_out):,} bytes (no novelty claims, no experiment caveats)")
