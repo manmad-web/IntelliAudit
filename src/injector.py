@@ -12,7 +12,7 @@ citation_resolver so you can verify it:
     on the line (e.g. recognition ASC 606-10-25 on a revenue line). These are the
     HARD, expert-authored citations and are the interesting cases.
 """
-import copy, json, os, random
+import copy, json, os, random, re
 from render import to_auditbench_text, to_xbrl_json
 from transactions import generate_for_statement
 
@@ -82,7 +82,12 @@ def inject(stmt, rule, rng):
             return None, "no-op move (source == target section)"
         row["section"] = to_section
         m["rows"].remove(row)
-        pos = max(i for i, r in enumerate(m["rows"]) if r.get("section") == to_section) + 1
+        # AUDIT FIX: v0.1 always inserted after the section's LAST row, i.e. directly
+        # after a subtotal — a deterministic positional tell. Now insert at a random
+        # position among the target section's line rows.
+        idxs = [i for i, r in enumerate(m["rows"])
+                if r.get("section") == to_section and r.get("kind") == "line"]
+        pos = rng.choice(idxs) if idxs else len(m["rows"])
         m["rows"].insert(pos, row)
         _reindex(m)
         return m, {"row_concept": row["concept"], "row_label": row["label"], "from_section": src, "to_section": to_section}
@@ -115,39 +120,77 @@ def inject(stmt, rule, rng):
         return m, {"row_concept": row["concept"], "row_label": row["label"], "original_value": orig, "erroneous_value": row["value"]}
 
     if op == "insert_row":
-        sub = next((r for r in m["rows"] if r.get("kind") == "subtotal"), None)
-        if not sub:
+        # AUDIT FIX: v0.1 always inserted immediately before the FIRST subtotal and
+        # drew from only 4 fixed labels — two deterministic tells. Now: random
+        # subtotal, random position among that section's lines, wider label pool.
+        subs = [r for r in m["rows"] if r.get("kind") == "subtotal" and r.get("value") is not None]
+        if not subs:
             return None, "no subtotal"
+        sub = rng.choice(subs)
         label = rng.choice(rule["injection"]["fabricated_labels"])
         lo, hi = rule["injection"].get("value_pct_of_subtotal", [0.02, 0.08])
-        val = int(round(sub["value"] * rng.uniform(lo, hi)))
-        m["rows"].insert(m["rows"].index(sub), {"idx": -1, "label": label, "section": sub["section"],
-                                                "concept": "us-gaap:FABRICATED", "value": val, "kind": "line", "injectable": False})
+        val = int(round(abs(sub["value"]) * rng.uniform(lo, hi)))
+        idxs = [i for i, r in enumerate(m["rows"])
+                if r.get("section") == sub["section"] and r.get("kind") == "line"]
+        pos = rng.choice(idxs) if idxs else m["rows"].index(sub)
+        m["rows"].insert(pos, {"idx": -1, "label": label, "section": sub["section"],
+                               "concept": "us-gaap:FABRICATED", "value": val,
+                               "kind": "line", "injectable": False})
         _reindex(m)
         return m, {"row_concept": "us-gaap:FABRICATED", "row_label": label, "fabricated_value": val}
 
     return None, f"op '{op}' not implemented in v0.1"
 
 
+def _strip(x):
+    """'ASC 210-10-45-1((b))' -> 'ASC 210-10-45-1'"""
+    return re.sub(r"\(\(.*?\)\)", "", x).strip()
+
+
 def _citation_gt(rule, stmt_type, concept):
+    """
+    AUDIT FIXES:
+      * linkbase_verified is now a STRICT PARAGRAPH match. v0.1 compared only the
+        subtopic, so 675 records were labelled "linkbase-verified" when just 103
+        hold at paragraph level. The flag now means what it says.
+      * DQC ids are only emitted when the rulebook marks them verified. v0.1
+        shipped provisional ids, 3 of 5 of which the audit found to be wrong;
+        omitting is better than asserting something false.
+      * A rule may declare citation.asc = null, meaning "no single ASC paragraph
+        governs this" (arithmetic/existence faults). Those become detection-only
+        cases and are EXCLUDED from citation scoring via citable=false.
+    """
     c = rule["citation"]
-    asc = c.get("citation_by_statement", {}).get(stmt_type, c["asc"])
-    parts = asc.replace("ASC ", "").split("-")
-    topic = parts[0]; subtopic = "-".join(parts[:2]) if len(parts) >= 2 else topic
-    # cross-check against the real linkbase reference set for this concept
-    linkbase_set, verified = [], None
+    asc = c.get("citation_by_statement", {}).get(stmt_type, c.get("asc"))
+
+    linkbase_set = []
     if _RESOLVER and concept and concept != "us-gaap:FABRICATED":
         try:
             linkbase_set = _RESOLVER.citations(concept.replace("us-gaap:", ""))
-            verified = any(x.startswith(f"ASC {subtopic}") for x in linkbase_set)
         except Exception:
-            verified = None
+            linkbase_set = []
+
+    if not asc:                                   # detection-only case
+        return {
+            "citable": False, "asc_full": None, "asc_subtopic": None, "asc_topic": None,
+            "dqc_rule": None, "linkbase_reference_set": linkbase_set,
+            "linkbase_verified": False, "citation_tier": "no-governing-paragraph",
+            "rationale": c.get("rationale", ""),
+            "note": "No single ASC paragraph governs this fault; detection-only, excluded from citation scoring.",
+        }
+
+    parts = asc.replace("ASC ", "").split("-")
+    topic = parts[0]
+    subtopic = "-".join(parts[:2]) if len(parts) >= 2 else topic
+    verified = any(_strip(x) == asc for x in linkbase_set)   # STRICT paragraph match
+    dqc = rule.get("dqc_rule", {})
     return {
+        "citable": True,
         "asc_full": asc, "asc_subtopic": f"ASC {subtopic}", "asc_topic": f"ASC {topic}",
-        "dqc_rule": rule["dqc_rule"].get("dqc_id"), "dqc_verified": rule["dqc_rule"].get("verified", False),
+        "dqc_rule": dqc.get("dqc_id") if dqc.get("verified") else None,
         "linkbase_reference_set": linkbase_set,
         "linkbase_verified": verified,
-        "citation_tier": ("linkbase-verified" if verified else "expert-authored") if verified is not None else "unresolved",
+        "citation_tier": "linkbase-verified" if verified else "expert-authored-UNVALIDATED",
         "weak_citation": c.get("weak_citation", False),
         "rationale": c["rationale"],
     }

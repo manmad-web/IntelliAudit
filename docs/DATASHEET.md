@@ -40,7 +40,13 @@ Only two places an LLM would enter — documented here so the artifact is comple
 
 **(b) Cross-check judge** (`scripts/cross_check_llm.py`) — the blind auditor prompt is embedded in that script (System + User), reproduced in the paper appendix.
 
-## 6. Validation protocol (how the ground truth is trusted)
+## 6. Validation protocol — ⚠️ DESCRIBED BUT **NOT PERFORMED**
+
+> **Correction (Sept 2026).** An external audit found that this section described a
+> validation protocol as though it had been carried out. **It had not.** Neither the
+> LLM cross-check nor the human expert review below was ever run. The harness
+> (`scripts/cross_check_llm.py`) exists; it has never been executed. Treat the
+> protocol below as *planned*, not *performed*. See `KNOWN_ISSUES.md`.
 - **Tier 1 — `linkbase-verified` (675 records):** deterministic; the ASC is in the concept's official linkbase reference set. No human/LLM needed.
 - **Tier 2 — `expert-authored` (271 records):** the governing standard the linkbase does not tag on the line (e.g. recognition ASC 606-10-25). Validate two ways: (i) **independent LLM judge** (`cross_check_llm.py`, a *different* model) predicts the citation blind; agreement raises confidence, disagreement flags the record; (ii) **human expert review** of the flagged set — the same 50%-manual-review discipline FinAuditing used.
 - **Leakage:** verified 0/1089 records contain any ASC code in model-visible fields.

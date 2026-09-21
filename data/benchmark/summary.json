@@ -36,9 +36,9 @@
     "Redundant Row": 143
   },
   "citation_tier_breakdown": {
-    "linkbase-verified": 675,
-    "expert-authored": 271,
-    "unresolved": 143
+    "linkbase-verified": 31,
+    "expert-authored-UNVALIDATED": 556,
+    "no-governing-paragraph": 502
   },
-  "verifiable_error_pct": 63.2
+  "verifiable_error_pct": 63.3
 }
