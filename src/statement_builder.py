@@ -12,7 +12,59 @@ Design choices (documented for the paper):
     a TODO.)
   * A line concept absent from the filing that year is dropped, not zero-filled.
 """
+import re as _re
 from edgar_ingest import get_company_facts, concept_value, company_meta
+
+# ── AUDIT FIX #6: lay statements out against the taxonomy's own classified
+# balance-sheet presentation linkbase (450 concepts, FASB's published order)
+# instead of a ~30-concept hand template, so real balances get real names
+# instead of falling into an unnamed "(residual)" plug.
+_ANCHOR_CONCEPTS = {
+    "us-gaap:AssetsCurrent", "us-gaap:AssetsNoncurrent", "us-gaap:Assets",
+    "us-gaap:LiabilitiesCurrent", "us-gaap:LiabilitiesNoncurrent", "us-gaap:Liabilities",
+    "us-gaap:StockholdersEquity", "us-gaap:LiabilitiesAndStockholdersEquity",
+}
+
+
+def _label_for(concept):
+    """'us-gaap:AccountsReceivableNetCurrent' -> 'Accounts receivable, net, current'"""
+    n = concept.split(":")[-1]
+    words = _re.findall(r"[A-Z][a-z0-9]*|[A-Z]+(?![a-z])", n)
+    s = " ".join(words)
+    s = s.replace(" Net Current", ", net, current").replace(" Net Noncurrent", ", net, non-current")
+    s = s.replace(" Current", ", current").replace(" Noncurrent", ", non-current").replace(" Net", ", net")
+    return (s[0].upper() + s[1:].lower().replace(" and ", " and ")) if s else n
+
+
+def _presentation_template():
+    """Build the ordered template from the taxonomy; fall back to BS_TEMPLATE."""
+    try:
+        from presentation import ordered_balance_sheet_concepts
+        cs = ordered_balance_sheet_concepts()
+    except Exception:
+        return None
+    from collections import defaultdict
+    by = defaultdict(list)
+    for c, s in cs:
+        if c not in _ANCHOR_CONCEPTS:
+            by[s].append(c)
+    if not by.get("CurrentAssets"):
+        return None
+    T = []
+    def block(header, sect, sub_label, sub_concept):
+        T.append((header, None, sect, "header", None))
+        T.extend((_label_for(c), c, sect, "line", None) for c in by.get(sect, []))
+        T.append((sub_label, sub_concept, sect, "subtotal", "auto"))
+    block("Current assets:", "CurrentAssets", "Total current assets", "us-gaap:AssetsCurrent")
+    block("Non-current assets:", "NoncurrentAssets", "Total non-current assets", "us-gaap:AssetsNoncurrent")
+    T.append(("Total assets", "us-gaap:Assets", "Assets", "total", "auto_assets"))
+    block("Current liabilities:", "CurrentLiabilities", "Total current liabilities", "us-gaap:LiabilitiesCurrent")
+    block("Non-current liabilities:", "NoncurrentLiabilities", "Total non-current liabilities", "us-gaap:LiabilitiesNoncurrent")
+    T.append(("Total liabilities", "us-gaap:Liabilities", "Liabilities", "total", "auto_liab"))
+    block("Stockholders' equity:", "Equity", "Total stockholders' equity", "us-gaap:StockholdersEquity")
+    T.append(("Total liabilities and stockholders' equity", "us-gaap:LiabilitiesAndStockholdersEquity",
+              "LiabilitiesAndEquity", "total", "auto_le"))
+    return T
 
 # Canonical, ordered balance-sheet template: (label, concept, section, kind, sums)
 BS_TEMPLATE = [
@@ -90,6 +142,9 @@ def _anchor(facts, concept, fy, scale):
     return (round(cv["value"] / scale), cv["end"]) if cv else (None, None)
 
 
+_PRES_TEMPLATE = _presentation_template()
+
+
 def build_balance_sheet(facts, fiscal_year, scale=1_000_000):
     """
     Build a canonical, RECONCILING balance sheet from real facts.
@@ -131,7 +186,16 @@ def build_balance_sheet(facts, fiscal_year, scale=1_000_000):
     # --- lay out rows, tracking per-section line sums ----------------------
     rows, idx = [], 0
     section_line_idx, section_line_sum = {}, {}
-    for label, concept, section, kind, sums in BS_TEMPLATE:
+    # NOTE (audit #6): we tried laying statements out from the taxonomy's own
+    # classified-SFP presentation linkbase (450 concepts) and from its calculation
+    # tree. BOTH made the residual WORSE (35% and 42-79% per section), because the
+    # us-gaap stm/ linkbases are a GENERIC template, not any filer's actual
+    # structure — e.g. Apple's $194bn MarketableSecuritiesNoncurrent is not
+    # reachable from AssetsNoncurrent in the standard tree. Properly fixing #6
+    # requires each FILING's own presentation/calculation linkbases from EDGAR.
+    # Until then we keep the extended hand template (residual ~16%, was 26%).
+    template = BS_TEMPLATE
+    for label, concept, section, kind, sums in template:
         if kind == "header":
             rows.append({"idx": idx, "label": label, "section": section, "concept": None, "value": None, "kind": "header"}); idx += 1
             continue
