@@ -119,6 +119,26 @@ def inject(stmt, rule, rng):
         row = rng.choice(cands); orig = row["value"]; row["value"] = -abs(orig)
         return m, {"row_concept": row["concept"], "row_label": row["label"], "original_value": orig, "erroneous_value": row["value"]}
 
+    if op == "relabel_concept":
+        # Lease misclassification: present an operating lease as a finance lease
+        # (or vice versa). The paired liability is left untouched, so the
+        # statement now asserts a lease classification its own figures contradict.
+        if not cands:
+            return None, "no eligible lease concept"
+        row = rng.choice(cands)
+        old_c, old_l = row["concept"], row["label"]
+        for a, b in rule["injection"].get("swap", [["Operating", "Finance"]]):
+            if a in old_c:
+                row["concept"] = old_c.replace(a, b); row["label"] = old_l.replace(a, b).replace(a.lower(), b.lower())
+                break
+            if b in old_c:
+                row["concept"] = old_c.replace(b, a); row["label"] = old_l.replace(b, a).replace(b.lower(), a.lower())
+                break
+        if row["concept"] == old_c:
+            return None, "swap token not present in concept"
+        return m, {"row_concept": old_c, "row_label": old_l,
+                   "relabelled_to": row["concept"], "relabelled_label": row["label"]}
+
     if op == "insert_row":
         # AUDIT FIX: v0.1 always inserted immediately before the FIRST subtotal and
         # drew from only 4 fixed labels — two deterministic tells. Now: random

@@ -21,24 +21,24 @@
     2023,
     2024
   ],
-  "clean_statements_built": 223,
-  "company_years_skipped": 15,
-  "records": 1089,
+  "clean_statements_built": 220,
+  "company_years_skipped": 5,
+  "records": 1231,
   "statement_type_breakdown": {
-    "BalanceSheet": 577,
+    "BalanceSheet": 719,
     "CashFlow": 230,
     "IncomeStatement": 282
   },
   "error_type_breakdown": {
-    "Misclassification": 251,
-    "Missing Row": 223,
-    "Numerical Error": 472,
-    "Redundant Row": 143
+    "Misclassification": 300,
+    "Missing Row": 220,
+    "Numerical Error": 571,
+    "Redundant Row": 140
   },
   "citation_tier_breakdown": {
-    "linkbase-verified": 31,
-    "expert-authored-UNVALIDATED": 556,
-    "no-governing-paragraph": 502
+    "linkbase-verified": 23,
+    "expert-authored-UNVALIDATED": 498,
+    "no-governing-paragraph": 710
   },
-  "verifiable_error_pct": 63.3
+  "verifiable_error_pct": 63.6
 }

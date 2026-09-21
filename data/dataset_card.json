@@ -33,8 +33,8 @@
     "self_check": "{clean_reconciles, error_breaks_reconciliation}"
   },
   "statistics": {
-    "records": 1089,
-    "clean_statements": 223,
+    "records": 1231,
+    "clean_statements": 220,
     "companies": [
       "Alphabet Inc.",
       "Apple Inc.",
@@ -58,20 +58,20 @@
       2024
     ],
     "by_statement_type": {
-      "BalanceSheet": 577,
+      "BalanceSheet": 719,
       "CashFlow": 230,
       "IncomeStatement": 282
     },
     "by_error_type": {
-      "Misclassification": 251,
-      "Missing Row": 223,
-      "Numerical Error": 472,
-      "Redundant Row": 143
+      "Misclassification": 300,
+      "Missing Row": 220,
+      "Numerical Error": 571,
+      "Redundant Row": 140
     },
     "by_citation_tier": {
-      "linkbase-verified": 31,
-      "expert-authored-UNVALIDATED": 556,
-      "no-governing-paragraph": 502
+      "linkbase-verified": 23,
+      "expert-authored-UNVALIDATED": 498,
+      "no-governing-paragraph": 710
     }
   },
   "error_rules": [
@@ -99,7 +99,7 @@
     {
       "rule_id": "R04_missing_line_item",
       "error_type": "Missing Row",
-      "asc": "ASC 210-10-45-1",
+      "asc": null,
       "dqc": "DQC_0004",
       "family": "completeness"
     },
@@ -158,6 +158,27 @@
       "asc": null,
       "dqc": "DQC_0015",
       "family": "sign"
+    },
+    {
+      "rule_id": "R13_lease_operating_finance_misclass",
+      "error_type": "Misclassification",
+      "asc": "ASC 842-10-25-2",
+      "dqc": null,
+      "family": "classification"
+    },
+    {
+      "rule_id": "R14_goodwill_impairment_omitted",
+      "error_type": "Numerical Error",
+      "asc": "ASC 350-20-35-1",
+      "dqc": null,
+      "family": "measurement"
+    },
+    {
+      "rule_id": "R15_afs_securities_measurement",
+      "error_type": "Numerical Error",
+      "asc": "ASC 320-10-35-1",
+      "dqc": null,
+      "family": "measurement"
     }
   ],
   "source_data": {
@@ -179,9 +200,9 @@
     "expert-authored": "Governing standard not tagged on that line by the linkbase (recognition/classification judgment); requires human validation.",
     "unresolved": "Fabricated line items with no corresponding us-gaap concept.",
     "counts": {
-      "linkbase-verified": 31,
-      "expert-authored-UNVALIDATED": 556,
-      "no-governing-paragraph": 502
+      "linkbase-verified": 23,
+      "expert-authored-UNVALIDATED": 498,
+      "no-governing-paragraph": 710
     }
   },
   "known_limitations": [
@@ -212,22 +233,22 @@
         "statement_type": "BalanceSheet",
         "period": "2015-09-26",
         "unit": "USD millions",
-        "source": "SEC EDGAR companyfacts (real 10-K)"
+        "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)"
       },
       "general_judgement": "Incorrect",
       "rule_id": "R01_current_noncurrent_asset_misclass",
       "error_type": "Misclassification",
       "error_identification": {
         "error_type": "Misclassification",
-        "problematic_entry": 10,
+        "problematic_entry": 11,
         "affected_xbrl_concept": "us-gaap:InventoryNet",
-        "affected_label": "Inventories",
+        "affected_label": "Inventory, net",
         "pre_inject_row": 4,
-        "post_inject_row": 10
+        "post_inject_row": 11
       },
       "injection_detail": {
         "row_concept": "us-gaap:InventoryNet",
-        "row_label": "Inventories",
+        "row_label": "Inventory, net",
         "from_section": "CurrentAssets",
         "to_section": "NoncurrentAssets"
       },
@@ -247,9 +268,9 @@
         "weak_citation": false,
         "rationale": "Current assets are cash and other assets expected to be realized within one year / operating cycle; a current item placed under non-current assets misstates the current/non-current classification."
       },
-      "modified_statement_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Current assets: [SEP]\n[row 1]: Cash and cash equivalents | $21,120 [SEP]\n[row 2]: Accounts receivable, net | $16,849 [SEP]\n[row 3]: Vendor non-trade receivables | $13,494 [SEP]\n[row 4]: Other current assets | $9,539 [SEP]\n[row 5]: Other current assets, net (residual) | $26,027 [SEP]\n[row 6]: Total current assets | $89,378 [SEP]\n[row 7]: Non-current assets: [SEP]\n[row 8]: Property, plant and equipment, net | $22,471 [SEP]\n[row 9]: Goodwill | $5,116 [SEP]\n[row 10]: Inventories | $2,349 [SEP]\n[row 11]: Intangible assets, net | $3,893 [SEP]\n[row 12]: Other non-current assets | $5,556 [SEP]\n[row 13]: Other non-current assets, net (residual) | $164,065 [SEP]\n[row 14]: Total non-current assets | $201,101 [SEP]\n[row 15]: Total assets | $290,479 [SEP]\n[row 16]: Current liabilities: [SEP]\n[row 17]: Accounts payable | $35,490 [SEP]\n[row 18]: Accrued liabilities | $25,181 [SEP]\n[row 19]: Commercial paper | $8,499 [SEP]\n[row 20]: Long-term debt, current | $2,500 [SEP]\n[row 21]: Other current liabilities, net (residual) | $8,940 [SEP]\n[row 22]: Total current liabilities | $80,610 [SEP]\n[row 23]: Non-current liabilities: [SEP]\n[row 24]: Long-term debt, non-current | $53,463 [SEP]\n[row 25]: Deferred income tax liabilities | $16,260 [SEP]\n[row 26]: Other non-current liabilities | $33,427 [SEP]\n[row 27]: Other non-current liabilities, net (residual) | ($12,636) [SEP]\n[row 28]: Total non-current liabilities | $90,514 [SEP]\n[row 29]: Total liabilities | $171,124 [SEP]\n[row 30]: Stockholders' equity: [SEP]\n[row 31]: Common stock and additional paid-in capital | $27,416 [SEP]\n[row 32]: Retained earnings | $92,284 [SEP]\n[row 33]: Accumulated other comprehensive income (loss) | ($345) [SEP]\n[row 34]: Total stockholders' equity | $119,355 [SEP]\n[row 35]: Total liabilities and stockholders' equity | $290,479 [SEP]",
-      "gt_table_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Current assets: [SEP]\n[row 1]: Cash and cash equivalents | $21,120 [SEP]\n[row 2]: Accounts receivable, net | $16,849 [SEP]\n[row 3]: Vendor non-trade receivables | $13,494 [SEP]\n[row 4]: Inventories | $2,349 [SEP]\n[row 5]: Other current assets | $9,539 [SEP]\n[row 6]: Other current assets, net (residual) | $26,027 [SEP]\n[row 7]: Total current assets | $89,378 [SEP]\n[row 8]: Non-current assets: [SEP]\n[row 9]: Property, plant and equipment, net | $22,471 [SEP]\n[row 10]: Goodwill | $5,116 [SEP]\n[row 11]: Intangible assets, net | $3,893 [SEP]\n[row 12]: Other non-current assets | $5,556 [SEP]\n[row 13]: Other non-current assets, net (residual) | $164,065 [SEP]\n[row 14]: Total non-current assets | $201,101 [SEP]\n[row 15]: Total assets | $290,479 [SEP]\n[row 16]: Current liabilities: [SEP]\n[row 17]: Accounts payable | $35,490 [SEP]\n[row 18]: Accrued liabilities | $25,181 [SEP]\n[row 19]: Commercial paper | $8,499 [SEP]\n[row 20]: Long-term debt, current | $2,500 [SEP]\n[row 21]: Other current liabilities, net (residual) | $8,940 [SEP]\n[row 22]: Total current liabilities | $80,610 [SEP]\n[row 23]: Non-current liabilities: [SEP]\n[row 24]: Long-term debt, non-current | $53,463 [SEP]\n[row 25]: Deferred income tax liabilities | $16,260 [SEP]\n[row 26]: Other non-current liabilities | $33,427 [SEP]\n[row 27]: Other non-current liabilities, net (residual) | ($12,636) [SEP]\n[row 28]: Total non-current liabilities | $90,514 [SEP]\n[row 29]: Total liabilities | $171,124 [SEP]\n[row 30]: Stockholders' equity: [SEP]\n[row 31]: Common stock and additional paid-in capital | $27,416 [SEP]\n[row 32]: Retained earnings | $92,284 [SEP]\n[row 33]: Accumulated other comprehensive income (loss) | ($345) [SEP]\n[row 34]: Total stockholders' equity | $119,355 [SEP]\n[row 35]: Total liabilities and stockholders' equity | $290,479 [SEP]",
-      "gt_transaction_data": "Transaction evidence \u2014 Apple Inc. FY2015 (BalanceSheet). Amounts are component movements; they are NOT the reported line totals.\n[row 1] Cash and cash equivalents: cash collected from customers: +29,092 (increase); operating cash disbursements: \u22127,972 (decrease)\n[row 2] Accounts receivable, net: invoiced customer sales on credit: +22,832 (increase); write-off of uncollectible accounts: \u22125,983 (decrease)\n[row 3] Vendor non-trade receivables: movement in the account during the period (first half): +8,443 (increase); movement in the account during the period (second half): +5,051 (increase)\n[row 5] Other current assets: movement in the account during the period (first half): +3,381 (increase); movement in the account during the period (second half): +6,158 (increase)\n[row 6] Other current assets, net (residual): movement in the account during the period (first half): +14,280 (increase); movement in the account during the period (second half): +11,747 (increase)\n[row 9] Property, plant and equipment, net: capital expenditure on equipment: +33,620 (increase); depreciation expense: \u221211,149 (decrease)\n[row 12] Other non-current assets: movement in the account during the period (first half): +3,216 (increase); movement in the account during the period (second half): +2,340 (increase)\n[row 17] Accounts payable: purchases on credit: +53,867 (increase); payments to vendors: \u221218,377 (decrease)\n[row 18] Accrued liabilities: expenses accrued: +38,079 (increase); accrued balances settled: \u221212,898 (decrease)\n[row 19] Commercial paper: movement in the account during the period (first half): +3,280 (increase); movement in the account during the period (second half): +5,219 (increase)\n[row 24] Long-term debt, non-current: issuance of long-term notes: +73,183 (increase); scheduled principal repayment: \u221219,720 (decrease)\n[row 25] Deferred income tax liabilities: movement in the account during the period (first half): +7,083 (increase); movement in the account during the period (second half): +9,177 (increase)\n[row 31] Common stock and additional paid-in capital: shares issued: +31,691 (increase); share repurchases retired: \u22124,275 (decrease)\n[row 32] Retained earnings: net income for the period: +111,636 (increase); dividends declared: \u221219,352 (decrease)\n[row 33] Accumulated other comprehensive income (loss): movement in the account during the period (first half): +164 (increase); movement in the account during the period (second half): +181 (increase)",
+      "modified_statement_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Current assets: [SEP]\n[row 1]: Cash and cash equivalents at carrying value | $21,120 [SEP]\n[row 2]: Available for sale securities, current | $20,481 [SEP]\n[row 3]: Accounts receivable, net, current | $16,849 [SEP]\n[row 4]: Deferred tax assets liabilities, net, current | $5,546 [SEP]\n[row 5]: Nontrade receivables, current | $13,494 [SEP]\n[row 6]: Other assets, current | $9,539 [SEP]\n[row 7]: Assets, current | $89,378 [SEP]\n[row 8]: Non-current assets: [SEP]\n[row 9]: Available for sale securities, non-current | $164,065 [SEP]\n[row 10]: Property plant and equipment, net | $22,471 [SEP]\n[row 11]: Inventory, net | $2,349 [SEP]\n[row 12]: Goodwill | $5,116 [SEP]\n[row 13]: Intangible assets, net excluding goodwill | $3,893 [SEP]\n[row 14]: Other assets, non-current | $5,556 [SEP]\n[row 15]: Assets | $290,479 [SEP]\n[row 16]: Current liabilities: [SEP]\n[row 17]: Accounts payable, current | $35,490 [SEP]\n[row 18]: Accrued liabilities, current | $25,181 [SEP]\n[row 19]: Deferred revenue, current | $8,940 [SEP]\n[row 20]: Commercial paper | $8,499 [SEP]\n[row 21]: Long term debt, current | $2,500 [SEP]\n[row 22]: Liabilities, current | $80,610 [SEP]\n[row 23]: Non-current liabilities: [SEP]\n[row 24]: Deferred revenue, non-current | $3,624 [SEP]\n[row 25]: Long term debt, non-current | $53,463 [SEP]\n[row 26]: Other liabilities, non-current | $33,427 [SEP]\n[row 27]: Liabilities | $171,124 [SEP]\n[row 28]: Stockholders' equity: [SEP]\n[row 29]: Common stocks including additional paid in capital | $27,416 [SEP]\n[row 30]: Retained earnings accumulated deficit | $92,284 [SEP]\n[row 31]: Accumulated other comprehensive income loss, net of tax | ($345) [SEP]\n[row 32]: Stockholders equity | $119,355 [SEP]\n[row 33]: Liabilities and stockholders equity | $290,479 [SEP]",
+      "gt_table_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Current assets: [SEP]\n[row 1]: Cash and cash equivalents at carrying value | $21,120 [SEP]\n[row 2]: Available for sale securities, current | $20,481 [SEP]\n[row 3]: Accounts receivable, net, current | $16,849 [SEP]\n[row 4]: Inventory, net | $2,349 [SEP]\n[row 5]: Deferred tax assets liabilities, net, current | $5,546 [SEP]\n[row 6]: Nontrade receivables, current | $13,494 [SEP]\n[row 7]: Other assets, current | $9,539 [SEP]\n[row 8]: Assets, current | $89,378 [SEP]\n[row 9]: Non-current assets: [SEP]\n[row 10]: Available for sale securities, non-current | $164,065 [SEP]\n[row 11]: Property plant and equipment, net | $22,471 [SEP]\n[row 12]: Goodwill | $5,116 [SEP]\n[row 13]: Intangible assets, net excluding goodwill | $3,893 [SEP]\n[row 14]: Other assets, non-current | $5,556 [SEP]\n[row 15]: Assets | $290,479 [SEP]\n[row 16]: Current liabilities: [SEP]\n[row 17]: Accounts payable, current | $35,490 [SEP]\n[row 18]: Accrued liabilities, current | $25,181 [SEP]\n[row 19]: Deferred revenue, current | $8,940 [SEP]\n[row 20]: Commercial paper | $8,499 [SEP]\n[row 21]: Long term debt, current | $2,500 [SEP]\n[row 22]: Liabilities, current | $80,610 [SEP]\n[row 23]: Non-current liabilities: [SEP]\n[row 24]: Deferred revenue, non-current | $3,624 [SEP]\n[row 25]: Long term debt, non-current | $53,463 [SEP]\n[row 26]: Other liabilities, non-current | $33,427 [SEP]\n[row 27]: Liabilities | $171,124 [SEP]\n[row 28]: Stockholders' equity: [SEP]\n[row 29]: Common stocks including additional paid in capital | $27,416 [SEP]\n[row 30]: Retained earnings accumulated deficit | $92,284 [SEP]\n[row 31]: Accumulated other comprehensive income loss, net of tax | ($345) [SEP]\n[row 32]: Stockholders equity | $119,355 [SEP]\n[row 33]: Liabilities and stockholders equity | $290,479 [SEP]",
+      "gt_transaction_data": "Transaction evidence \u2014 Apple Inc. FY2015 (BalanceSheet). Amounts are component movements; they are NOT the reported line totals.\n[row 1] Cash and cash equivalents at carrying value: cash collected from customers: +29,092 (increase); operating cash disbursements: \u22127,972 (decrease)\n[row 2] Available for sale securities, current: movement in the account during the period (first half): +10,318 (increase); movement in the account during the period (second half): +10,163 (increase)\n[row 3] Accounts receivable, net, current: invoiced customer sales on credit: +25,570 (increase); write-off of uncollectible accounts: \u22128,721 (decrease)\n[row 5] Deferred tax assets liabilities, net, current: movement in the account during the period (first half): +1,965 (increase); movement in the account during the period (second half): +3,581 (increase)\n[row 6] Nontrade receivables, current: movement in the account during the period (first half): +7,404 (increase); movement in the account during the period (second half): +6,090 (increase)\n[row 7] Other assets, current: movement in the account during the period (first half): +5,815 (increase); movement in the account during the period (second half): +3,724 (increase)\n[row 12] Goodwill: goodwill recognised on acquisition (first half): +2,962 (increase); goodwill recognised on acquisition (second half): +2,154 (increase)\n[row 14] Other assets, non-current: movement in the account during the period (first half): +3,477 (increase); movement in the account during the period (second half): +2,079 (increase)\n[row 17] Accounts payable, current: purchases on credit: +53,669 (increase); payments to vendors: \u221218,179 (decrease)\n[row 18] Accrued liabilities, current: expenses accrued: +30,165 (increase); accrued balances settled: \u22124,984 (decrease)\n[row 21] Long term debt, current: reclassified from long-term debt: +3,422 (increase); current maturities repaid: \u2212922 (decrease)\n[row 24] Deferred revenue, non-current: movement in the account during the period (first half): +1,579 (increase); movement in the account during the period (second half): +2,045 (increase)\n[row 29] Common stocks including additional paid in capital: shares issued: +31,691 (increase); share repurchases retired: \u22124,275 (decrease)\n[row 30] Retained earnings accumulated deficit: net income for the period: +111,636 (increase); dividends declared: \u221219,352 (decrease)\n[row 31] Accumulated other comprehensive income loss, net of tax: movement in the account during the period (first half): +164 (increase); movement in the account during the period (second half): +181 (increase)",
       "gt_xbrl_json": {
         "entity": {
           "name": "Apple Inc.",
@@ -267,7 +288,18 @@
             "value": 21120,
             "decimals": -6,
             "row": 1,
-            "label": "Cash and cash equivalents"
+            "label": "Cash and cash equivalents at carrying value"
+          },
+          {
+            "concept": "us-gaap:AvailableForSaleSecuritiesCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 20481,
+            "decimals": -6,
+            "row": 2,
+            "label": "Available for sale securities, current"
           },
           {
             "concept": "us-gaap:AccountsReceivableNetCurrent",
@@ -277,19 +309,8 @@
             "unit": "iso4217:USD",
             "value": 16849,
             "decimals": -6,
-            "row": 2,
-            "label": "Accounts receivable, net"
-          },
-          {
-            "concept": "us-gaap:NontradeReceivablesCurrent",
-            "period": {
-              "instant": "2015-09-26"
-            },
-            "unit": "iso4217:USD",
-            "value": 13494,
-            "decimals": -6,
             "row": 3,
-            "label": "Vendor non-trade receivables"
+            "label": "Accounts receivable, net, current"
           },
           {
             "concept": "us-gaap:InventoryNet",
@@ -300,7 +321,29 @@
             "value": 2349,
             "decimals": -6,
             "row": 4,
-            "label": "Inventories"
+            "label": "Inventory, net"
+          },
+          {
+            "concept": "us-gaap:DeferredTaxAssetsLiabilitiesNetCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 5546,
+            "decimals": -6,
+            "row": 5,
+            "label": "Deferred tax assets liabilities, net, current"
+          },
+          {
+            "concept": "us-gaap:NontradeReceivablesCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 13494,
+            "decimals": -6,
+            "row": 6,
+            "label": "Nontrade receivables, current"
           },
           {
             "concept": "us-gaap:OtherAssetsCurrent",
@@ -310,8 +353,8 @@
             "unit": "iso4217:USD",
             "value": 9539,
             "decimals": -6,
-            "row": 5,
-            "label": "Other current assets"
+            "row": 7,
+            "label": "Other assets, current"
           },
           {
             "concept": "us-gaap:AssetsCurrent",
@@ -321,8 +364,19 @@
             "unit": "iso4217:USD",
             "value": 89378,
             "decimals": -6,
-            "row": 7,
-            "label": "Total current assets"
+            "row": 8,
+            "label": "Assets, current"
+          },
+          {
+            "concept": "us-gaap:AvailableForSaleSecuritiesNoncurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 164065,
+            "decimals": -6,
+            "row": 10,
+            "label": "Available for sale securities, non-current"
           },
           {
             "concept": "us-gaap:PropertyPlantAndEquipmentNet",
@@ -332,8 +386,8 @@
             "unit": "iso4217:USD",
             "value": 22471,
             "decimals": -6,
-            "row": 9,
-            "label": "Property, plant and equipment, net"
+            "row": 11,
+            "label": "Property plant and equipment, net"
           },
           {
             "concept": "us-gaap:Goodwill",
@@ -343,7 +397,7 @@
             "unit": "iso4217:USD",
             "value": 5116,
             "decimals": -6,
-            "row": 10,
+            "row": 12,
             "label": "Goodwill"
           },
           {
@@ -354,8 +408,8 @@
             "unit": "iso4217:USD",
             "value": 3893,
             "decimals": -6,
-            "row": 11,
-            "label": "Intangible assets, net"
+            "row": 13,
+            "label": "Intangible assets, net excluding goodwill"
           },
           {
             "concept": "us-gaap:OtherAssetsNoncurrent",
@@ -365,19 +419,8 @@
             "unit": "iso4217:USD",
             "value": 5556,
             "decimals": -6,
-            "row": 12,
-            "label": "Other non-current assets"
-          },
-          {
-            "concept": "us-gaap:AssetsNoncurrent",
-            "period": {
-              "instant": "2015-09-26"
-            },
-            "unit": "iso4217:USD",
-            "value": 201101,
-            "decimals": -6,
             "row": 14,
-            "label": "Total non-current assets"
+            "label": "Other assets, non-current"
           },
           {
             "concept": "us-gaap:Assets",
@@ -388,7 +431,7 @@
             "value": 290479,
             "decimals": -6,
             "row": 15,
-            "label": "Total assets"
+            "label": "Assets"
           },
           {
             "concept": "us-gaap:AccountsPayableCurrent",
@@ -399,7 +442,7 @@
             "value": 35490,
             "decimals": -6,
             "row": 17,
-            "label": "Accounts payable"
+            "label": "Accounts payable, current"
           },
           {
             "concept": "us-gaap:AccruedLiabilitiesCurrent",
@@ -410,7 +453,18 @@
             "value": 25181,
             "decimals": -6,
             "row": 18,
-            "label": "Accrued liabilities"
+            "label": "Accrued liabilities, current"
+          },
+          {
+            "concept": "us-gaap:DeferredRevenueCurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 8940,
+            "decimals": -6,
+            "row": 19,
+            "label": "Deferred revenue, current"
           },
           {
             "concept": "us-gaap:CommercialPaper",
@@ -420,7 +474,7 @@
             "unit": "iso4217:USD",
             "value": 8499,
             "decimals": -6,
-            "row": 19,
+            "row": 20,
             "label": "Commercial paper"
           },
           {
@@ -431,8 +485,8 @@
             "unit": "iso4217:USD",
             "value": 2500,
             "decimals": -6,
-            "row": 20,
-            "label": "Long-term debt, current"
+            "row": 21,
+            "label": "Long term debt, current"
           },
           {
             "concept": "us-gaap:LiabilitiesCurrent",
@@ -443,7 +497,18 @@
             "value": 80610,
             "decimals": -6,
             "row": 22,
-            "label": "Total current liabilities"
+            "label": "Liabilities, current"
+          },
+          {
+            "concept": "us-gaap:DeferredRevenueNoncurrent",
+            "period": {
+              "instant": "2015-09-26"
+            },
+            "unit": "iso4217:USD",
+            "value": 3624,
+            "decimals": -6,
+            "row": 24,
+            "label": "Deferred revenue, non-current"
           },
           {
             "concept": "us-gaap:LongTermDebtNoncurrent",
@@ -453,19 +518,8 @@
             "unit": "iso4217:USD",
             "value": 53463,
             "decimals": -6,
-            "row": 24,
-            "label": "Long-term debt, non-current"
-          },
-          {
-            "concept": "us-gaap:DeferredIncomeTaxLiabilitiesNet",
-            "period": {
-              "instant": "2015-09-26"
-            },
-            "unit": "iso4217:USD",
-            "value": 16260,
-            "decimals": -6,
             "row": 25,
-            "label": "Deferred income tax liabilities"
+            "label": "Long term debt, non-current"
           },
           {
             "concept": "us-gaap:OtherLiabilitiesNoncurrent",
@@ -476,18 +530,7 @@
             "value": 33427,
             "decimals": -6,
             "row": 26,
-            "label": "Other non-current liabilities"
-          },
-          {
-            "concept": "us-gaap:LiabilitiesNoncurrent",
-            "period": {
-              "instant": "2015-09-26"
-            },
-            "unit": "iso4217:USD",
-            "value": 90514,
-            "decimals": -6,
-            "row": 28,
-            "label": "Total non-current liabilities"
+            "label": "Other liabilities, non-current"
           },
           {
             "concept": "us-gaap:Liabilities",
@@ -497,8 +540,8 @@
             "unit": "iso4217:USD",
             "value": 171124,
             "decimals": -6,
-            "row": 29,
-            "label": "Total liabilities"
+            "row": 27,
+            "label": "Liabilities"
           },
           {
             "concept": "us-gaap:CommonStocksIncludingAdditionalPaidInCapital",
@@ -508,8 +551,8 @@
             "unit": "iso4217:USD",
             "value": 27416,
             "decimals": -6,
-            "row": 31,
-            "label": "Common stock and additional paid-in capital"
+            "row": 29,
+            "label": "Common stocks including additional paid in capital"
           },
           {
             "concept": "us-gaap:RetainedEarningsAccumulatedDeficit",
@@ -519,8 +562,8 @@
             "unit": "iso4217:USD",
             "value": 92284,
             "decimals": -6,
-            "row": 32,
-            "label": "Retained earnings"
+            "row": 30,
+            "label": "Retained earnings accumulated deficit"
           },
           {
             "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax",
@@ -530,8 +573,8 @@
             "unit": "iso4217:USD",
             "value": -345,
             "decimals": -6,
-            "row": 33,
-            "label": "Accumulated other comprehensive income (loss)"
+            "row": 31,
+            "label": "Accumulated other comprehensive income loss, net of tax"
           },
           {
             "concept": "us-gaap:StockholdersEquity",
@@ -541,8 +584,8 @@
             "unit": "iso4217:USD",
             "value": 119355,
             "decimals": -6,
-            "row": 34,
-            "label": "Total stockholders' equity"
+            "row": 32,
+            "label": "Stockholders equity"
           },
           {
             "concept": "us-gaap:LiabilitiesAndStockholdersEquity",
@@ -552,8 +595,8 @@
             "unit": "iso4217:USD",
             "value": 290479,
             "decimals": -6,
-            "row": 35,
-            "label": "Total liabilities and stockholders' equity"
+            "row": 33,
+            "label": "Liabilities and stockholders equity"
           }
         ]
       },
@@ -588,7 +631,7 @@
         "row_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
         "row_label": "Revenue",
         "original_value": 229234,
-        "erroneous_value": 260669
+        "erroneous_value": 274087
       },
       "ground_truth_citations": {
         "citable": true,
@@ -614,7 +657,7 @@
         "weak_citation": false,
         "rationale": "Revenue is recognized when control of goods/services transfers to the customer (performance obligation satisfied). Premature recognition violates ASC 606-10-25."
       },
-      "modified_statement_text": "[Time]: 2017-09-30 [SEP]\n[row 0]: Revenue | $260,669 [SEP]\n[row 1]: Cost of revenue | ($141,048) [SEP]\n[row 2]: Research and development | ($11,581) [SEP]\n[row 3]: Selling, general and administrative | ($15,261) [SEP]\n[row 4]: Other operating expenses, net (residual) | $0 [SEP]\n[row 5]: Operating income (loss) | $61,344 [SEP]\n[row 6]: Other income (expense), net | $2,745 [SEP]\n[row 7]: Income before income taxes | $64,089 [SEP]\n[row 8]: Income tax (expense) benefit | ($15,738) [SEP]\n[row 9]: Net income (loss) | $48,351 [SEP]",
+      "modified_statement_text": "[Time]: 2017-09-30 [SEP]\n[row 0]: Revenue | $274,087 [SEP]\n[row 1]: Cost of revenue | ($141,048) [SEP]\n[row 2]: Research and development | ($11,581) [SEP]\n[row 3]: Selling, general and administrative | ($15,261) [SEP]\n[row 4]: Other operating expenses, net (residual) | $0 [SEP]\n[row 5]: Operating income (loss) | $61,344 [SEP]\n[row 6]: Other income (expense), net | $2,745 [SEP]\n[row 7]: Income before income taxes | $64,089 [SEP]\n[row 8]: Income tax (expense) benefit | ($15,738) [SEP]\n[row 9]: Net income (loss) | $48,351 [SEP]",
       "gt_table_text": "[Time]: 2017-09-30 [SEP]\n[row 0]: Revenue | $229,234 [SEP]\n[row 1]: Cost of revenue | ($141,048) [SEP]\n[row 2]: Research and development | ($11,581) [SEP]\n[row 3]: Selling, general and administrative | ($15,261) [SEP]\n[row 4]: Other operating expenses, net (residual) | $0 [SEP]\n[row 5]: Operating income (loss) | $61,344 [SEP]\n[row 6]: Other income (expense), net | $2,745 [SEP]\n[row 7]: Income before income taxes | $64,089 [SEP]\n[row 8]: Income tax (expense) benefit | ($15,738) [SEP]\n[row 9]: Net income (loss) | $48,351 [SEP]",
       "gt_transaction_data": "Transaction evidence \u2014 Apple Inc. FY2017 (IncomeStatement). Amounts are component movements; they are NOT the reported line totals.\n[row 1] Cost of revenue: cost of goods sold (first half): +58,222 (increase); cost of goods sold (second half): +82,826 (increase)\n[row 2] Research and development: research and development spend (first half): +4,285 (increase); research and development spend (second half): +7,296 (increase)\n[row 3] Selling, general and administrative: movement in the account during the period (first half): +7,690 (increase); movement in the account during the period (second half): +7,571 (increase)\n[row 4] Other operating expenses, net (residual): movement in the account during the period (first half): +1 (increase); movement in the account during the period (second half): +-1 (increase)\n[row 6] Other income (expense), net: movement in the account during the period (first half): +1,756 (increase); movement in the account during the period (second half): +989 (increase)",
       "gt_xbrl_json": {
@@ -736,11 +779,11 @@
       "error_type": "Misclassification",
       "error_identification": {
         "error_type": "Misclassification",
-        "problematic_entry": 3,
+        "problematic_entry": 4,
         "affected_xbrl_concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
         "affected_label": "Purchases of property, plant and equipment",
         "pre_inject_row": 7,
-        "post_inject_row": 3
+        "post_inject_row": 4
       },
       "injection_detail": {
         "row_concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
@@ -762,7 +805,7 @@
         "weak_citation": false,
         "rationale": "Cash flow items must be classified as operating, investing, or financing per ASC 230-10-45; e.g., capex is investing, dividends paid are financing."
       },
-      "modified_statement_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Operating activities: [SEP]\n[row 1]: Net income | $53,394 [SEP]\n[row 2]: Depreciation and amortization | $9,200 [SEP]\n[row 3]: Purchases of property, plant and equipment | ($11,247) [SEP]\n[row 4]: Share-based compensation | $3,586 [SEP]\n[row 5]: Other operating activities, net (residual) | $15,086 [SEP]\n[row 6]: Net cash from operating activities | $81,266 [SEP]\n[row 7]: Investing activities: [SEP]\n[row 8]: Other investing activities, net (residual) | ($45,027) [SEP]\n[row 9]: Net cash from investing activities | ($56,274) [SEP]\n[row 10]: Financing activities: [SEP]\n[row 11]: Dividends paid | ($11,431) [SEP]\n[row 12]: Repurchases of common stock | ($35,253) [SEP]\n[row 13]: Other financing activities, net (residual) | $28,968 [SEP]\n[row 14]: Net cash from financing activities | ($17,716) [SEP]\n[row 15]: Net increase (decrease) in cash | $7,276 [SEP]",
+      "modified_statement_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Operating activities: [SEP]\n[row 1]: Net income | $53,394 [SEP]\n[row 2]: Depreciation and amortization | $9,200 [SEP]\n[row 3]: Share-based compensation | $3,586 [SEP]\n[row 4]: Purchases of property, plant and equipment | ($11,247) [SEP]\n[row 5]: Other operating activities, net (residual) | $15,086 [SEP]\n[row 6]: Net cash from operating activities | $81,266 [SEP]\n[row 7]: Investing activities: [SEP]\n[row 8]: Other investing activities, net (residual) | ($45,027) [SEP]\n[row 9]: Net cash from investing activities | ($56,274) [SEP]\n[row 10]: Financing activities: [SEP]\n[row 11]: Dividends paid | ($11,431) [SEP]\n[row 12]: Repurchases of common stock | ($35,253) [SEP]\n[row 13]: Other financing activities, net (residual) | $28,968 [SEP]\n[row 14]: Net cash from financing activities | ($17,716) [SEP]\n[row 15]: Net increase (decrease) in cash | $7,276 [SEP]",
       "gt_table_text": "[Time]: 2015-09-26 [SEP]\n[row 0]: Operating activities: [SEP]\n[row 1]: Net income | $53,394 [SEP]\n[row 2]: Depreciation and amortization | $9,200 [SEP]\n[row 3]: Share-based compensation | $3,586 [SEP]\n[row 4]: Other operating activities, net (residual) | $15,086 [SEP]\n[row 5]: Net cash from operating activities | $81,266 [SEP]\n[row 6]: Investing activities: [SEP]\n[row 7]: Purchases of property, plant and equipment | ($11,247) [SEP]\n[row 8]: Other investing activities, net (residual) | ($45,027) [SEP]\n[row 9]: Net cash from investing activities | ($56,274) [SEP]\n[row 10]: Financing activities: [SEP]\n[row 11]: Dividends paid | ($11,431) [SEP]\n[row 12]: Repurchases of common stock | ($35,253) [SEP]\n[row 13]: Other financing activities, net (residual) | $28,968 [SEP]\n[row 14]: Net cash from financing activities | ($17,716) [SEP]\n[row 15]: Net increase (decrease) in cash | $7,276 [SEP]",
       "gt_transaction_data": "Transaction evidence \u2014 Apple Inc. FY2015 (CashFlow). Amounts are component movements; they are NOT the reported line totals.\n[row 1] Net income: net income for the period (first half): +30,967 (increase); net income for the period (second half): +22,427 (increase)\n[row 2] Depreciation and amortization: depreciation and amortisation add-back (first half): +3,595 (increase); depreciation and amortisation add-back (second half): +5,605 (increase)\n[row 4] Other operating activities, net (residual): movement in the account during the period (first half): +9,126 (increase); movement in the account during the period (second half): +5,960 (increase)\n[row 8] Other investing activities, net (residual): movement in the account during the period (first half): +21,595 (increase); movement in the account during the period (second half): +23,432 (increase)\n[row 12] Repurchases of common stock: common stock repurchased (first half): +16,020 (increase); common stock repurchased (second half): +19,233 (increase)\n[row 13] Other financing activities, net (residual): movement in the account during the period (first half): +15,080 (increase); movement in the account during the period (second half): +13,888 (increase)",
       "gt_xbrl_json": {

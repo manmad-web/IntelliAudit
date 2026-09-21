@@ -1,12 +1,12 @@
 {
-  "company": "COCA COLA CO",
-  "ticker": "KO",
-  "cik": "0000021344",
+  "company": "Johnson & Johnson",
+  "ticker": "JNJ",
+  "cik": "0000200406",
   "statement_type": "BalanceSheet",
-  "fiscal_year": 2020,
-  "period": "2020-12-31",
+  "fiscal_year": 2019,
+  "period": "2019-12-29",
   "unit": "USD millions",
-  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
   "rows": [
     {
       "idx": 0,
@@ -18,65 +18,64 @@
     },
     {
       "idx": 1,
-      "label": "Cash and cash equivalents",
+      "label": "Cash and cash equivalents at carrying value",
       "section": "CurrentAssets",
       "concept": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
-      "value": 6795,
+      "value": 17305,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 2,
-      "label": "Marketable securities, current",
+      "label": "Available for sale securities, current",
       "section": "CurrentAssets",
-      "concept": "us-gaap:MarketableSecuritiesCurrent",
-      "value": 2348,
+      "concept": "us-gaap:AvailableForSaleSecuritiesCurrent",
+      "value": 1982,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 3,
-      "label": "Accounts receivable, net",
+      "label": "Accounts receivable, net, current",
       "section": "CurrentAssets",
       "concept": "us-gaap:AccountsReceivableNetCurrent",
-      "value": 3144,
+      "value": 14481,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 4,
-      "label": "Inventories",
+      "label": "Inventory, net",
       "section": "CurrentAssets",
       "concept": "us-gaap:InventoryNet",
-      "value": 3266,
+      "value": 9020,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 5,
-      "label": "Prepaid expenses",
+      "label": "Prepaid expense and other assets, current",
       "section": "CurrentAssets",
       "concept": "us-gaap:PrepaidExpenseAndOtherAssetsCurrent",
-      "value": 1916,
+      "value": 2392,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 6,
-      "label": "Other current assets, net (residual)",
+      "label": "Assets held for sale not part of disposal group, current other",
       "section": "CurrentAssets",
-      "concept": null,
-      "value": 1771,
+      "concept": "us-gaap:AssetsHeldForSaleNotPartOfDisposalGroupCurrentOther",
+      "value": 94,
       "kind": "line",
-      "injectable": false,
-      "residual": true
+      "injectable": true
     },
     {
       "idx": 7,
-      "label": "Total current assets",
+      "label": "Assets, current",
       "section": "CurrentAssets",
       "concept": "us-gaap:AssetsCurrent",
-      "value": 19240,
+      "value": 45274,
       "kind": "subtotal",
       "sums": [
         1,
@@ -97,19 +96,19 @@
     },
     {
       "idx": 9,
-      "label": "Property, plant and equipment, net",
+      "label": "Property plant and equipment, net",
       "section": "NoncurrentAssets",
       "concept": "us-gaap:PropertyPlantAndEquipmentNet",
-      "value": 10777,
+      "value": 17658,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 10,
-      "label": "Operating lease right-of-use assets",
+      "label": "Intangible assets, net excluding goodwill",
       "section": "NoncurrentAssets",
-      "concept": "us-gaap:OperatingLeaseRightOfUseAsset",
-      "value": 1548,
+      "concept": "us-gaap:IntangibleAssetsNetExcludingGoodwill",
+      "value": 47643,
       "kind": "line",
       "injectable": true
     },
@@ -118,68 +117,46 @@
       "label": "Goodwill",
       "section": "NoncurrentAssets",
       "concept": "us-gaap:Goodwill",
-      "value": 17506,
+      "value": 33639,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 12,
-      "label": "Deferred income tax assets",
+      "label": "Deferred tax assets, net, non-current",
       "section": "NoncurrentAssets",
-      "concept": "us-gaap:DeferredIncomeTaxAssetsNet",
-      "value": 2460,
+      "concept": "us-gaap:DeferredTaxAssetsNetNoncurrent",
+      "value": 7819,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 13,
-      "label": "Other non-current assets",
+      "label": "Other assets, non-current",
       "section": "NoncurrentAssets",
       "concept": "us-gaap:OtherAssetsNoncurrent",
-      "value": 6184,
+      "value": 5695,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 14,
-      "label": "Other non-current assets, net (residual)",
-      "section": "NoncurrentAssets",
-      "concept": null,
-      "value": 29581,
-      "kind": "line",
-      "injectable": false,
-      "residual": true
-    },
-    {
-      "idx": 15,
-      "label": "Total non-current assets",
-      "section": "NoncurrentAssets",
-      "concept": "us-gaap:AssetsNoncurrent",
-      "value": 68056,
-      "kind": "subtotal",
+      "label": "Assets",
+      "section": "Assets",
+      "concept": "us-gaap:Assets",
+      "value": 157728,
+      "kind": "total",
       "sums": [
+        7,
         9,
         10,
         11,
         12,
-        13,
-        14
+        13
       ]
     },
     {
-      "idx": 16,
-      "label": "Total assets",
-      "section": "Assets",
-      "concept": "us-gaap:Assets",
-      "value": 87296,
-      "kind": "total",
-      "sums": [
-        7,
-        15
-      ]
-    },
-    {
-      "idx": 17,
+      "idx": 15,
       "label": "Current liabilities:",
       "section": "CurrentLiabilities",
       "concept": null,
@@ -187,50 +164,70 @@
       "kind": "header"
     },
     {
-      "idx": 18,
-      "label": "Commercial paper",
+      "idx": 16,
+      "label": "Short term borrowings",
       "section": "CurrentLiabilities",
-      "concept": "us-gaap:CommercialPaper",
-      "value": 1329,
+      "concept": "us-gaap:ShortTermBorrowings",
+      "value": 1202,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 17,
+      "label": "Accounts payable, current",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:AccountsPayableCurrent",
+      "value": 8544,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 18,
+      "label": "Accrued liabilities, current",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:AccruedLiabilitiesCurrent",
+      "value": 9715,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 19,
-      "label": "Long-term debt, current",
+      "label": "Employee related liabilities, current",
       "section": "CurrentLiabilities",
-      "concept": "us-gaap:LongTermDebtCurrent",
-      "value": 485,
+      "concept": "us-gaap:EmployeeRelatedLiabilitiesCurrent",
+      "value": 3354,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 20,
-      "label": "Operating lease liabilities, current",
+      "label": "Accrued income taxes, current",
       "section": "CurrentLiabilities",
-      "concept": "us-gaap:OperatingLeaseLiabilityCurrent",
-      "value": 322,
+      "concept": "us-gaap:AccruedIncomeTaxesCurrent",
+      "value": 2266,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 21,
-      "label": "Other current liabilities, net (residual)",
+      "label": "Other CurrentLiabilities, net (residual)",
       "section": "CurrentLiabilities",
       "concept": null,
-      "value": 12465,
+      "value": 10883,
       "kind": "line",
       "injectable": false,
       "residual": true
     },
     {
       "idx": 22,
-      "label": "Total current liabilities",
+      "label": "Liabilities, current",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:LiabilitiesCurrent",
-      "value": 14601,
+      "value": 35964,
       "kind": "subtotal",
       "sums": [
+        16,
+        17,
         18,
         19,
         20,
@@ -247,58 +244,58 @@
     },
     {
       "idx": 24,
-      "label": "Long-term debt, non-current",
+      "label": "Long term debt, non-current",
       "section": "NoncurrentLiabilities",
       "concept": "us-gaap:LongTermDebtNoncurrent",
-      "value": 40125,
+      "value": 26494,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 25,
-      "label": "Operating lease liabilities, non-current",
+      "label": "Deferred tax liabilities, non-current",
       "section": "NoncurrentLiabilities",
-      "concept": "us-gaap:OperatingLeaseLiabilityNoncurrent",
-      "value": 1300,
+      "concept": "us-gaap:DeferredTaxLiabilitiesNoncurrent",
+      "value": 5958,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 26,
-      "label": "Deferred income tax liabilities",
+      "label": "Pension and other postretirement defined benefit plans liabilities, non-current",
       "section": "NoncurrentLiabilities",
-      "concept": "us-gaap:DeferredIncomeTaxLiabilitiesNet",
-      "value": 1833,
+      "concept": "us-gaap:PensionAndOtherPostretirementDefinedBenefitPlansLiabilitiesNoncurrent",
+      "value": 10663,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 27,
-      "label": "Other non-current liabilities",
+      "label": "Accrued income taxes, non-current",
       "section": "NoncurrentLiabilities",
-      "concept": "us-gaap:OtherLiabilitiesNoncurrent",
-      "value": 9453,
+      "concept": "us-gaap:AccruedIncomeTaxesNoncurrent",
+      "value": 7444,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 28,
-      "label": "Other non-current liabilities, net (residual)",
+      "label": "Other liabilities, non-current",
       "section": "NoncurrentLiabilities",
-      "concept": null,
-      "value": 685,
+      "concept": "us-gaap:OtherLiabilitiesNoncurrent",
+      "value": 11734,
       "kind": "line",
-      "injectable": false,
-      "residual": true
+      "injectable": true
     },
     {
       "idx": 29,
-      "label": "Total non-current liabilities",
+      "label": "Liabilities",
       "section": "NoncurrentLiabilities",
-      "concept": "us-gaap:LiabilitiesNoncurrent",
-      "value": 53396,
+      "concept": "us-gaap:Liabilities",
+      "value": 98257,
       "kind": "subtotal",
       "sums": [
+        22,
         24,
         25,
         26,
@@ -308,18 +305,6 @@
     },
     {
       "idx": 30,
-      "label": "Total liabilities",
-      "section": "Liabilities",
-      "concept": "us-gaap:Liabilities",
-      "value": 67997,
-      "kind": "total",
-      "sums": [
-        22,
-        29
-      ]
-    },
-    {
-      "idx": 31,
       "label": "Stockholders' equity:",
       "section": "Equity",
       "concept": null,
@@ -327,76 +312,76 @@
       "kind": "header"
     },
     {
+      "idx": 31,
+      "label": "Accumulated other comprehensive income loss, net of tax",
+      "section": "Equity",
+      "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax",
+      "value": -15891,
+      "kind": "line",
+      "injectable": true
+    },
+    {
       "idx": 32,
-      "label": "Retained earnings",
+      "label": "Retained earnings accumulated deficit",
       "section": "Equity",
       "concept": "us-gaap:RetainedEarningsAccumulatedDeficit",
-      "value": 66555,
+      "value": 110659,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 33,
-      "label": "Accumulated other comprehensive income (loss)",
+      "label": "Common stock value",
       "section": "Equity",
-      "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax",
-      "value": -14601,
+      "concept": "us-gaap:CommonStockValue",
+      "value": 3120,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 34,
-      "label": "Treasury stock",
+      "label": "Treasury stock value",
       "section": "Equity",
       "concept": "us-gaap:TreasuryStockValue",
-      "value": 52016,
+      "value": 38417,
       "kind": "line",
       "injectable": true
     },
     {
       "idx": 35,
-      "label": "Noncontrolling interests",
-      "section": "Equity",
-      "concept": "us-gaap:MinorityInterest",
-      "value": 1985,
-      "kind": "line",
-      "injectable": true
-    },
-    {
-      "idx": 36,
-      "label": "Other equity, net (residual)",
+      "label": "Other Equity, net (residual)",
       "section": "Equity",
       "concept": null,
-      "value": -86656,
+      "value": -76834,
       "kind": "line",
       "injectable": false,
       "residual": true
     },
     {
-      "idx": 37,
-      "label": "Total stockholders' equity",
+      "idx": 36,
+      "label": "Stockholders equity including portion attributable to noncontrolling interest",
       "section": "Equity",
-      "concept": "us-gaap:StockholdersEquity",
-      "value": 19299,
+      "concept": "us-gaap:StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+      "value": 59471,
       "kind": "subtotal",
       "sums": [
+        31,
         32,
         33,
         34,
-        35,
-        36
+        35
       ]
     },
     {
-      "idx": 38,
-      "label": "Total liabilities and stockholders' equity",
+      "idx": 37,
+      "label": "Liabilities and stockholders equity",
       "section": "LiabilitiesAndEquity",
       "concept": "us-gaap:LiabilitiesAndStockholdersEquity",
-      "value": 87296,
+      "value": 157728,
       "kind": "total",
       "sums": [
-        30,
-        37
+        29,
+        36
       ]
     }
   ],

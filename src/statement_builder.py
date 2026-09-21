@@ -155,6 +155,16 @@ def build_balance_sheet(facts, fiscal_year, scale=1_000_000):
     """
     meta = company_meta(facts)
 
+    # AUDIT FIX #6: prefer the FILING'S OWN calculation linkbase — real line
+    # items, real order, no unnamed residual plug. Falls back to the template
+    # only if the filing's linkbase can't be fetched or parsed.
+    try:
+        _real = build_balance_sheet_from_filing(facts, fiscal_year, meta["cik"], scale)
+        if _real:
+            return _real
+    except Exception:
+        pass
+
     # --- real reported anchors --------------------------------------------
     a_cur, end_date = _anchor(facts, "us-gaap:AssetsCurrent", fiscal_year, scale)
     assets, e2 = _anchor(facts, "us-gaap:Assets", fiscal_year, scale)
@@ -400,3 +410,106 @@ def build_cash_flow(facts, fiscal_year):
             "rows": rows,
             "identities": [{"lhs": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
                             "rhs": [oa_c, ia_c, fa_c], "name": "cash_rollforward", "tolerant": True}]}
+
+
+# ============================================================================
+#  AUDIT FIX #6 (real) — build the balance sheet from the FILING'S OWN
+#  calculation linkbase, so line items are the company's actual lines and the
+#  unnamed "(residual)" plug disappears.
+# ============================================================================
+_SECT_ORDER = ["CurrentAssets", "NoncurrentAssets", "Assets",
+               "CurrentLiabilities", "NoncurrentLiabilities", "Liabilities",
+               "Equity", "LiabilitiesAndEquity"]
+_SECT_HEADER = {"CurrentAssets": "Current assets:", "NoncurrentAssets": "Non-current assets:",
+                "CurrentLiabilities": "Current liabilities:",
+                "NoncurrentLiabilities": "Non-current liabilities:",
+                "Equity": "Stockholders' equity:"}
+_GRAND = {"Assets": "Assets", "LiabilitiesAndStockholdersEquity": "LiabilitiesAndEquity"}
+
+
+def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000):
+    from filing_structure import balance_sheet_tree, flatten
+    meta = company_meta(facts)
+    anchor = concept_value(facts, "us-gaap:Assets", fiscal_year)
+    if not anchor:
+        return None
+    try:
+        tree = balance_sheet_tree(cik, anchor["accn"])
+    except Exception:
+        return None
+    if not tree or "AssetsCurrent" not in tree:
+        return None
+    flat = flatten(tree)
+
+    def val(c):
+        cv = concept_value(facts, "us-gaap:" + c, fiscal_year)
+        return round(cv["value"] / scale) if cv else None
+
+    # assign each concept its display section (grand totals get their own)
+    entries = []
+    for c, s, k, p in flat:
+        entries.append((c, _GRAND.get(c, s), k))
+
+    rows, idx, at = [], 0, {}
+    for sect in _SECT_ORDER:
+        lines = [e for e in entries if e[1] == sect and e[2] == "line"]
+        subs = [e for e in entries if e[1] == sect and e[2] in ("subtotal", "total")]
+        if not lines and not subs:
+            continue
+        if lines and sect in _SECT_HEADER:
+            rows.append({"idx": idx, "label": _SECT_HEADER[sect], "section": sect,
+                         "concept": None, "value": None, "kind": "header"}); idx += 1
+        for c, s, k in lines:
+            v = val(c)
+            if v is None:
+                continue
+            rows.append({"idx": idx, "label": _label_for(c), "section": sect,
+                         "concept": "us-gaap:" + c, "value": v, "kind": "line",
+                         "injectable": True}); at[c] = idx; idx += 1
+        for c, s, k in subs:
+            v = val(c)
+            if v is None:
+                continue
+            kids = [at[ch] for ch, _w in tree.get(c, []) if ch in at]
+            rows.append({"idx": idx, "label": _label_for(c), "section": sect,
+                         "concept": "us-gaap:" + c, "value": v,
+                         "kind": "total" if c in _GRAND else "subtotal",
+                         "sums": kids}); at[c] = idx; idx += 1
+
+    # close any gap with ONE labelled residual per subtotal (usually none now)
+    by = {r["idx"]: r for r in rows}
+    extra = []
+    for r in list(rows):
+        if r.get("kind") in ("subtotal", "total") and r.get("sums"):
+            gap = r["value"] - sum(by[i]["value"] for i in r["sums"])
+            if gap:
+                extra.append((r, gap))
+    for r, gap in extra:
+        rows.insert(rows.index(r), {"idx": -1, "label": "Other " + r["section"] + ", net (residual)",
+                                    "section": r["section"], "concept": None, "value": gap,
+                                    "kind": "line", "injectable": False, "residual": True})
+    if extra:
+        remap = {}
+        for i, rr in enumerate(rows):
+            remap[rr["idx"]] = i; rr["idx"] = i
+        for rr in rows:
+            if rr.get("sums"):
+                rr["sums"] = [remap[s] for s in rr["sums"] if s in remap]
+        # attach each new residual to its subtotal
+        for rr in rows:
+            if rr.get("kind") in ("subtotal", "total") and rr.get("sums"):
+                for j, cand in enumerate(rows):
+                    if cand.get("residual") and cand["section"] == rr["section"] and j < rows.index(rr):
+                        if j not in rr["sums"]:
+                            rr["sums"].append(j)
+
+    if not any(r.get("concept") == "us-gaap:Assets" for r in rows):
+        return None
+    return {"company": meta["company"], "ticker": None, "cik": meta["cik"],
+            "statement_type": "BalanceSheet", "fiscal_year": fiscal_year,
+            "period": anchor["end"], "unit": "USD millions",
+            "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
+            "rows": rows,
+            "identities": [{"lhs": "us-gaap:Assets",
+                            "rhs": ["us-gaap:LiabilitiesAndStockholdersEquity"],
+                            "name": "accounting_equation"}]}

@@ -8,7 +8,11 @@ against SEC EDGAR.
 **Every checkable claim reproduced exactly on our side.** This file records all
 findings, what was fixed in v0.2, and what is still open.
 
-> **Status: v0.2 is NOT ready for publication.** Findings 1, 2 and 5 are only
+> **v0.3 status: the triviality gate now PASSES on all seven checks.** Findings 1-6 are
+> addressed; finding 7 (sample bias) and validation of the remaining citations are open.
+> Do not quote accuracy numbers until a blind re-run.
+
+> **v0.2 status (superseded): NOT ready for publication.** Findings 1, 2 and 5 are only
 > partly addressed and require an accountant. Do not quote accuracy numbers from
 > this dataset yet.
 
@@ -79,3 +83,30 @@ should be dropped or given the evidence they need.
   accounting principle. Retracted pending accountant review.
 - `DATASHEET.md` described an LLM cross-check and human expert review. **Neither was
   ever run.** Corrected.
+
+
+---
+
+# v0.3 — issues 6 and 2 closed
+
+**#6 residual filler: 26% → 4.1%.** Root cause was that the us-gaap `stm/` linkbases
+are a generic FASB template, not any filer's structure. The fix: `companyfacts`
+carries the **accession number** of the 10-K each fact came from, so we fetch that
+filing's own `*_cal.xml` and rebuild the statement from the company's real
+calculation tree (`src/filing_structure.py`). Apple FY2017 now resolves to its
+actual 22 lines with **0.0% residual** — the $194bn plug is a properly named
+"Available-for-sale securities, non-current".
+
+**#2 citation guessability: 79.2% → 48.0%.** Two changes:
+1. Added subject-matter rules derivable from concepts already in companyfacts —
+   **R13 lease operating/finance (ASC 842-10-25-2)**, **R14 goodwill impairment
+   (ASC 350-20-35-1)**, **R15 AFS fair value (ASC 320-10-35-1)**. The two main
+   buckets are now genuinely hard: Misclassification/BalanceSheet majority **28%**
+   (four competing citations), Numerical/BalanceSheet **35%** (three).
+2. **R04 (missing row) made detection-only.** `ASC 210-10-45-1` for an arbitrary
+   omitted line was the same catch-all the audit flagged on R05/R06/R07/R12.
+
+Dataset: **1,231 records**, 521 citable / 710 detection-only.
+
+**Still open:** sample bias (#7); whether the 8 remaining citations are correct
+(needs the accountant); the LLM cross-check and human review still unrun.

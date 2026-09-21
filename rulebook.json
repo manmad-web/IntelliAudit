@@ -10,13 +10,15 @@
       "Redundant Row",
       "Misclassification"
     ],
-    "version": "0.2",
+    "version": "0.3",
     "audit_changes": [
       "Citations removed for R05/R06/R07/R12 (no governing ASC paragraph) -> detection-only cases.",
       "linkbase_verified is now a STRICT paragraph match (was subtopic).",
       "Unverified DQC ids suppressed rather than asserted.",
       "Fabricated-row label pool widened 4 -> 12; injection positions randomised.",
-      "Remaining citations are UNVALIDATED pending accountant review; tier renamed expert-authored-UNVALIDATED."
+      "Remaining citations are UNVALIDATED pending accountant review; tier renamed expert-authored-UNVALIDATED.",
+      "v0.3: added subject-matter rules R13 lease (842), R14 goodwill (350), R15 AFS fair value (320) to break citation guessability \u2014 all derivable from concepts present in companyfacts.",
+      "v0.3: R04 (missing row) also made detection-only \u2014 ASC 210-10-45-1 was a catch-all, not a governing paragraph."
     ]
   },
   "rules": [
@@ -131,14 +133,11 @@
         ]
       },
       "citation": {
-        "asc": "ASC 210-10-45-1",
+        "asc": null,
         "topic": "210",
         "subtopic": "210-10",
-        "rationale": "Omission of a required line item breaks completeness of statement presentation; the enclosing subtotal no longer reconciles to its components.",
-        "citation_by_statement": {
-          "IncomeStatement": "ASC 220-10-45",
-          "CashFlow": "ASC 230-10-45"
-        }
+        "rationale": "An omitted line item is a completeness fault. No single ASC paragraph governs 'a line is missing' for an arbitrary concept; ASC 210-10-45-1 was a catch-all. Detection-only.",
+        "audit_note": "v0.1 asserted ASC 210-10-45-1; removed for the same reason as R05/R06/R07/R12."
       },
       "dqc_rule": {
         "dqc_id": "DQC_0004",
@@ -426,6 +425,113 @@
       },
       "detection_predicate": "row.value < 0 on a non-negative element",
       "difficulty": "easy"
+    },
+    {
+      "rule_id": "R13_lease_operating_finance_misclass",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": [
+        "BalanceSheet"
+      ],
+      "eligible_concepts": [
+        "us-gaap:OperatingLeaseRightOfUseAsset",
+        "us-gaap:FinanceLeaseRightOfUseAsset",
+        "us-gaap:OperatingLeaseLiabilityNoncurrent",
+        "us-gaap:FinanceLeaseLiabilityNoncurrent",
+        "us-gaap:OperatingLeaseLiabilityCurrent",
+        "us-gaap:FinanceLeaseLiabilityCurrent"
+      ],
+      "injection": {
+        "op": "relabel_concept",
+        "swap": [
+          [
+            "Operating",
+            "Finance"
+          ]
+        ]
+      },
+      "citation": {
+        "asc": "ASC 842-10-25-2",
+        "topic": "842",
+        "subtopic": "842-10",
+        "rationale": "Lessee lease classification (finance vs operating) follows the ASC 842-10-25-2 criteria; presenting an operating lease as a finance lease (or vice versa) misstates both the right-of-use asset and the lease liability."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "detection_predicate": "lease asset/liability labelled finance while its paired item remains operating",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R14_goodwill_impairment_omitted",
+      "family": "measurement",
+      "error_type": "Numerical Error",
+      "statements": [
+        "BalanceSheet"
+      ],
+      "eligible_concepts": [
+        "us-gaap:Goodwill"
+      ],
+      "injection": {
+        "op": "perturb_value",
+        "direction": "overstate",
+        "pct_range": [
+          0.1,
+          0.35
+        ],
+        "keep_totals": true,
+        "narrative": "goodwill carried above its implied fair value; required impairment not recognised"
+      },
+      "citation": {
+        "asc": "ASC 350-20-35-1",
+        "topic": "350",
+        "subtopic": "350-20",
+        "rationale": "Goodwill is not amortised but tested for impairment; carrying goodwill above its implied fair value without recognising the loss violates ASC 350-20-35."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "detection_predicate": "goodwill inconsistent with the enclosing subtotal / prior-period balance",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R15_afs_securities_measurement",
+      "family": "measurement",
+      "error_type": "Numerical Error",
+      "statements": [
+        "BalanceSheet"
+      ],
+      "eligible_concepts": [
+        "us-gaap:AvailableForSaleSecuritiesCurrent",
+        "us-gaap:AvailableForSaleSecuritiesNoncurrent",
+        "us-gaap:AvailableForSaleSecuritiesDebtSecuritiesCurrent",
+        "us-gaap:AvailableForSaleSecuritiesDebtSecuritiesNoncurrent",
+        "us-gaap:MarketableSecuritiesCurrent",
+        "us-gaap:MarketableSecuritiesNoncurrent"
+      ],
+      "injection": {
+        "op": "perturb_value",
+        "pct_range": [
+          0.08,
+          0.3
+        ],
+        "keep_totals": true,
+        "narrative": "available-for-sale securities not carried at fair value"
+      },
+      "citation": {
+        "asc": "ASC 320-10-35-1",
+        "topic": "320",
+        "subtopic": "320-10",
+        "rationale": "Available-for-sale debt securities are measured at fair value at each reporting date; carrying them at another amount violates ASC 320-10-35."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "detection_predicate": "AFS/marketable securities balance inconsistent with its subtotal",
+      "difficulty": "hard"
     }
   ]
 }
