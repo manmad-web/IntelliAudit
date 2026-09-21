@@ -23,22 +23,22 @@
   ],
   "clean_statements_built": 220,
   "company_years_skipped": 5,
-  "records": 1231,
+  "records": 1202,
   "statement_type_breakdown": {
-    "BalanceSheet": 719,
+    "BalanceSheet": 690,
     "CashFlow": 230,
     "IncomeStatement": 282
   },
   "error_type_breakdown": {
-    "Misclassification": 300,
+    "Misclassification": 271,
     "Missing Row": 220,
     "Numerical Error": 571,
     "Redundant Row": 140
   },
   "citation_tier_breakdown": {
-    "linkbase-verified": 23,
-    "expert-authored-UNVALIDATED": 498,
+    "linkbase-verified": 13,
+    "expert-authored-UNVALIDATED": 479,
     "no-governing-paragraph": 710
   },
-  "verifiable_error_pct": 63.6
+  "verifiable_error_pct": 65.0
 }

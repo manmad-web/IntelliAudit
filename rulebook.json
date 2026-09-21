@@ -18,7 +18,8 @@
       "Fabricated-row label pool widened 4 -> 12; injection positions randomised.",
       "Remaining citations are UNVALIDATED pending accountant review; tier renamed expert-authored-UNVALIDATED.",
       "v0.3: added subject-matter rules R13 lease (842), R14 goodwill (350), R15 AFS fair value (320) to break citation guessability \u2014 all derivable from concepts present in companyfacts.",
-      "v0.3: R04 (missing row) also made detection-only \u2014 ASC 210-10-45-1 was a catch-all, not a governing paragraph."
+      "v0.3: R04 (missing row) also made detection-only \u2014 ASC 210-10-45-1 was a catch-all, not a governing paragraph.",
+      "v0.3.1: merged duplicate lease rules \u2014 R13 removed, R10 kept (it was the original id and only began firing once relabel_concept was implemented)."
     ]
   },
   "rules": [
@@ -337,7 +338,9 @@
         "us-gaap:OperatingLeaseRightOfUseAsset",
         "us-gaap:FinanceLeaseRightOfUseAsset",
         "us-gaap:OperatingLeaseLiabilityNoncurrent",
-        "us-gaap:FinanceLeaseLiabilityNoncurrent"
+        "us-gaap:FinanceLeaseLiabilityNoncurrent",
+        "us-gaap:OperatingLeaseLiabilityCurrent",
+        "us-gaap:FinanceLeaseLiabilityCurrent"
       ],
       "injection": {
         "op": "relabel_concept",
@@ -352,15 +355,14 @@
         "asc": "ASC 842-10-25-2",
         "topic": "842",
         "subtopic": "842-10",
-        "rationale": "Lessee lease classification (finance vs operating) follows ASC 842-10-25-2 criteria; mislabeling changes recognition and presentation of ROU assets and lease liabilities."
+        "rationale": "Lessee lease classification (finance vs operating) follows the ASC 842-10-25-2 criteria; presenting an operating lease as a finance lease (or vice versa) misstates both the right-of-use asset and the lease liability."
       },
       "dqc_rule": {
         "dqc_id": null,
         "verified": false
       },
-      "detection_predicate": "lease concept operating/finance label inconsistent with lease terms",
-      "difficulty": "hard",
-      "requires": "lease footnote / terms in seed"
+      "detection_predicate": "lease asset/liability labelled finance while its paired item remains operating",
+      "difficulty": "hard"
     },
     {
       "rule_id": "R11_inventory_no_nrv_writedown",
@@ -425,43 +427,6 @@
       },
       "detection_predicate": "row.value < 0 on a non-negative element",
       "difficulty": "easy"
-    },
-    {
-      "rule_id": "R13_lease_operating_finance_misclass",
-      "family": "classification",
-      "error_type": "Misclassification",
-      "statements": [
-        "BalanceSheet"
-      ],
-      "eligible_concepts": [
-        "us-gaap:OperatingLeaseRightOfUseAsset",
-        "us-gaap:FinanceLeaseRightOfUseAsset",
-        "us-gaap:OperatingLeaseLiabilityNoncurrent",
-        "us-gaap:FinanceLeaseLiabilityNoncurrent",
-        "us-gaap:OperatingLeaseLiabilityCurrent",
-        "us-gaap:FinanceLeaseLiabilityCurrent"
-      ],
-      "injection": {
-        "op": "relabel_concept",
-        "swap": [
-          [
-            "Operating",
-            "Finance"
-          ]
-        ]
-      },
-      "citation": {
-        "asc": "ASC 842-10-25-2",
-        "topic": "842",
-        "subtopic": "842-10",
-        "rationale": "Lessee lease classification (finance vs operating) follows the ASC 842-10-25-2 criteria; presenting an operating lease as a finance lease (or vice versa) misstates both the right-of-use asset and the lease liability."
-      },
-      "dqc_rule": {
-        "dqc_id": null,
-        "verified": false
-      },
-      "detection_predicate": "lease asset/liability labelled finance while its paired item remains operating",
-      "difficulty": "hard"
     },
     {
       "rule_id": "R14_goodwill_impairment_omitted",
