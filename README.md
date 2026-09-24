@@ -96,6 +96,10 @@ python3 scripts/build_benchmark.py
 
 # offline / fast (skip the linkbase citation cross-check)
 python3 scripts/build_benchmark.py --no-citations
+
+# regression gate: fails loudly if the rebuild became guessable or leaks its own
+# answers again (see KNOWN_ISSUES.md for the failure modes it checks)
+python3 scripts/check_triviality.py
 ```
 
 Outputs land in `data/clean/` (real reconciling statements) and
@@ -112,6 +116,10 @@ cash-flow classification (ASC 230-10-45), revenue timing (ASC 606-10-25), leases
 detection predicate, and its ASC + DQC citation.
 
 ## Evaluation
+
+See [`docs/EVAL.md`](docs/EVAL.md) for the short protocol (exam in, key only at
+score time, never parse `sample_id` for the rule, score citation only over
+`citable: true` records).
 
 ```python
 from src.scorer import score_citation, score_detection
