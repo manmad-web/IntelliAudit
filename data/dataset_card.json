@@ -1,6 +1,6 @@
 {
   "name": "IntelliAudit-Bench",
-  "version": "0.1",
+  "version": "0.3",
   "description": "A benchmark for standards-citation attribution in financial-statement auditing. Each record is a real 10-K financial statement containing one deliberately injected accounting error, paired with synthetic supporting transactions and the governing FASB ASC citation as ground truth.",
   "repository": "https://github.com/manmad-web/IntelliAudit",
   "domain": "financial auditing / accounting standards / XBRL",
@@ -12,12 +12,12 @@
     "generated_content": "Injected errors and synthetic transactions produced by this repository's generator."
   },
   "files": {
-    "data/benchmark/exam.jsonl": "1089 rows \u2014 statement WITH injected error + transactions. No labels. Input to a system.",
-    "data/benchmark/answer_key.jsonl": "1089 rows \u2014 judgement, error identification, and ASC citation. Withheld during evaluation.",
-    "data/benchmark/statements_clean.jsonl": "223 rows \u2014 the error-free statements (control set / repair target).",
-    "data/benchmark/records.jsonl": "1089 rows \u2014 exam and answer key joined, for convenience.",
-    "data/clean/": "223 files \u2014 one clean statement per company x fiscal year x statement type.",
-    "data/benchmark/summary.json": "Aggregate counts."
+    "data/benchmark/exam.jsonl": "1202 rows — statement WITH injected error + transactions. No labels. Input to a system.",
+    "data/benchmark/answer_key.jsonl": "1202 rows — judgement, error identification, and ASC citation. Withheld during evaluation.",
+    "data/benchmark/statements_clean.jsonl": "220 rows — the error-free statements (control set / repair target).",
+    "data/benchmark/records.jsonl": "1202 rows — exam and answer key joined, for convenience.",
+    "data/clean/": "220 files — one clean statement per company x fiscal year x statement type.",
+    "data/benchmark/summary.json": "Aggregate counts — the authoritative source of truth; regenerate on every rebuild."
   },
   "record_schema": {
     "sample_id": "unique id, e.g. IA-AAPL-2023-BS-R01_...",
@@ -29,11 +29,11 @@
     "modified_statement_text": "the ERROR-INSERTED statement ([row n] text)",
     "gt_transaction_data": "synthetic transactions summing to real line values",
     "gt_xbrl_json": "OIM-style fact list (concept, period, unit, value)",
-    "ground_truth_citations": "{asc_full, asc_subtopic, asc_topic, dqc_rule, linkbase_reference_set, linkbase_verified, citation_tier, rationale}",
+    "ground_truth_citations": "{asc_full, asc_subtopic, asc_topic, citable, dqc_rule, linkbase_reference_set, linkbase_verified, citation_tier, rationale}",
     "self_check": "{clean_reconciles, error_breaks_reconciliation}"
   },
   "statistics": {
-    "records": 1231,
+    "records": 1202,
     "clean_statements": 220,
     "companies": [
       "Alphabet Inc.",
@@ -58,19 +58,19 @@
       2024
     ],
     "by_statement_type": {
-      "BalanceSheet": 719,
+      "BalanceSheet": 690,
       "CashFlow": 230,
       "IncomeStatement": 282
     },
     "by_error_type": {
-      "Misclassification": 300,
+      "Misclassification": 271,
       "Missing Row": 220,
       "Numerical Error": 571,
       "Redundant Row": 140
     },
     "by_citation_tier": {
-      "linkbase-verified": 23,
-      "expert-authored-UNVALIDATED": 498,
+      "linkbase-verified": 13,
+      "expert-authored-UNVALIDATED": 479,
       "no-governing-paragraph": 710
     }
   },
@@ -196,12 +196,12 @@
     "details": "See docs/DATASHEET.md"
   },
   "ground_truth_confidence": {
-    "linkbase-verified": "Citation confirmed present in the concept's official FASB linkbase reference set.",
-    "expert-authored": "Governing standard not tagged on that line by the linkbase (recognition/classification judgment); requires human validation.",
-    "unresolved": "Fabricated line items with no corresponding us-gaap concept.",
+    "linkbase-verified": "Citation confirmed present in the concept's official FASB linkbase reference set, holding at the full paragraph level.",
+    "expert-authored-UNVALIDATED": "Governing standard not tagged on that line by the linkbase (recognition/classification judgment); the planned LLM cross-check and human review have NOT been run yet — see KNOWN_ISSUES.md.",
+    "no-governing-paragraph": "Detection-only: no single ASC paragraph governs this error type (e.g. an arbitrary numeric perturbation); excluded from citation scoring.",
     "counts": {
-      "linkbase-verified": 23,
-      "expert-authored-UNVALIDATED": 498,
+      "linkbase-verified": 13,
+      "expert-authored-UNVALIDATED": 479,
       "no-governing-paragraph": 710
     }
   },
@@ -211,7 +211,8 @@
     "Compact single statements (~30 rows), not multi-document long-context filings.",
     "Errors are injected rather than naturally occurring.",
     "DQC rule identifiers are provisional (dqc_verified=false) pending cross-check against the official XBRL-US ruleset.",
-    "Statement layout follows a canonical concept template with residual balancing lines, not each filer's exact presentation linkbase ordering."
+    "Statement layout follows a canonical concept template with residual balancing lines, not each filer's exact presentation linkbase ordering.",
+    "See KNOWN_ISSUES.md for the full external-audit trail: sample/rule bias (8 companies, 5 big tech) is still open, and expert-authored-UNVALIDATED citations have not yet had the planned LLM cross-check or human review run."
   ],
   "evaluation": {
     "scorer": "scripts/score_predictions.py",
