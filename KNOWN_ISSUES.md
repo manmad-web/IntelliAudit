@@ -106,7 +106,9 @@ actual 22 lines with **0.0% residual** — the $194bn plug is a properly named
 2. **R04 (missing row) made detection-only.** `ASC 210-10-45-1` for an arbitrary
    omitted line was the same catch-all the audit flagged on R05/R06/R07/R12.
 
-Dataset: **1,231 records**, 521 citable / 710 detection-only.
+Dataset: **1,202 records**, 492 citable (13 linkbase-verified + 479
+expert-authored-UNVALIDATED) / 710 detection-only (no-governing-paragraph). See
+`data/benchmark/summary.json` for the live, authoritative counts.
 
 **Still open:** sample bias (#7); whether the 8 remaining citations are correct
 (needs the accountant); the LLM cross-check and human review still unrun.
