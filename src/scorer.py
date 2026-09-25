@@ -12,6 +12,10 @@ string (AuditBench) is too brittle. We report EM at three granularities:
 extract_asc() pulls ASC codes from free-text model output. A prediction counts
 if it matches the GT rule's ASC at that granularity, OR (optionally, credit=True)
 if it falls in the concept's valid linkbase reference set.
+
+Records with citable=false (no governing paragraph; see docs/CITATION_POLICY.md)
+are not citation items. score_citation returns None for them and callers must
+leave them out of citation precision and recall.
 """
 import re
 
@@ -36,8 +40,21 @@ def _levels(code):
     return {"topic": p[0], "subtopic": "-".join(p[:2]) if len(p) >= 2 else p[0], "full": code}
 
 
+def citation_scored(gt_citations):
+    """False for detection-only rows (citable is false, or no paragraph was asserted)."""
+    if not gt_citations or gt_citations.get("citable") is False:
+        return False
+    return bool(gt_citations.get("asc_full"))
+
+
 def score_citation(pred_text, gt_citations, credit_linkbase_set=True):
-    """Return {em_topic, em_subtopic, em_full} in {0,1} for one prediction vs GT."""
+    """Return {em_topic, em_subtopic, em_full} in {0,1}, or None if this row is not citable.
+
+    None means "skip" — do not treat the row as a miss. Detection-only faults
+    have no governing paragraph and are excluded from citation scoring.
+    """
+    if not citation_scored(gt_citations):
+        return None
     preds = [_levels(c) for c in extract_asc(pred_text)]
     gt_full = gt_citations["asc_full"].replace("ASC ", "")
     gt = _levels(gt_full)
