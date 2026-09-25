@@ -2,7 +2,7 @@
   "_meta": {
     "name": "IntelliAudit Citation Rulebook v0.1",
     "purpose": "Rule-FIRST error injection. Each rule pre-specifies the violated standard so the citation ground truth is deterministic and independent of any LLM. The generator applies a rule's injection recipe to a concept-tagged clean statement and emits the rule's citation as ground truth.",
-    "citation_ground_truth_policy": "asc_primary. The ASC code is the canonical citation label. dqc_rule is a SECONDARY machine-checkable label and every dqc_id below is marked verified=false until cross-checked against the official XBRL-US DQC ruleset (https://xbrl.us/data-rule/). Do NOT publish dqc ids as ground truth until verified.",
+    "citation_ground_truth_policy": "Governing paragraph per docs/CITATION_POLICY.md. A rulebook string is not ground truth: linkbase-verified requires CitationResolver.paragraph_verified (exact paragraph, not subtopic). Otherwise the tier is expert-authored-UNVALIDATED, or the rule is detection-only. DQC ids are not ground truth and are not stored.",
     "scoring": "Exact match on ASC code at three granularities: topic (606), subtopic (606-10), full (606-10-25-1). Report EM@topic / EM@subtopic / EM@full. This replaces AuditBench's fuzzy Top-K-over-vague-prose metric.",
     "auditbench_compat_error_types": [
       "Missing Row",
@@ -10,7 +10,8 @@
       "Redundant Row",
       "Misclassification"
     ],
-    "version": "0.3",
+    "version": "0.3-citation-policy",
+    "governing_paragraph_policy": "docs/CITATION_POLICY.md",
     "audit_changes": [
       "Citations removed for R05/R06/R07/R12 (no governing ASC paragraph) -> detection-only cases.",
       "linkbase_verified is now a STRICT paragraph match (was subtopic).",
@@ -19,7 +20,8 @@
       "Remaining citations are UNVALIDATED pending accountant review; tier renamed expert-authored-UNVALIDATED.",
       "v0.3: added subject-matter rules R13 lease (842), R14 goodwill (350), R15 AFS fair value (320) to break citation guessability \u2014 all derivable from concepts present in companyfacts.",
       "v0.3: R04 (missing row) also made detection-only \u2014 ASC 210-10-45-1 was a catch-all, not a governing paragraph.",
-      "v0.3.1: merged duplicate lease rules \u2014 R13 removed, R10 kept (it was the original id and only began firing once relabel_concept was implemented)."
+      "v0.3.1: merged duplicate lease rules \u2014 R13 removed, R10 kept (it was the original id and only began firing once relabel_concept was implemented).",
+      "citation-policy: governing paragraph is docs/CITATION_POLICY.md. Section-only codes replaced with the paragraph that policy names. Every asserted ASC is expert-authored-UNVALIDATED until paragraph_verified says otherwise. DQC id strings removed."
     ]
   },
   "rules": [
@@ -43,15 +45,17 @@
       },
       "citation": {
         "asc": "ASC 210-10-45-1",
+        "citable": true,
+        "policy_clause": "presentation",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "210",
         "subtopic": "210-10",
-        "rationale": "Current assets are cash and other assets expected to be realized within one year / operating cycle; a current item placed under non-current assets misstates the current/non-current classification."
+        "rationale": "Presentation wins over 330/310. ASC 210-10-45-1 lists receivables, inventory, and prepaid expenses as current assets. Placing one of those lines in noncurrent assets violates that sentence. Subject topics measure the asset; they do not assign the section. Not linkbase-verified until paragraph_verified matches the concept."
       },
       "dqc_rule": {
-        "dqc_id": "DQC_0015",
+        "dqc_id": null,
         "verified": false,
-        "note": "0015 is non-negative-values; classification may instead surface via calc-linkbase parenting. Verify.",
-        "suppressed_until_verified": true
+        "note": "DQC ids are not citation ground truth."
       },
       "detection_predicate": "row.concept is a *Current concept but row.section == NoncurrentAssets",
       "difficulty": "medium"
@@ -74,10 +78,13 @@
         "to_section": "NoncurrentLiabilities"
       },
       "citation": {
-        "asc": "ASC 210-10-45-5",
+        "asc": "ASC 210-10-45-8",
+        "citable": true,
+        "policy_clause": "presentation",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "210",
         "subtopic": "210-10",
-        "rationale": "A current liability due within one year classified as non-current understates current liabilities and misstates liquidity."
+        "rationale": "Presentation wins. Eligible lines are operating-cycle liabilities (payables, accruals, collections in advance), which ASC 210-10-45-8 lists as current. ASC 210-10-45-5 only requires a total of current liabilities and does not govern this fault. 606 governs when deferred revenue is recognized, not which caption it uses."
       },
       "dqc_rule": {
         "dqc_id": null,
@@ -102,10 +109,13 @@
         "to_section": "CurrentLiabilities"
       },
       "citation": {
-        "asc": "ASC 470-10-45",
-        "topic": "470",
-        "subtopic": "470-10",
-        "rationale": "Classification of debt between current and non-current, including short-term obligations expected to be refinanced, is governed by ASC 470-10-45."
+        "asc": "ASC 210-10-45-12",
+        "citable": true,
+        "policy_clause": "presentation",
+        "citation_tier": "expert-authored-UNVALIDATED",
+        "topic": "210",
+        "subtopic": "210-10",
+        "rationale": "Presentation wins. The injection moves LongTermDebtNoncurrent into current liabilities and supplies no due-on-demand, callable, or refinancing fact. ASC 210-10-45-7 hands only those three facts to 470-10-45; without one of them, 470 does not win. ASC 210-10-45-12 says current liabilities do not include long-term obligations incurred for long periods. A section-only 'ASC 470-10-45' is not a paragraph and is not asserted."
       },
       "dqc_rule": {
         "dqc_id": null,
@@ -135,16 +145,18 @@
       },
       "citation": {
         "asc": null,
-        "topic": "210",
-        "subtopic": "210-10",
-        "rationale": "An omitted line item is a completeness fault. No single ASC paragraph governs 'a line is missing' for an arbitrary concept; ASC 210-10-45-1 was a catch-all. Detection-only.",
-        "audit_note": "v0.1 asserted ASC 210-10-45-1; removed for the same reason as R05/R06/R07/R12."
+        "citable": false,
+        "policy_clause": "neither",
+        "citation_tier": "no-governing-paragraph",
+        "topic": null,
+        "subtopic": null,
+        "rationale": "An omitted line item is a completeness fault. No single ASC paragraph governs 'a line is missing' for an arbitrary concept. Detection-only.",
+        "audit_note": "v0.1 asserted ASC 210-10-45-1; removed. 210-10-45-1 is not a catch-all."
       },
       "dqc_rule": {
-        "dqc_id": "DQC_0004",
+        "dqc_id": null,
         "verified": false,
-        "note": "subtotal != sum(children) is a calculation-consistency signal.",
-        "suppressed_until_verified": true
+        "note": "DQC ids are not citation ground truth."
       },
       "detection_predicate": "subtotal.value != sum(children present)",
       "difficulty": "easy"
@@ -171,20 +183,22 @@
       },
       "citation": {
         "asc": null,
-        "topic": "210",
-        "subtopic": "210-10",
+        "citable": false,
+        "policy_clause": "neither",
+        "citation_tier": "no-governing-paragraph",
+        "topic": null,
+        "subtopic": null,
         "rationale": "A wrong value is an arithmetic fault, not an ASC violation. Detection-only.",
-        "weak_citation": true,
         "audit_note": "v0.1 asserted ASC 210-10-45-1; removed after external audit (did not govern the fault)."
       },
       "dqc_rule": {
-        "dqc_id": "DQC_0004",
+        "dqc_id": null,
         "verified": false,
-        "suppressed_until_verified": true
+        "note": "DQC ids are not citation ground truth."
       },
       "detection_predicate": "row.value != value_implied_by_transactions",
       "difficulty": "easy",
-      "note": "Numerical errors are a DETECTION test, not a citation test. Flagged weak_citation. Do not over-weight these when scoring citation accuracy."
+      "note": "Numerical errors are a DETECTION test, not a citation test. citable is false; scorer.score_citation skips them."
     },
     {
       "rule_id": "R06_redundant_fabricated_row",
@@ -217,8 +231,11 @@
       },
       "citation": {
         "asc": null,
-        "topic": "210",
-        "subtopic": "210-10",
+        "citable": false,
+        "policy_clause": "neither",
+        "citation_tier": "no-governing-paragraph",
+        "topic": null,
+        "subtopic": null,
         "rationale": "A fabricated line is an existence/occurrence fault; no single ASC paragraph governs it. Detection-only.",
         "audit_note": "v0.1 asserted ASC 210-10-45-1; removed after external audit (did not govern the fault)."
       },
@@ -251,17 +268,19 @@
       },
       "citation": {
         "asc": null,
-        "topic": "210",
-        "subtopic": "210-10",
+        "citable": false,
+        "policy_clause": "neither",
+        "citation_tier": "no-governing-paragraph",
+        "topic": null,
+        "subtopic": null,
         "rationale": "Assets = Liabilities + Equity is definitional; no ASC paragraph states it. Detection-only.",
         "identity": "Assets = LiabilitiesAndStockholdersEquity",
         "audit_note": "v0.1 asserted ASC 210-10-45-1; removed after external audit (did not govern the fault)."
       },
       "dqc_rule": {
-        "dqc_id": "DQC_0004",
+        "dqc_id": null,
         "verified": false,
-        "note": "DQC_0004 Element Values Are Equal \u2014 canonical Assets == Liabilities+Equity check.",
-        "suppressed_until_verified": true
+        "note": "DQC ids are not citation ground truth."
       },
       "detection_predicate": "Assets != Liabilities + Equity",
       "difficulty": "easy"
@@ -282,10 +301,13 @@
         "to_section": "OperatingActivities"
       },
       "citation": {
-        "asc": "ASC 230-10-45",
+        "asc": "ASC 230-10-45-13",
+        "citable": true,
+        "policy_clause": "presentation",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "230",
         "subtopic": "230-10",
-        "rationale": "Cash flow items must be classified as operating, investing, or financing per ASC 230-10-45; e.g., capex is investing, dividends paid are financing."
+        "rationale": "Presentation wins over 360. The injection moves PaymentsToAcquirePropertyPlantAndEquipment from investing to operating. ASC 230-10-45-13(c) classifies those payments as investing outflows. Topic 360 measures PPE and does not classify the cash flow. The scored code is the paragraph; subparagraph (c) is the operative sentence. A section-only 'ASC 230-10-45' is not asserted."
       },
       "dqc_rule": {
         "dqc_id": null,
@@ -314,10 +336,13 @@
         "narrative": "prematurely recognized revenue for goods/services not yet transferred"
       },
       "citation": {
-        "asc": "ASC 606-10-25-1",
+        "asc": "ASC 606-10-25-23",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "606",
         "subtopic": "606-10",
-        "rationale": "Revenue is recognized when control of goods/services transfers to the customer (performance obligation satisfied). Premature recognition violates ASC 606-10-25."
+        "rationale": "Subject wins over 220. The injection overstates revenue for goods or services not yet transferred. ASC 606-10-25-23 requires recognition when the performance obligation is satisfied by transferring control. ASC 606-10-25-1 is the contract-existence test and is not asserted. Topic 220 only governs income-statement display."
       },
       "dqc_rule": {
         "dqc_id": null,
@@ -353,9 +378,12 @@
       },
       "citation": {
         "asc": "ASC 842-10-25-2",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "842",
         "subtopic": "842-10",
-        "rationale": "Lessee lease classification (finance vs operating) follows the ASC 842-10-25-2 criteria; presenting an operating lease as a finance lease (or vice versa) misstates both the right-of-use asset and the lease liability."
+        "rationale": "Subject wins over 210. The injection relabels an operating lease as finance (or the reverse). ASC 842-10-25-2 is the lessee classification criteria. Topic 210 assigns current vs noncurrent; it does not decide finance vs operating."
       },
       "dqc_rule": {
         "dqc_id": null,
@@ -384,9 +412,12 @@
       },
       "citation": {
         "asc": "ASC 330-10-35-1B",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "330",
         "subtopic": "330-10",
-        "rationale": "Inventory is measured at the lower of cost and net realizable value; omitting a required NRV write-down overstates inventory (ASC 330-10-35)."
+        "rationale": "Subject wins over 210. The injection carries inventory above NRV. ASC 330-10-35-1B requires the lower of cost and net realizable value for methods other than LIFO and retail. ASC 210-10-45-1 only lists inventory as a current asset. UNVALIDATED in part because the filing's cost method is not in the record; LIFO would be a different paragraph."
       },
       "dqc_rule": {
         "dqc_id": null,
@@ -414,16 +445,18 @@
       },
       "citation": {
         "asc": null,
-        "topic": "210",
-        "subtopic": "210-10",
-        "rationale": "A negative balance on a non-negative element is a data-quality fault (DQC), not an ASC paragraph. Detection-only.",
+        "citable": false,
+        "policy_clause": "neither",
+        "citation_tier": "no-governing-paragraph",
+        "topic": null,
+        "subtopic": null,
+        "rationale": "A negative balance on a non-negative element is a data-quality fault, not an ASC paragraph. Detection-only.",
         "audit_note": "v0.1 asserted ASC 210-10-45-1; removed after external audit (did not govern the fault)."
       },
       "dqc_rule": {
-        "dqc_id": "DQC_0015",
+        "dqc_id": null,
         "verified": false,
-        "note": "DQC_0015 Negative Values \u2014 the canonical machine check for this class.",
-        "suppressed_until_verified": true
+        "note": "DQC ids are not citation ground truth."
       },
       "detection_predicate": "row.value < 0 on a non-negative element",
       "difficulty": "easy"
@@ -450,9 +483,12 @@
       },
       "citation": {
         "asc": "ASC 350-20-35-1",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "350",
         "subtopic": "350-20",
-        "rationale": "Goodwill is not amortised but tested for impairment; carrying goodwill above its implied fair value without recognising the loss violates ASC 350-20-35."
+        "rationale": "Subject wins over 210. The injection carries goodwill without the impairment the narrative describes. ASC 350-20-35-1 is the sentence that goodwill is not amortized and is tested for impairment. Topic 210 does not measure goodwill. The loss amount is developed in later paragraphs of 350-20-35, so this citation stays expert-authored-UNVALIDATED."
       },
       "dqc_rule": {
         "dqc_id": null,
@@ -487,9 +523,12 @@
       },
       "citation": {
         "asc": "ASC 320-10-35-1",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
         "topic": "320",
         "subtopic": "320-10",
-        "rationale": "Available-for-sale debt securities are measured at fair value at each reporting date; carrying them at another amount violates ASC 320-10-35."
+        "rationale": "Subject wins over 210 for available-for-sale debt securities. ASC 320-10-35-1 is the subsequent-measurement sentence (fair value). ASC 210-10-45-1(f) only places marketable securities of operating cash in current assets. Unlabeled MarketableSecurities concepts may be equity securities under ASC 321, which is why this rule is expert-authored-UNVALIDATED rather than verified."
       },
       "dqc_rule": {
         "dqc_id": null,
