@@ -22,6 +22,36 @@ import xml.etree.ElementTree as ET
 CACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache")
 ZIP_URL = "https://xbrl.fasb.org/us-gaap/2023/us-gaap-2023.zip"
 
+# A governing citation is Topic-SubTopic-Section-Paragraph. Subparagraphs
+# ("(c)", "((b))") are stripped. A topic, subtopic, or section is not a paragraph
+# and must not verify. See docs/CITATION_POLICY.md.
+_PARAGRAPH_RE = re.compile(
+    r"^(?:ASC\s+)?(\d{3})-(\d{2,3})-(\d+[A-Z]?)-(\d+[A-Z]?)(?:\([^)]*\))*$",
+    re.I,
+)
+
+
+def paragraph_of(asc):
+    """Return '210-10-45-1' or None if `asc` is not a paragraph.
+
+    Section-only codes ('ASC 470-10-45') and subtopic codes ('ASC 210-10')
+    return None. Subparagraph markers are removed before the comparison.
+    """
+    if not asc:
+        return None
+    text = re.sub(r"\(\(.*?\)\)", "", str(asc)).strip()
+    m = _PARAGRAPH_RE.match(text)
+    if not m:
+        return None
+    return "-".join(m.groups())
+
+
+def paragraphs_match(claimed, linkbase_code):
+    """True only when both sides are the same paragraph. Subtopic overlap is not a match."""
+    claimed_p = paragraph_of(claimed)
+    linkbase_p = paragraph_of(linkbase_code)
+    return claimed_p is not None and claimed_p == linkbase_p
+
 
 def _local(tag):
     return tag.rsplit("}", 1)[-1] if "}" in tag else tag
@@ -134,6 +164,28 @@ class CitationResolver:
                 seen.add(asc)
                 out.append(asc)
         return out
+
+    def paragraph_verified(self, concept_id, asc):
+        """True iff the linkbase attaches this exact paragraph to the concept.
+
+        A shared topic or subtopic does not verify. A section-only code
+        (no paragraph) is never verified. The rulebook author's string is
+        not evidence; only this check may set linkbase-verified.
+        """
+        if paragraph_of(asc) is None:
+            return False
+        concept = (concept_id or "").replace("us-gaap:", "")
+        if not concept or concept == "FABRICATED":
+            return False
+        return any(paragraphs_match(asc, cited) for cited in self.citations(concept))
+
+    def citation_tier(self, concept_id, asc):
+        """Paragraph-level tier. None means the code is not a governing paragraph."""
+        if paragraph_of(asc) is None:
+            return None
+        if self.paragraph_verified(concept_id, asc):
+            return "linkbase-verified"
+        return "expert-authored-UNVALIDATED"
 
 
 if __name__ == "__main__":
