@@ -94,10 +94,14 @@ def main():
     agree = {"em_topic": 0, "em_subtopic": 0, "em_full": 0}
     tier_agree = {}
     flags = []
+    n_scored = 0
     for r in recs:
         out = call(SYSTEM, build_prompt(r))
         pred = parse_asc(out)
         sc = score_citation(pred, r["ground_truth_citations"])
+        if sc is None:               # detection-only; citation agreement is undefined
+            continue
+        n_scored += 1
         for k in agree: agree[k] += sc[k]
         tier = r["ground_truth_citations"]["citation_tier"]
         tier_agree.setdefault(tier, {"n": 0, "sub": 0})
@@ -105,8 +109,11 @@ def main():
         if tier == "expert-authored" and sc["em_subtopic"] == 0:
             flags.append({"id": r["sample_id"], "gt": r["ground_truth_citations"]["asc_full"], "llm": pred})
 
-    n = len(recs)
-    print(f"Independent LLM ({args.model}) vs benchmark GT, n={n}")
+    n = n_scored
+    print(f"Independent LLM ({args.model}) vs benchmark GT, n={n} citable (of {len(recs)} sampled)")
+    if not n:
+        print("  no citable rows in the sample")
+        return
     print(f"  agreement  EM@topic={agree['em_topic']/n:.1%}  @subtopic={agree['em_subtopic']/n:.1%}  @full={agree['em_full']/n:.1%}")
     print("  by tier (subtopic agreement):")
     for t, d in tier_agree.items():
