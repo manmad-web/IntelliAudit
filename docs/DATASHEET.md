@@ -12,10 +12,11 @@ financial-statement violation — a task AuditBench scored with broken labels an
 FinAuditing/AuditFlow do not score at all.
 
 ## 2. Composition
-1,089 records over 223 real statements (8 companies × 10 fiscal years × {balance
+1,202 records over 220 real statements (8 companies × 10 fiscal years × {balance
 sheet, income statement, cash flow}). Each record = one clean statement + one
 injected error + synthetic transactions + labels (see `record_schema` in
-`intelliaudit_dataset_showcase.json`).
+`intelliaudit_dataset_showcase.json`). See `data/benchmark/summary.json` for the
+current authoritative counts — this file is regenerated on every rebuild.
 
 ## 3. Collection & construction process (fully deterministic)
 1. **Real values** — `src/edgar_ingest.py` fetches `https://data.sec.gov/api/xbrl/companyfacts/CIK<10-digit>.json`; each line value is the company's actual reported 10-K fact (`fy`, `fp=FY`, `form=10-K`).
@@ -47,9 +48,10 @@ Only two places an LLM would enter — documented here so the artifact is comple
 > LLM cross-check nor the human expert review below was ever run. The harness
 > (`scripts/cross_check_llm.py`) exists; it has never been executed. Treat the
 > protocol below as *planned*, not *performed*. See `KNOWN_ISSUES.md`.
-- **Tier 1 — `linkbase-verified` (675 records):** deterministic; the ASC is in the concept's official linkbase reference set. No human/LLM needed.
-- **Tier 2 — `expert-authored` (271 records):** the governing standard the linkbase does not tag on the line (e.g. recognition ASC 606-10-25). Validate two ways: (i) **independent LLM judge** (`cross_check_llm.py`, a *different* model) predicts the citation blind; agreement raises confidence, disagreement flags the record; (ii) **human expert review** of the flagged set — the same 50%-manual-review discipline FinAuditing used.
-- **Leakage:** verified 0/1089 records contain any ASC code in model-visible fields.
+- **Tier 1 — `linkbase-verified` (13 records):** deterministic; the ASC holds at paragraph level in the concept's official linkbase reference set. No human/LLM needed.
+- **Tier 2 — `expert-authored-UNVALIDATED` (479 records):** the governing standard the linkbase does not tag on the line (e.g. recognition ASC 606-10-25). *Planned* validation (still not run): (i) **independent LLM judge** (`cross_check_llm.py`, a *different* model) predicts the citation blind; agreement raises confidence, disagreement flags the record; (ii) **human expert review** of the flagged set — the same 50%-manual-review discipline FinAuditing used.
+- **`no-governing-paragraph` (710 records):** detection-only — no single ASC paragraph governs the error type (e.g. an arbitrary numeric perturbation), so these are excluded from citation scoring. See `KNOWN_ISSUES.md`.
+- **Leakage:** verified 0/1202 records contain any ASC code in model-visible fields.
 
 ## 7. Uses & limitations
 For citation-attribution and error-detection evaluation. Limitations: compact
