@@ -15,6 +15,7 @@ citation_resolver so you can verify it:
 import copy, json, os, random, re
 from render import to_auditbench_text, to_xbrl_json
 from transactions import generate_for_statement
+from evidence import facts_for_exam
 
 try:
     from citation_resolver import CitationResolver
@@ -147,17 +148,26 @@ def inject(stmt, rule, rng):
         if not subs:
             return None, "no subtotal"
         sub = rng.choice(subs)
-        label = rng.choice(rule["injection"]["fabricated_labels"])
+        existing = {r.get("label") for r in m["rows"]}
+        pool = [l for l in rule["injection"]["fabricated_labels"]
+                if l not in existing and "residual" not in l.lower()]
+        if not pool:
+            return None, "no unused fabricated label"
+        label = rng.choice(pool)
         lo, hi = rule["injection"].get("value_pct_of_subtotal", [0.02, 0.08])
-        val = int(round(abs(sub["value"]) * rng.uniform(lo, hi)))
+        val = int(round(abs(sub["value"]) * rng.uniform(lo, hi))) or 1
         idxs = [i for i, r in enumerate(m["rows"])
                 if r.get("section") == sub["section"] and r.get("kind") == "line"]
         pos = rng.choice(idxs) if idxs else m["rows"].index(sub)
+        # Distinguishable from residual filler: named caption, us-gaap:FABRICATED,
+        # fabricated=True, injectable=False. Residual rows are concept=None with
+        # residual=True and a "(residual)" label, and they sit in the subtotal.
         m["rows"].insert(pos, {"idx": -1, "label": label, "section": sub["section"],
                                "concept": "us-gaap:FABRICATED", "value": val,
-                               "kind": "line", "injectable": False})
+                               "kind": "line", "injectable": False, "fabricated": True})
         _reindex(m)
-        return m, {"row_concept": "us-gaap:FABRICATED", "row_label": label, "fabricated_value": val}
+        return m, {"row_concept": "us-gaap:FABRICATED", "row_label": label,
+                   "fabricated_value": val, "fabricated": True}
 
     return None, f"op '{op}' not implemented in v0.1"
 
@@ -216,6 +226,15 @@ def _citation_gt(rule, stmt_type, concept):
     }
 
 
+def _exam_evidence(clean, rule, mod, meta, row_idx):
+    """Table txs (from the clean statement) plus any rule-specific facts."""
+    tx = generate_for_statement(clean, seed=clean["fiscal_year"])
+    extra = facts_for_exam(rule, clean, mod, meta, row_idx=row_idx)
+    if extra:
+        return tx.rstrip("\n") + "\n" + extra
+    return tx
+
+
 def build_record(clean, rule, mod, meta, sid):
     concept = meta.get("row_concept")
     label = meta.get("row_label")
@@ -238,7 +257,7 @@ def build_record(clean, rule, mod, meta, sid):
         "ground_truth_citations": _citation_gt(rule, clean["statement_type"], concept),
         "modified_statement_text": to_auditbench_text(mod),
         "gt_table_text": to_auditbench_text(clean),
-        "gt_transaction_data": generate_for_statement(clean, seed=clean["fiscal_year"]),
+        "gt_transaction_data": _exam_evidence(clean, rule, mod, meta, pe),
         "gt_xbrl_json": to_xbrl_json(clean),
         "self_check": {"clean_reconciles": check_reconciles(clean),
                        "error_breaks_reconciliation": not check_reconciles(mod)},
