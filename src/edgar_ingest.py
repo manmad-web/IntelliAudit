@@ -21,6 +21,10 @@ def get_company_facts(cik: str, refresh: bool = False) -> dict:
     path = os.path.join(CACHE, f"companyfacts_CIK{padded}.json")
     if os.path.exists(path) and not refresh:
         return json.load(open(path))
+    # committed snapshot (scripts/fetch_raw.py), for builds without SEC access
+    snap = os.path.join(os.path.dirname(CACHE), "raw_snapshot", f"companyfacts_CIK{padded}.json")
+    if os.path.exists(snap) and not refresh:
+        return json.load(open(snap))
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{padded}.json"
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     data = json.loads(urllib.request.urlopen(req, timeout=60).read())

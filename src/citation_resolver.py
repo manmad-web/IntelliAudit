@@ -267,6 +267,23 @@ class IfrsCitationResolver(CitationResolver):
         return any(ifrs_paragraph_of(c) == want for c in self.citations(concept))
 
 
+IFRS_REF_CACHE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                              "data", "reference", "ifrs_ref_cache.json")
+
+
+def build_ifrs_ref_cache(zip_path, path=IFRS_REF_CACHE):
+    """Concept -> IAS/IFRS paragraphs for every concept in the IFRS taxonomy."""
+    import json
+    cr = IfrsCitationResolver(zip_path)
+    cr._build()
+    data = {c: cr.citations(c) for c in sorted(cr._index)}
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    json.dump({"_meta": {"source": os.path.basename(zip_path), "built_by": "citation_resolver.build_ifrs_ref_cache",
+                         "note": "paragraph identifiers only; no standards text"},
+               "concepts": {k: v for k, v in data.items() if v}}, open(path, "w"), indent=1)
+    return len(data)
+
+
 REF_CACHE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "reference", "us-gaap-2023_ref_cache.json")
 
@@ -286,10 +303,10 @@ class CachedResolver(CitationResolver):
         self._cache = json.load(open(path))["concepts"]
 
     def covers(self, concept_id):
-        return (concept_id or "").replace("us-gaap:", "") in self._cache
+        return (concept_id or "").split(":")[-1] in self._cache
 
     def citations(self, concept_id):
-        return list(self._cache.get((concept_id or "").replace("us-gaap:", ""), []))
+        return list(self._cache.get((concept_id or "").split(":")[-1], []))
 
 
 def build_ref_cache(concepts, path=REF_CACHE):

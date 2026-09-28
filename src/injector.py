@@ -301,14 +301,23 @@ def _citation_gt(rule, stmt_type, concept):
             "note": "No single ASC paragraph governs this fault; detection-only, excluded from citation scoring.",
         }
     else:
-        parts = asc.replace("ASC ", "").split("-")
-        topic = parts[0]
-        subtopic = "-".join(parts[:2]) if len(parts) >= 2 else topic
-        verified = any(_strip(x) == asc for x in linkbase_set)   # STRICT paragraph match
+        from citation_resolver import ifrs_paragraph_of, ifrs_standard_of
+        if ifrs_standard_of(asc) and not asc.startswith("ASC"):
+            # IFRS: two levels (standard, paragraph); a linkbase subparagraph
+            # 'IAS 2.9(a)' verifies paragraph 'IAS 2.9'
+            std = ifrs_standard_of(asc)
+            topic_code, subtopic_code = std, std
+            verified = any(ifrs_paragraph_of(x) == ifrs_paragraph_of(asc) for x in linkbase_set)
+        else:
+            parts = asc.replace("ASC ", "").split("-")
+            topic = parts[0]
+            subtopic = "-".join(parts[:2]) if len(parts) >= 2 else topic
+            topic_code, subtopic_code = f"ASC {topic}", f"ASC {subtopic}"
+            verified = any(_strip(x) == asc for x in linkbase_set)   # STRICT paragraph match
         dqc = rule.get("dqc_rule", {})
         out = {
             "citable": True,
-            "asc_full": asc, "asc_subtopic": f"ASC {subtopic}", "asc_topic": f"ASC {topic}",
+            "asc_full": asc, "asc_subtopic": subtopic_code, "asc_topic": topic_code,
             "dqc_rule": dqc.get("dqc_id") if dqc.get("verified") else None,
             "linkbase_reference_set": linkbase_set,
             "linkbase_verified": verified,

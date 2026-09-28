@@ -40,6 +40,10 @@ def calc_linkbase(cik, accn):
     key = os.path.join(CACHE, f"{accn}_cal.xml")
     if os.path.exists(key):
         return open(key, "rb").read()
+    snap = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                        "data", "raw_snapshot", "filings", f"{accn}_cal.xml")
+    if os.path.exists(snap):                  # committed snapshot (scripts/fetch_raw.py)
+        return open(snap, "rb").read()
     acc = accn.replace("-", "")
     idx = json.loads(_get(f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{acc}/index.json"))
     names = [i["name"] for i in idx["directory"]["item"]]

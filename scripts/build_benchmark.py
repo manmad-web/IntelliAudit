@@ -60,14 +60,15 @@ def main():
         global BUILDERS
         BUILDERS = [("BS", lambda f, y, c=None: build_balance_sheet_from_filing(f, y, c, framework=framework))]
         rulebook["rules"] = [r for r in rulebook["rules"] if r.get("status") == "ready"]
-        if args.offline:
-            injector._RESOLVER = None
-        elif cfg.get("taxonomy_zip"):
-            from citation_resolver import IfrsCitationResolver
-            injector._RESOLVER = IfrsCitationResolver(cfg["taxonomy_zip"])
+        from citation_resolver import IFRS_REF_CACHE, CachedResolver, IfrsCitationResolver
+        if cfg.get("taxonomy_zip") and os.path.exists(os.path.join(ROOT, cfg["taxonomy_zip"])):
+            injector._RESOLVER = IfrsCitationResolver(os.path.join(ROOT, cfg["taxonomy_zip"]))
+        elif os.path.exists(IFRS_REF_CACHE):
+            injector._RESOLVER = CachedResolver(IFRS_REF_CACHE)
         else:
             injector._RESOLVER = None
-            print("[warn] no IFRS taxonomy_zip in the config: citations will not be linkbase-checked")
+            print("[warn] no IFRS taxonomy zip or data/reference/ifrs_ref_cache.json: "
+                  "every IFRS citation stays expert-authored-UNVALIDATED")
 
     if args.no_citations:
         injector._RESOLVER = None
@@ -88,16 +89,21 @@ def main():
 
     records, tier = [], Counter()
     built, skipped_year = 0, 0
+    status = []        # per-company outcome, written to summary.json (the ingestion log)
     for co in companies:
         facts = None
+        n_before = built
         if not args.offline:
             try:
                 facts = get_company_facts(co["cik"])
             except Exception as e:
-                print(f"[skip] {co['ticker']}: EDGAR fetch failed: {e}"); continue
+                print(f"[skip] {co['ticker']}: EDGAR fetch failed: {e}")
+                status.append({"ticker": co["ticker"], "status": "skipped", "reason": f"fetch failed: {e}"}); continue
             if not _name_ok(co["name"], facts.get("entityName")):
                 print(f"[skip] {co['ticker']}: CIK {co['cik']} is {facts.get('entityName')!r}, "
-                      f"not {co['name']!r} — fix the CIK in {args.config}"); continue
+                      f"not {co['name']!r} — fix the CIK in {args.config}")
+                status.append({"ticker": co["ticker"], "status": "skipped",
+                               "reason": f"CIK resolves to {facts.get('entityName')!r}"}); continue
         for yr in years:
             for tag, build in BUILDERS:
                 clean_path = os.path.join(clean_dir, f"{co['cik']}_{yr}_{tag}.json")
@@ -130,7 +136,10 @@ def main():
                         rec = injector.build_record(stmt, rule, mod, meta, sid)
                         records.append(rec)
                         tier[rec["ground_truth_citations"]["citation_tier"]] += 1
-        print(f"  {co['ticker']}: built BS/IS/CF through FY{max(years)}")
+        n = built - n_before
+        status.append({"ticker": co["ticker"], "status": "built" if n else "skipped",
+                       "statements": n, **({} if n else {"reason": "no statement could be built"})})
+        print(f"  {co['ticker']}: {n} clean statements")
 
     with open(os.path.join(bench_dir, "records.jsonl"), "w") as f:
         for r in records:
@@ -138,6 +147,9 @@ def main():
     summary = {
         "framework": framework,
         "companies": [c["ticker"] for c in companies], "years": years,
+        "companies_targeted": len(companies),
+        "companies_built": sum(1 for x in status if x["status"] == "built"),
+        "company_status": status,
         "clean_statements_built": built, "company_years_skipped": skipped_year,
         "records": len(records),
         "controls": sum(1 for r in records if r["record_type"] == "control"),

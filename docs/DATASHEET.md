@@ -35,7 +35,14 @@ paragraphs); 710 are detection-only. `data/benchmark/summary.json` is authoritat
    `src/evidence.py` (contrastive supporting facts on every statement).
 7. **Split** — `scripts/split_dataset.py`: opaque exam ids, 17 forms, withheld key.
 
-**No LLM is used anywhere in the build.** The generator is the disclosure.
+**No LLM is used anywhere in the build**, neither for data nor for ground truth. The
+generator is the disclosure. Counts quoted anywhere should come from
+`data/benchmark/validation_report.json` (`scripts/make_validation_report.py`), which
+recomputes them from the files and records the gate result.
+
+**IFRS edition.** Separate dataset, not yet built from real filings; runbook in
+`docs/IFRS_BUILD.md`. Once built, only citations tagged `linkbase-verified` have been
+checked against the IFRS Taxonomy reference linkbase; the rest await an accountant.
 
 ## 4. Preprocessing / normalization
 Values scaled to $millions; residual lines absorb template gaps (labelled, not

@@ -22,6 +22,50 @@
     2023,
     2024
   ],
+  "companies_targeted": 8,
+  "companies_built": 8,
+  "company_status": [
+    {
+      "ticker": "AAPL",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "MSFT",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "NVDA",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "GOOGL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "META",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "KO",
+      "status": "built",
+      "statements": 19
+    },
+    {
+      "ticker": "JNJ",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "WMT",
+      "status": "built",
+      "statements": 25
+    }
+  ],
   "clean_statements_built": 220,
   "company_years_skipped": 20,
   "records": 1756,

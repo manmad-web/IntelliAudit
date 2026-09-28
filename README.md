@@ -69,7 +69,7 @@ Rebuilds are byte-identical.
 
 1,756 items = 1,536 injected + 220 clean controls, from 220 real statements
 (8 companies × FY2015–2024 × BS/IS/CF). 826 citable items over **15 governing
-paragraphs in 11 topics**; 178 paragraph-verified against the linkbase, 648
+paragraphs in 11 topics**; 177 paragraph-verified against the linkbase, 649
 `expert-authored-UNVALIDATED`; 710 detection-only (no single paragraph governs).
 
 | Gate check | v0.3 | v0.4 |

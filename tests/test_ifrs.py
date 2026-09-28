@@ -57,6 +57,25 @@ class Scoring(unittest.TestCase):
         self.assertEqual(score_citation("ASC 360-10-35-17", gt, credit_linkbase_set=False)["em_full"], 1)
 
 
+class GroundTruth(unittest.TestCase):
+    def test_ifrs_citation_fields_and_subparagraph_verification(self):
+        import injector
+        with open(os.path.join(ROOT, "rulebook_ifrs.json")) as fh:
+            rb = {r["rule_id"].split("_")[0]: r for r in json.load(fh)["rules"]}
+
+        class Fake:
+            def citations(self, c):
+                return ["IAS 1.54(g)", "IAS 2.9(a)"]
+        saved, injector._RESOLVER = injector._RESOLVER, Fake()
+        try:
+            g = injector._citation_gt(rb["I11"], "BalanceSheet", "ifrs-full:Inventories")
+        finally:
+            injector._RESOLVER = saved
+        self.assertEqual((g["asc_full"], g["asc_topic"], g["asc_subtopic"]), ("IAS 2.9", "IAS 2", "IAS 2"))
+        self.assertTrue(g["linkbase_verified"])
+        self.assertEqual(g["citation_tier"], "linkbase-verified")
+
+
 class Rulebook(unittest.TestCase):
     def test_ifrs_rulebook_is_separate_and_parallel(self):
         with open(os.path.join(ROOT, "rulebook_ifrs.json")) as f:
@@ -135,3 +154,27 @@ class SyntheticIfrsFiling(unittest.TestCase):
                 self.assertIn("iso4217:EUR", json.dumps(rec["gt_xbrl_json"]))
         finally:
             injector._RESOLVER = saved
+
+
+class Snapshot(unittest.TestCase):
+    def test_trim_keeps_only_annual_forms_and_years(self):
+        sys.path.insert(0, os.path.join(ROOT, "scripts"))
+        from fetch_raw import trim
+        facts = {"cik": 1, "entityName": "X", "facts": {"ifrs-full": {"Assets": {"units": {"EUR": [
+            {"val": 1, "fy": 2022, "fp": "FY", "form": "20-F", "end": "2022-12-31"},
+            {"val": 2, "fy": 2022, "fp": "Q2", "form": "6-K", "end": "2022-06-30"},
+            {"val": 3, "fy": 2015, "fp": "FY", "form": "20-F", "end": "2015-12-31"}]}}}}}
+        got = trim(facts, ("20-F", "40-F"), [2021, 2022, 2023])
+        self.assertEqual([f["val"] for f in got["facts"]["ifrs-full"]["Assets"]["units"]["EUR"]], [1])
+
+    def test_ingest_reads_the_committed_snapshot(self):
+        import edgar_ingest
+        d = tempfile.mkdtemp()
+        os.makedirs(os.path.join(d, "raw_snapshot"))
+        with open(os.path.join(d, "raw_snapshot", "companyfacts_CIK0000000042.json"), "w") as f:
+            json.dump({"entityName": "Snap Co", "facts": {}}, f)
+        saved, edgar_ingest.CACHE = edgar_ingest.CACHE, os.path.join(d, "raw")
+        try:
+            self.assertEqual(edgar_ingest.get_company_facts("42")["entityName"], "Snap Co")
+        finally:
+            edgar_ingest.CACHE = saved
