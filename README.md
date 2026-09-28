@@ -97,6 +97,12 @@ sign, identity) and **citable** faults:
 
 Why each paragraph wins: [`docs/CITATION_POLICY.md`](docs/CITATION_POLICY.md).
 
+## Multi-error split
+
+`data/benchmark_multi/`: 1,100 items (1–3 faults each, plus 220 clean controls) on the same
+real statements; the single-error benchmark is unchanged. See
+[`docs/MULTI_ERROR.md`](docs/MULTI_ERROR.md).
+
 ## IFRS edition (separate dataset, scaffolded)
 
 `rulebook_ifrs.json` (23 draft rules, 8 of them framework contrasts where the same facts

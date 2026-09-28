@@ -127,10 +127,14 @@ def _sentence(label):
     return label[:1].upper() + label[1:].lower() if label else label
 
 
-def inject(stmt, rule, rng):
+def inject(stmt, rule, rng, exclude=()):
+    """exclude: (concept, label) identities that may not be targeted (rows a
+    previous error on the same multi-error item already touched)."""
     op = rule["injection"]["op"]
     m = copy.deepcopy(stmt)
     cands = _eligible(m, rule)
+    if exclude:
+        cands = [r for r in cands if (r.get("concept"), r.get("label")) not in exclude]
     inj = rule["injection"]
 
     if op == "move_row":

@@ -96,6 +96,12 @@ def fact_violation(f):
 
 
 def solve(e):
+    """First citation found (single-error exam)."""
+    return next(iter(solve_all(e)), None)
+
+
+def solve_all(e):
+    """Every citation the rules find, in order (multi-error exam)."""
     t = e["transaction_data"]
     facts = [ln[2:] for ln in t.split("Supporting facts", 1)[1].splitlines()[1:]] if "Supporting facts" in t else []
     rows = rows_with_sections(e["statement_text"])
@@ -113,26 +119,25 @@ def solve(e):
         r = fact_violation(f)
         if isinstance(r, tuple) and r[0] == "carried":
             if vals.get(label) is not None and vals[label] != r[2]:
-                return "ASC 320-10-35-1"
+                yield "ASC 320-10-35-1"
         elif isinstance(r, tuple) and r[0] == "lease":
             cap = "finance" if label.lower().startswith("finance") else "operating"
             if cap != r[1]:
-                return "ASC 842-10-25-2"
+                yield "ASC 842-10-25-2"
         elif r:
-            return r
+            yield r
     for label, v, sect in rows:
         lab = label.lower()
         if sect and sect.startswith("non-current assets") and re.search(r"inventor|receivable", lab):
-            return "ASC 210-10-45-1"
+            yield "ASC 210-10-45-1"
         if sect and sect.startswith("non-current liab") and re.search(r"accounts payable|accrued liab|accrued comp", lab):
-            return "ASC 210-10-45-8"
+            yield "ASC 210-10-45-8"
         if sect and sect.startswith("current liab") and lab == "long-term debt":
-            return "ASC 210-10-45-12"
+            yield "ASC 210-10-45-12"
         if sect and sect.startswith("operating") and "property, plant" in lab:
-            return "ASC 230-10-45-13"
+            yield "ASC 230-10-45-13"
         if sect and sect.startswith("operating") and re.search(r"dividends paid|repurchases of common", lab):
-            return "ASC 230-10-45-15"
-    return None
+            yield "ASC 230-10-45-15"
 
 
 def main():

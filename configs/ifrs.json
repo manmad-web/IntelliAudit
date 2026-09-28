@@ -296,6 +296,31 @@
    "sector": "Financials",
    "why": "40-F bank; Oct FYE",
    "phase": 2
+  },
+  {
+   "name": "BCE Inc.",
+   "ticker": "BCE",
+   "cik": "718940",
+   "sector": "Communication Services",
+   "why": "40-F IFRS; IFRS 16 right-of-use assets, spectrum licences",
+   "phase": 1
+  },
+  {
+   "name": "Suncor Energy Inc.",
+   "ticker": "SU",
+   "cik": "311337",
+   "sector": "Energy",
+   "why": "40-F IFRS; decommissioning provisions (IAS 37), IFRS 16",
+   "phase": 1
+  },
+  {
+   "name": "Vodafone Group Plc",
+   "ticker": "VOD",
+   "cik": "839923",
+   "sector": "Communication Services",
+   "why": "20-F IFRS; March FYE; spectrum, leases, goodwill impairments",
+   "fiscal_year_end": "Mar",
+   "phase": 1
   }
  ],
  "fiscal_years": [
@@ -324,5 +349,12 @@
   "Puma SE",
   "Hugo Boss AG",
   "Kering SA"
- ]
+ ],
+ "rejected_candidates": {
+  "Shopify (SHOP)": "reports under US GAAP, not IFRS",
+  "Alimentation Couche-Tard (ATD), Canadian Tire (CTC.A)": "not SEC registrants and SEDAR+ has no mandatory XBRL: statements exist only as PDFs, so 'every value is a tagged fact' would not hold",
+  "Novartis on ESEF": "Switzerland is not in the EU; use its SEC 20-F (already listed), not ESEF",
+  "ASML": "ESEF (filings.xbrl.org) IFRS filing is usable; its SEC 20-F has historically been US GAAP, so do not pull it from SEC",
+  "JPM-style banks": "phase 2 in both editions (unclassified balance sheets)"
+ }
 }

@@ -177,3 +177,37 @@ is where LLMs trained mostly on US content should fail in an informative way.
 arXiv 2608.07688, "IntelliAudit: Using Large Language Models to Evaluate Audit Controls"
 (ISO 27001 IT audit), lists Mohammad A. Tayebi as an author. If that is the same group,
 agree on names before submission. If not, pick another name for this benchmark.
+
+## 7. Review of the proposed IFRS plan (Sept 2026)
+
+A plan circulated in the team proposed five IFRS error types with citations and a
+12-company Canada/Europe list. Keep its structure (same error types as US GAAP, separate
+dataset, citation tiers, jurisdiction metadata); fix these before using it:
+
+**Error types.** Keep the same types in both editions so the two datasets are comparable:
+AuditBench's four (Missing Row, Numerical Error, Redundant Row, Misclassification) with sign
+errors as a Numerical-Error rule (R12/I12). Only the citations differ by framework.
+
+| Proposed mapping | Problem | Use instead |
+|---|---|---|
+| Misclassification → IAS 1.60 | 1.60 requires presenting a current/non-current split; the criteria are 1.66 (assets) and 1.69 (liabilities) | IAS 1.66 / 1.69 / 1.70 (rulebook_ifrs I01–I03) |
+| lease classification → IFRS 16.47 | 16.47 is lessee *presentation*; IFRS 16 has no lessee operating/finance classification | IFRS 16.22 for an unrecognised lease (I10); no lessee classification rule |
+| Missing line → IAS 1.112 | 1.112 is about the content of the notes; a complete set of statements is IAS 1.10 | detection-only for an arbitrary missing line; IFRS 16.22 only when the missing line is a lessee's ROU asset/lease liability |
+| Fabricated line → IAS 1.29 / IFRS 8.10 | 1.29 is materiality and aggregation; IFRS 8.10 defines an operating segment; neither governs an invented line | detection-only (no governing paragraph), as in US GAAP |
+| Sign error → IAS 1.54–55 / IAS 7.18–21 | 1.54 lists line items; 7.18–21 are direct vs indirect method; neither says anything about signs | detection-only |
+| "IFRS taxonomy has fewer paragraph links" | unverified; every IFRS Taxonomy element carries references | measure it once the taxonomy is downloaded |
+
+**Companies.** Shopify reports under US GAAP. Couche-Tard and Canadian Tire are not SEC
+registrants, and SEDAR+ has no mandatory XBRL, so their statements are PDFs only.
+Switzerland is not in the EU, so Novartis is not an ESEF filer; use its SEC 20-F. For
+Canada, use 40-F filers (RBC, BCE, Suncor, CNQ). BCE, Suncor and Vodafone were added to
+`configs/ifrs.json`; the rejected ones are listed there with reasons.
+
+**Size.** 12 companies × 3 years × ~2 errors ≈ 72 items is too small for per-rule numbers.
+Use every available year (SEC IFRS XBRL from FY2018, ESEF from FY2020) and every applicable
+rule per statement, as the US set does.
+
+**US list.** The 12-company US proposal is mostly covered: AAPL, MSFT, WMT, JNJ are built;
+HD, XOM, BA, CAT were in the expansion config; UNH and V were added. JPM stays phase 2
+(unclassified bank balance sheet). R&D is ASC 730, not 720; asset retirement obligations
+(ASC 410) would need a new rule.

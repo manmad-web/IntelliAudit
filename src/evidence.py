@@ -278,13 +278,16 @@ def supporting_facts(shown, rng, labels, violation=None, no_decoy=()):
                  non-fact rule changed: a consistent fact there would contradict
                  the changed number and look like a measurement fault)
     """
+    # multi-error items pass several violations: {row_idx: (kind, meta)}
+    viol = violation if isinstance(violation, dict) else (
+        {violation[0]: (violation[1], violation[2])} if violation else {})
     lines, spare = [], []
     for r in shown["rows"]:
         if r.get("kind") != "line":
             continue
         kind = KIND_BY_CONCEPT.get(r.get("concept"))
-        if violation and r["idx"] == violation[0]:
-            t = violating_fact(violation[1], violation[2], r, rng, labels.get(r["idx"], r["label"]))
+        if r["idx"] in viol:
+            t = violating_fact(viol[r["idx"]][0], viol[r["idx"]][1], r, rng, labels.get(r["idx"], r["label"]))
         elif kind and r["idx"] not in no_decoy and rng.random() < P_DECOY:
             t = consistent_fact(kind, r, rng, labels.get(r["idx"], r["label"]))
         else:

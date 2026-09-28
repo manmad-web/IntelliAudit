@@ -3,6 +3,23 @@
  "_note": "PROPOSED expansion. CIKs are from memory and are checked at build time: the build skips a company whose EDGAR entityName does not match 'name'. Phase 1 fits the current classified-balance-sheet templates; phase 2 (banks, insurers, REITs, utilities) needs its own statement template and rule families before it can be built.",
  "companies": [
   {
+   "name": "Visa Inc.",
+   "ticker": "V",
+   "cik": "1403161",
+   "sector": "Financials",
+   "why": "payments network with a CLASSIFIED balance sheet: AFS securities (320), settlement receivables/payables; Sept FYE",
+   "fiscal_year_end": "Sep",
+   "phase": 1
+  },
+  {
+   "name": "UnitedHealth Group Inc.",
+   "ticker": "UNH",
+   "cik": "731766",
+   "sector": "Health Care",
+   "why": "goodwill-heavy acquirer (Optum); medical cost payables; classified balance sheet",
+   "phase": 1
+  },
+  {
    "name": "Procter & Gamble Co.",
    "ticker": "PG",
    "cik": "80424",
@@ -603,5 +620,21 @@
  ],
  "n_per_rule_per_statement": 1,
  "seed": 13,
- "controls_per_statement": 1
+ "controls_per_statement": 1,
+ "priority_12": {
+  "note": "The 12-company set proposed in Sept 2026 review. AAPL, MSFT, WMT, JNJ are already built (config.json). JPM is phase 2 (unclassified bank balance sheet: the current builder returns nothing for it).",
+  "tickers": [
+   "AAPL",
+   "MSFT",
+   "WMT",
+   "JNJ",
+   "HD",
+   "UNH",
+   "V",
+   "XOM",
+   "BA",
+   "CAT",
+   "JPM"
+  ]
+ }
 }
