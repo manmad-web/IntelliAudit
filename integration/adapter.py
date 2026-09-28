@@ -15,7 +15,7 @@ STMT_MAP = {"BalanceSheet": "balance_sheet", "IncomeStatement": "income_statemen
 
 def iab_to_item(record: dict) -> dict:
     """IntelliAudit-Bench record → capstone `item` dict (+ gold-concept bypass)."""
-    ei = record["error_identification"]
+    ei = record["error_identification"] or {}
     return {
         # fields the capstone parser / run_pipeline expect:
         "table": record["modified_statement_text"],
@@ -25,7 +25,7 @@ def iab_to_item(record: dict) -> dict:
         "errors": [{
             "error_type": record["error_type"],
             "problematic_entry": ei.get("problematic_entry"),
-        }],
+        }] if record["error_type"] else [],
         # IntelliAudit-Bench extras that let the pipeline skip its mapper:
         "statement_type": STMT_MAP.get(record["metadata"]["statement_type"]),
         "gold_concept": ei.get("affected_xbrl_concept"),

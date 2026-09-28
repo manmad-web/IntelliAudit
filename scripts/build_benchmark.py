@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 
 from edgar_ingest import get_company_facts
 from statement_builder import build_balance_sheet, build_income_statement, build_cash_flow
+from normalize import normalize_statement
 import injector
 
 BUILDERS = [("BS", build_balance_sheet), ("IS", build_income_statement), ("CF", build_cash_flow)]
@@ -73,11 +74,15 @@ def main():
                 if not stmt:
                     skipped_year += 1; continue
                 stmt["ticker"] = co["ticker"]
+                stmt = normalize_statement(stmt)
                 if not injector.check_reconciles(stmt):
                     print(f"[warn] {co['ticker']} FY{yr} {tag}: does not reconcile, skipping"); continue
-                if not args.offline:
-                    json.dump(stmt, open(clean_path, "w"), indent=2)
+                json.dump(stmt, open(clean_path, "w"), indent=2)
                 built += 1
+                if cfg.get("controls_per_statement", 1):
+                    rec = injector.build_control(stmt, f"IA-{co['ticker']}-{yr}-{tag}-CONTROL-00")
+                    records.append(rec)
+                    tier[rec["ground_truth_citations"]["citation_tier"]] += 1
                 for rule in rulebook["rules"]:
                     if stmt["statement_type"] not in rule["statements"]:
                         continue
@@ -98,10 +103,15 @@ def main():
         "companies": [c["ticker"] for c in companies], "years": years,
         "clean_statements_built": built, "company_years_skipped": skipped_year,
         "records": len(records),
+        "controls": sum(1 for r in records if r["record_type"] == "control"),
         "statement_type_breakdown": dict(Counter(r["metadata"]["statement_type"] for r in records)),
-        "error_type_breakdown": dict(Counter(r["error_type"] for r in records)),
+        "error_type_breakdown": dict(Counter(r["error_type"] or "None (control)" for r in records)),
+        "rule_breakdown": dict(sorted(Counter((r["rule_id"] or "CONTROL").split("_")[0] for r in records).items())),
+        "distinct_citable_paragraphs": sorted({r["ground_truth_citations"]["asc_full"] for r in records
+                                               if r["ground_truth_citations"].get("citable")}),
         "citation_tier_breakdown": dict(tier),
-        "verifiable_error_pct": round(100 * sum(1 for r in records if r["self_check"]["error_breaks_reconciliation"]) / max(1, len(records)), 1),
+        "injected_breaking_footing_pct": round(100 * sum(1 for r in records if r["record_type"] == "injected" and r["self_check"]["error_breaks_reconciliation"]) / max(1, sum(1 for r in records if r["record_type"] == "injected")), 1),
+        "citable_breaking_footing_pct": round(100 * sum(1 for r in records if r["ground_truth_citations"].get("citable") and r["self_check"]["error_breaks_reconciliation"]) / max(1, sum(1 for r in records if r["ground_truth_citations"].get("citable"))), 1),
     }
     json.dump(summary, open(os.path.join(bench_dir, "summary.json"), "w"), indent=2)
     print("\n=== SUMMARY ===")

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "name": "IntelliAudit Citation Rulebook v0.1",
+    "name": "IntelliAudit Citation Rulebook v0.4",
     "purpose": "Rule-FIRST error injection. Each rule pre-specifies the violated standard so the citation ground truth is deterministic and independent of any LLM. The generator applies a rule's injection recipe to a concept-tagged clean statement and emits the rule's citation as ground truth.",
     "citation_ground_truth_policy": "Governing paragraph per docs/CITATION_POLICY.md. A rulebook string is not ground truth: linkbase-verified requires CitationResolver.paragraph_verified (exact paragraph, not subtopic). Otherwise the tier is expert-authored-UNVALIDATED, or the rule is detection-only. DQC ids are not ground truth and are not stored.",
     "scoring": "Exact match on ASC code at three granularities: topic (606), subtopic (606-10), full (606-10-25-1). Report EM@topic / EM@subtopic / EM@full. This replaces AuditBench's fuzzy Top-K-over-vague-prose metric.",
@@ -10,7 +10,7 @@
       "Redundant Row",
       "Misclassification"
     ],
-    "version": "0.3-citation-policy",
+    "version": "0.4-contrastive",
     "governing_paragraph_policy": "docs/CITATION_POLICY.md",
     "audit_changes": [
       "Citations removed for R05/R06/R07/R12 (no governing ASC paragraph) -> detection-only cases.",
@@ -21,7 +21,13 @@
       "v0.3: added subject-matter rules R13 lease (842), R14 goodwill (350), R15 AFS fair value (320) to break citation guessability \u2014 all derivable from concepts present in companyfacts.",
       "v0.3: R04 (missing row) also made detection-only \u2014 ASC 210-10-45-1 was a catch-all, not a governing paragraph.",
       "v0.3.1: merged duplicate lease rules \u2014 R13 removed, R10 kept (it was the original id and only began firing once relabel_concept was implemented).",
-      "citation-policy: governing paragraph is docs/CITATION_POLICY.md. Section-only codes replaced with the paragraph that policy names. Every asserted ASC is expert-authored-UNVALIDATED until paragraph_verified says otherwise. DQC id strings removed."
+      "citation-policy: governing paragraph is docs/CITATION_POLICY.md. Section-only codes replaced with the paragraph that policy names. Every asserted ASC is expert-authored-UNVALIDATED until paragraph_verified says otherwise. DQC id strings removed.",
+      "v0.4: citable rules no longer break footing. move_row recomputes the subtotals it moves between; measurement/recognition rules post the other side of the entry (retained earnings, AOCI, or the income-statement chain). Citable cases are the ones arithmetic cannot find.",
+      "v0.4: 'ledger' = as_booked for measurement/recognition rules: the company booked what it reported, so the violation is only visible in the supporting facts.",
+      "v0.4: 'facts' names the supporting-fact kind (src/evidence.py). Consistent facts of every kind appear on clean controls and other records, so a fact's presence carries no signal.",
+      "v0.4: R01 drops OtherAssetsCurrent/PrepaidExpenseAndOtherAssetsCurrent (the caption says 'current'); R02 drops DeferredRevenueCurrent (a non-current deferred revenue line is often legitimate).",
+      "v0.4: R06 label pool is section-aware and sentence-case; 'Goodwill Reserve' removed.",
+      "v0.4: new citable rules R16 (230-10-45-15), R17 (326-20-30-1), R18 (360-10-35-17), R19 (470-10-45-11, fact-only), R20 (740-10-30-5), R21 (730-10-25-1). All expert-authored-UNVALIDATED unless the paragraph is in the concept's linkbase set."
     ]
   },
   "rules": [
@@ -34,14 +40,14 @@
       ],
       "eligible_concepts": [
         "us-gaap:AccountsReceivableNetCurrent",
-        "us-gaap:InventoryNet",
-        "us-gaap:OtherAssetsCurrent",
-        "us-gaap:PrepaidExpenseAndOtherAssetsCurrent"
+        "us-gaap:ReceivablesNetCurrent",
+        "us-gaap:InventoryNet"
       ],
       "injection": {
         "op": "move_row",
         "from_section": "CurrentAssets",
-        "to_section": "NoncurrentAssets"
+        "to_section": "NoncurrentAssets",
+        "recompute": true
       },
       "citation": {
         "asc": "ASC 210-10-45-1",
@@ -69,13 +75,15 @@
       ],
       "eligible_concepts": [
         "us-gaap:AccountsPayableCurrent",
+        "us-gaap:AccountsPayableTradeCurrent",
         "us-gaap:AccruedLiabilitiesCurrent",
-        "us-gaap:DeferredRevenueCurrent"
+        "us-gaap:EmployeeRelatedLiabilitiesCurrent"
       ],
       "injection": {
         "op": "move_row",
         "from_section": "CurrentLiabilities",
-        "to_section": "NoncurrentLiabilities"
+        "to_section": "NoncurrentLiabilities",
+        "recompute": true
       },
       "citation": {
         "asc": "ASC 210-10-45-8",
@@ -106,7 +114,8 @@
       "injection": {
         "op": "move_row",
         "from_section": "NoncurrentLiabilities",
-        "to_section": "CurrentLiabilities"
+        "to_section": "CurrentLiabilities",
+        "recompute": true
       },
       "citation": {
         "asc": "ASC 210-10-45-12",
@@ -210,24 +219,136 @@
       ],
       "injection": {
         "op": "insert_row",
-        "fabricated_labels": [
-          "Software Licenses",
-          "Deferred Revenue",
-          "Goodwill Reserve",
-          "Brand Value",
-          "Capitalized Cloud Costs",
-          "Customer Relationships, net",
-          "Deferred Commissions",
-          "Spare Parts and Supplies",
-          "Restricted Cash, non-current",
-          "Equity Method Investments",
-          "Contract Assets",
-          "Prepaid Income Taxes"
-        ],
         "value_pct_of_subtotal": [
           0.02,
           0.08
-        ]
+        ],
+        "fabricated_labels": {
+          "CurrentAssets": [
+            [
+              "Contract assets",
+              1
+            ],
+            [
+              "Prepaid income taxes",
+              1
+            ],
+            [
+              "Restricted cash",
+              1
+            ],
+            [
+              "Spare parts and supplies",
+              1
+            ],
+            [
+              "Short-term deposits",
+              1
+            ],
+            [
+              "Derivative assets",
+              1
+            ]
+          ],
+          "NoncurrentAssets": [
+            [
+              "Software licenses",
+              1
+            ],
+            [
+              "Capitalized cloud computing costs",
+              1
+            ],
+            [
+              "Customer relationships, net",
+              1
+            ],
+            [
+              "Deferred commissions",
+              1
+            ],
+            [
+              "Equity method investments",
+              1
+            ],
+            [
+              "Long-term restricted cash",
+              1
+            ]
+          ],
+          "Assets": [
+            [
+              "Software licenses",
+              1
+            ],
+            [
+              "Capitalized cloud computing costs",
+              1
+            ],
+            [
+              "Deferred commissions",
+              1
+            ],
+            [
+              "Equity method investments",
+              1
+            ]
+          ],
+          "CurrentLiabilities": [
+            [
+              "Customer deposits",
+              1
+            ],
+            [
+              "Accrued warranty obligations",
+              1
+            ],
+            [
+              "Dividends payable",
+              1
+            ],
+            [
+              "Accrued restructuring costs",
+              1
+            ],
+            [
+              "Derivative liabilities",
+              1
+            ]
+          ],
+          "NoncurrentLiabilities": [
+            [
+              "Asset retirement obligations",
+              1
+            ],
+            [
+              "Long-term warranty obligations",
+              1
+            ],
+            [
+              "Deferred compensation liabilities",
+              1
+            ]
+          ],
+          "IncomeStatement": [
+            [
+              "Licensing income",
+              1
+            ],
+            [
+              "Gain on sale of assets",
+              1
+            ],
+            [
+              "Restructuring charges",
+              -1
+            ],
+            [
+              "Impairment of intangible assets",
+              -1
+            ]
+          ]
+        }
       },
       "citation": {
         "asc": null,
@@ -298,7 +419,8 @@
       "injection": {
         "op": "move_row",
         "from_section": "InvestingActivities",
-        "to_section": "OperatingActivities"
+        "to_section": "OperatingActivities",
+        "recompute": true
       },
       "citation": {
         "asc": "ASC 230-10-45-13",
@@ -324,7 +446,8 @@
         "IncomeStatement"
       ],
       "eligible_concepts": [
-        "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax"
+        "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "us-gaap:Revenues"
       ],
       "injection": {
         "op": "perturb_value",
@@ -333,7 +456,9 @@
           0.05,
           0.2
         ],
-        "narrative": "prematurely recognized revenue for goods/services not yet transferred"
+        "narrative": "prematurely recognized revenue for goods/services not yet transferred",
+        "recompute": true,
+        "keep_totals": false
       },
       "citation": {
         "asc": "ASC 606-10-25-23",
@@ -348,9 +473,11 @@
         "dqc_id": null,
         "verified": false
       },
-      "detection_predicate": "revenue overstated relative to satisfied performance obligations in transactions",
+      "detection_predicate": "facts show unsatisfied obligations not carried in contract liabilities; income statement still foots",
       "difficulty": "hard",
-      "requires": "income statement seed + transaction narratives encoding obligation timing"
+      "requires": "income statement seed + transaction narratives encoding obligation timing",
+      "ledger": "as_booked",
+      "facts": "revenue"
     },
     {
       "rule_id": "R10_lease_operating_finance_misclass",
@@ -389,8 +516,10 @@
         "dqc_id": null,
         "verified": false
       },
-      "detection_predicate": "lease asset/liability labelled finance while its paired item remains operating",
-      "difficulty": "hard"
+      "detection_predicate": "lease tests in the facts contradict the caption",
+      "difficulty": "hard",
+      "ledger": "as_booked",
+      "facts": "lease"
     },
     {
       "rule_id": "R11_inventory_no_nrv_writedown",
@@ -408,7 +537,10 @@
           0.1,
           0.3
         ],
-        "narrative": "inventory carried above net realizable value; required write-down omitted"
+        "narrative": "inventory carried above net realizable value; required write-down omitted",
+        "balance_with": [
+          "us-gaap:RetainedEarningsAccumulatedDeficit"
+        ]
       },
       "citation": {
         "asc": "ASC 330-10-35-1B",
@@ -423,9 +555,11 @@
         "dqc_id": null,
         "verified": false
       },
-      "detection_predicate": "inventory carrying value > NRV given in facts",
+      "detection_predicate": "inventory carrying amount > NRV stated in the supporting facts; statement still foots",
       "difficulty": "hard",
-      "requires": "NRV/market datum in seed"
+      "requires": "NRV/market datum in seed",
+      "ledger": "as_booked",
+      "facts": "inventory"
     },
     {
       "rule_id": "R12_negative_value_on_nonnegative_element",
@@ -478,8 +612,11 @@
           0.1,
           0.35
         ],
-        "keep_totals": true,
-        "narrative": "goodwill carried above its implied fair value; required impairment not recognised"
+        "keep_totals": false,
+        "narrative": "goodwill carried above its implied fair value; required impairment not recognised",
+        "balance_with": [
+          "us-gaap:RetainedEarningsAccumulatedDeficit"
+        ]
       },
       "citation": {
         "asc": "ASC 350-20-35-1",
@@ -494,8 +631,10 @@
         "dqc_id": null,
         "verified": false
       },
-      "detection_predicate": "goodwill inconsistent with the enclosing subtotal / prior-period balance",
-      "difficulty": "hard"
+      "detection_predicate": "reporting-unit carrying amount > fair value in the facts, goodwill not reduced; statement still foots",
+      "difficulty": "hard",
+      "ledger": "as_booked",
+      "facts": "goodwill"
     },
     {
       "rule_id": "R15_afs_securities_measurement",
@@ -515,11 +654,14 @@
       "injection": {
         "op": "perturb_value",
         "pct_range": [
-          0.08,
-          0.3
+          0.02,
+          0.1
         ],
-        "keep_totals": true,
-        "narrative": "available-for-sale securities not carried at fair value"
+        "keep_totals": false,
+        "narrative": "available-for-sale securities not carried at fair value",
+        "balance_with": [
+          "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax"
+        ]
       },
       "citation": {
         "asc": "ASC 320-10-35-1",
@@ -534,7 +676,239 @@
         "dqc_id": null,
         "verified": false
       },
-      "detection_predicate": "AFS/marketable securities balance inconsistent with its subtotal",
+      "detection_predicate": "AFS carrying amount != fair value in the facts; statement still foots (AOCI absorbs it)",
+      "difficulty": "hard",
+      "ledger": "as_booked",
+      "facts": "securities"
+    },
+    {
+      "rule_id": "R16_cashflow_financing_misclass",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": [
+        "CashFlow"
+      ],
+      "eligible_concepts": [
+        "us-gaap:PaymentsOfDividendsCommonStock",
+        "us-gaap:PaymentsForRepurchaseOfCommonStock"
+      ],
+      "injection": {
+        "op": "move_row",
+        "from_section": "FinancingActivities",
+        "to_section": "OperatingActivities",
+        "recompute": true
+      },
+      "citation": {
+        "asc": "ASC 230-10-45-15",
+        "citable": true,
+        "policy_clause": "presentation",
+        "citation_tier": "expert-authored-UNVALIDATED",
+        "topic": "230",
+        "subtopic": "230-10",
+        "rationale": "Presentation wins over 505. The injection moves a dividend payment or a share repurchase from financing to operating. ASC 230-10-45-15(a) lists payments of dividends and outlays to reacquire the entity's equity instruments as financing outflows. Topic 505 governs the equity accounts, not the cash-flow class."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "detection_predicate": "distribution to owners shown in operating activities",
+      "difficulty": "medium"
+    },
+    {
+      "rule_id": "R17_receivable_credit_loss_understated",
+      "family": "measurement",
+      "error_type": "Numerical Error",
+      "statements": [
+        "BalanceSheet"
+      ],
+      "eligible_concepts": [
+        "us-gaap:AccountsReceivableNetCurrent",
+        "us-gaap:ReceivablesNetCurrent"
+      ],
+      "injection": {
+        "op": "perturb_value",
+        "direction": "overstate",
+        "pct_range": [
+          0.02,
+          0.08
+        ],
+        "balance_with": [
+          "us-gaap:RetainedEarningsAccumulatedDeficit"
+        ],
+        "keep_totals": false,
+        "narrative": "allowance for credit losses below the expected credit losses the entity estimated"
+      },
+      "citation": {
+        "asc": "ASC 326-20-30-1",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
+        "topic": "326",
+        "subtopic": "326-20",
+        "rationale": "Subject wins over 210 and 310. The facts give an expected-credit-loss estimate larger than the allowance booked. ASC 326-20-30-1 requires an allowance that presents the net amount expected to be collected. 210 only classifies receivables; 310-10-45 is presentation."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "ledger": "as_booked",
+      "facts": "receivable",
+      "detection_predicate": "allowance recorded < expected credit losses in the facts",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R18_ppe_impairment_omitted",
+      "family": "measurement",
+      "error_type": "Numerical Error",
+      "statements": [
+        "BalanceSheet"
+      ],
+      "eligible_concepts": [
+        "us-gaap:PropertyPlantAndEquipmentNet"
+      ],
+      "injection": {
+        "op": "perturb_value",
+        "direction": "overstate",
+        "pct_range": [
+          0.02,
+          0.06
+        ],
+        "balance_with": [
+          "us-gaap:RetainedEarningsAccumulatedDeficit"
+        ],
+        "keep_totals": false,
+        "narrative": "asset group not recoverable and carried above fair value; impairment loss not recognized"
+      },
+      "citation": {
+        "asc": "ASC 360-10-35-17",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
+        "topic": "360",
+        "subtopic": "360-10",
+        "rationale": "Subject wins over 210. The facts show an asset group whose carrying amount exceeds both its undiscounted cash flows and its fair value, with no loss recorded. ASC 360-10-35-17 recognizes an impairment loss only when the carrying amount is not recoverable and exceeds fair value. Decoys include groups that are recoverable on undiscounted flows even though fair value is lower (no loss under 360)."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "ledger": "as_booked",
+      "facts": "ppe",
+      "detection_predicate": "undiscounted flows < carrying amount and fair value < carrying amount in the facts, no loss",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R19_debt_covenant_breach_not_current",
+      "family": "classification",
+      "error_type": "Misclassification",
+      "statements": [
+        "BalanceSheet"
+      ],
+      "eligible_concepts": [
+        "us-gaap:LongTermDebtNoncurrent"
+      ],
+      "injection": {
+        "op": "fact_only",
+        "corrected_section": "CurrentLiabilities",
+        "narrative": "covenant breach at period-end makes the debt callable within a year; debt left in non-current liabilities"
+      },
+      "citation": {
+        "asc": "ASC 470-10-45-11",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
+        "topic": "470",
+        "subtopic": "470-10",
+        "rationale": "The handoff 210-10-45-7 describes: the record contains a callable-debt fact, so 470 wins over 210. ASC 470-10-45-11 requires current classification of long-term obligations callable because of a covenant violation at the balance-sheet date, unless the creditor waives the right for more than one year. Contrast R03 (no such fact), which stays 210-10-45-12."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "ledger": "clean",
+      "facts": "debt",
+      "detection_predicate": "facts show an unwaived (or <12-month waived) covenant breach; debt still non-current",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R20_dta_valuation_allowance_understated",
+      "family": "measurement",
+      "error_type": "Numerical Error",
+      "statements": [
+        "BalanceSheet"
+      ],
+      "eligible_concepts": [
+        "us-gaap:DeferredIncomeTaxAssetsNet",
+        "us-gaap:DeferredTaxAssetsNetNoncurrent"
+      ],
+      "injection": {
+        "op": "perturb_value",
+        "direction": "overstate",
+        "pct_range": [
+          0.1,
+          0.4
+        ],
+        "balance_with": [
+          "us-gaap:RetainedEarningsAccumulatedDeficit"
+        ],
+        "keep_totals": false,
+        "narrative": "valuation allowance smaller than the portion not more-likely-than-not realizable"
+      },
+      "citation": {
+        "asc": "ASC 740-10-30-5",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
+        "topic": "740",
+        "subtopic": "740-10",
+        "rationale": "Subject wins over 210. ASC 740-10-30-5(e) reduces deferred tax assets by a valuation allowance for the portion that is more likely than not not to be realized. The facts give a realizable amount below the net asset carried. The scored code is the paragraph; (e) is the operative subparagraph."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "ledger": "as_booked",
+      "facts": "dta",
+      "detection_predicate": "net DTA carried > amount more likely than not realizable in the facts",
+      "difficulty": "hard"
+    },
+    {
+      "rule_id": "R21_rnd_costs_capitalized",
+      "family": "recognition",
+      "error_type": "Numerical Error",
+      "statements": [
+        "IncomeStatement"
+      ],
+      "eligible_concepts": [
+        "us-gaap:ResearchAndDevelopmentExpense"
+      ],
+      "injection": {
+        "op": "perturb_value",
+        "direction": "toward_zero",
+        "pct_range": [
+          0.05,
+          0.2
+        ],
+        "recompute": true,
+        "keep_totals": false,
+        "narrative": "development-phase costs capitalized instead of expensed"
+      },
+      "citation": {
+        "asc": "ASC 730-10-25-1",
+        "citable": true,
+        "policy_clause": "subject",
+        "citation_tier": "expert-authored-UNVALIDATED",
+        "topic": "730",
+        "subtopic": "730-10",
+        "rationale": "Subject wins over 220. The facts show research and development costs deferred to the balance sheet. ASC 730-10-25-1 requires research and development costs to be charged to expense when incurred. Under IFRS (IAS 38.57) development costs meeting the criteria must be capitalized; that is a framework difference the IFRS rulebook keeps."
+      },
+      "dqc_rule": {
+        "dqc_id": null,
+        "verified": false
+      },
+      "ledger": "as_booked",
+      "facts": "rnd",
+      "detection_predicate": "facts show R&D costs capitalized; income statement still foots",
       "difficulty": "hard"
     }
   ]

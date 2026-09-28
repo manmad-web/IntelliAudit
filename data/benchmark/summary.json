@@ -22,23 +22,67 @@
     2024
   ],
   "clean_statements_built": 220,
-  "company_years_skipped": 5,
-  "records": 1202,
+  "company_years_skipped": 20,
+  "records": 1756,
+  "controls": 220,
   "statement_type_breakdown": {
-    "BalanceSheet": 690,
-    "CashFlow": 230,
-    "IncomeStatement": 282
+    "BalanceSheet": 943,
+    "CashFlow": 388,
+    "IncomeStatement": 425
   },
   "error_type_breakdown": {
-    "Misclassification": 271,
+    "None (control)": 220,
+    "Misclassification": 391,
     "Missing Row": 220,
-    "Numerical Error": 571,
+    "Numerical Error": 785,
     "Redundant Row": 140
   },
+  "rule_breakdown": {
+    "CONTROL": 220,
+    "R01": 65,
+    "R02": 65,
+    "R03": 42,
+    "R04": 220,
+    "R05": 220,
+    "R06": 140,
+    "R07": 65,
+    "R08": 70,
+    "R09": 75,
+    "R10": 29,
+    "R11": 52,
+    "R12": 65,
+    "R14": 58,
+    "R15": 53,
+    "R16": 78,
+    "R17": 65,
+    "R18": 60,
+    "R19": 42,
+    "R20": 22,
+    "R21": 50
+  },
+  "distinct_citable_paragraphs": [
+    "ASC 210-10-45-1",
+    "ASC 210-10-45-12",
+    "ASC 210-10-45-8",
+    "ASC 230-10-45-13",
+    "ASC 230-10-45-15",
+    "ASC 320-10-35-1",
+    "ASC 326-20-30-1",
+    "ASC 330-10-35-1B",
+    "ASC 350-20-35-1",
+    "ASC 360-10-35-17",
+    "ASC 470-10-45-11",
+    "ASC 606-10-25-23",
+    "ASC 730-10-25-1",
+    "ASC 740-10-30-5",
+    "ASC 842-10-25-2"
+  ],
   "citation_tier_breakdown": {
-    "linkbase-verified": 83,
-    "expert-authored-UNVALIDATED": 409,
+    "no-error": 220,
+    "linkbase-verified": 177,
+    "expert-authored-UNVALIDATED": 649,
     "no-governing-paragraph": 710
   },
-  "verifiable_error_pct": 65.0
+  "injected_breaking_footing_pct": 46.2,
+  "citable_breaking_footing_pct": 0.0
 }

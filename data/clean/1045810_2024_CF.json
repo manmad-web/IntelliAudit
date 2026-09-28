@@ -45,7 +45,7 @@
     },
     {
       "idx": 4,
-      "label": "Other operating activities, net (residual)",
+      "label": "Other operating activities, net",
       "section": "OperatingActivities",
       "concept": null,
       "value": -6727,
@@ -77,7 +77,7 @@
     },
     {
       "idx": 7,
-      "label": "Other investing activities, net (residual)",
+      "label": "Other investing activities, net",
       "section": "InvestingActivities",
       "concept": null,
       "value": -10566,
@@ -124,7 +124,7 @@
     },
     {
       "idx": 12,
-      "label": "Other financing activities, net (residual)",
+      "label": "Other financing activities, net",
       "section": "FinancingActivities",
       "concept": null,
       "value": -3705,
@@ -170,5 +170,9 @@
       "name": "cash_rollforward",
       "tolerant": true
     }
-  ]
+  ],
+  "normalization": {
+    "version": 1,
+    "notes": []
+  }
 }

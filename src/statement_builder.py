@@ -449,6 +449,11 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000):
     entries = []
     for c, s, k, p in flat:
         entries.append((c, _GRAND.get(c, s), k))
+    # calculation weights: a weight -1 child (treasury stock, contra accounts)
+    # is shown negative. v0.3 ignored weights and plugged -2x the balance
+    # into a residual line; src/normalize.py repairs the committed v0.3 data.
+    weight = {(par, ch): w for par, kids in tree.items() for ch, w in kids}
+    parent_of = {c: p for c, s, k, p in flat}
 
     rows, idx, at = [], 0, {}
     for sect in _SECT_ORDER:
@@ -463,6 +468,8 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000):
             v = val(c)
             if v is None:
                 continue
+            if weight.get((parent_of.get(c), c), 1) < 0:
+                v = -abs(v)
             rows.append({"idx": idx, "label": _label_for(c), "section": sect,
                          "concept": "us-gaap:" + c, "value": v, "kind": "line",
                          "injectable": True}); at[c] = idx; idx += 1

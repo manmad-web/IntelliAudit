@@ -18,7 +18,7 @@
     },
     {
       "idx": 1,
-      "label": "Cash and cash equivalents at carrying value",
+      "label": "Cash and cash equivalents",
       "section": "CurrentAssets",
       "concept": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
       "value": 10019,
@@ -27,7 +27,7 @@
     },
     {
       "idx": 2,
-      "label": "Available for sale securities debt securities, current",
+      "label": "Available-for-sale debt securities",
       "section": "CurrentAssets",
       "concept": "us-gaap:AvailableForSaleSecuritiesDebtSecuritiesCurrent",
       "value": 31095,
@@ -36,7 +36,7 @@
     },
     {
       "idx": 3,
-      "label": "Accounts receivable, net, current",
+      "label": "Accounts receivable, net",
       "section": "CurrentAssets",
       "concept": "us-gaap:AccountsReceivableNetCurrent",
       "value": 7587,
@@ -45,7 +45,7 @@
     },
     {
       "idx": 4,
-      "label": "Prepaid expense and other assets, current",
+      "label": "Prepaid expenses and other current assets",
       "section": "CurrentAssets",
       "concept": "us-gaap:PrepaidExpenseAndOtherAssetsCurrent",
       "value": 1779,
@@ -54,7 +54,7 @@
     },
     {
       "idx": 5,
-      "label": "Assets, current",
+      "label": "Total current assets",
       "section": "CurrentAssets",
       "concept": "us-gaap:AssetsCurrent",
       "value": 50480,
@@ -76,7 +76,7 @@
     },
     {
       "idx": 7,
-      "label": "Property plant and equipment, net",
+      "label": "Property, plant and equipment, net",
       "section": "NoncurrentAssets",
       "concept": "us-gaap:PropertyPlantAndEquipmentNet",
       "value": 24683,
@@ -85,7 +85,7 @@
     },
     {
       "idx": 8,
-      "label": "Intangible assets, net excluding goodwill",
+      "label": "Intangible assets, net",
       "section": "NoncurrentAssets",
       "concept": "us-gaap:IntangibleAssetsNetExcludingGoodwill",
       "value": 1294,
@@ -103,7 +103,7 @@
     },
     {
       "idx": 10,
-      "label": "Other assets, non-current",
+      "label": "Other non-current assets",
       "section": "NoncurrentAssets",
       "concept": "us-gaap:OtherAssetsNoncurrent",
       "value": 2576,
@@ -112,7 +112,7 @@
     },
     {
       "idx": 11,
-      "label": "Assets",
+      "label": "Total assets",
       "section": "Assets",
       "concept": "us-gaap:Assets",
       "value": 97334,
@@ -135,7 +135,7 @@
     },
     {
       "idx": 13,
-      "label": "Accounts payable, current",
+      "label": "Accounts payable",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:AccountsPayableCurrent",
       "value": 820,
@@ -144,7 +144,7 @@
     },
     {
       "idx": 14,
-      "label": "Accounts payable other, current",
+      "label": "Other payables",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:AccountsPayableOtherCurrent",
       "value": 541,
@@ -153,7 +153,7 @@
     },
     {
       "idx": 15,
-      "label": "Accrued liabilities, current",
+      "label": "Accrued liabilities",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:AccruedLiabilitiesCurrent",
       "value": 5509,
@@ -162,7 +162,7 @@
     },
     {
       "idx": 16,
-      "label": "Contract with customer liability, current",
+      "label": "Deferred revenue",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:ContractWithCustomerLiabilityCurrent",
       "value": 147,
@@ -171,7 +171,7 @@
     },
     {
       "idx": 17,
-      "label": "Liabilities, current",
+      "label": "Total current liabilities",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:LiabilitiesCurrent",
       "value": 7017,
@@ -193,7 +193,7 @@
     },
     {
       "idx": 19,
-      "label": "Other liabilities, non-current",
+      "label": "Other non-current liabilities",
       "section": "NoncurrentLiabilities",
       "concept": "us-gaap:OtherLiabilitiesNoncurrent",
       "value": 6190,
@@ -202,7 +202,7 @@
     },
     {
       "idx": 20,
-      "label": "Liabilities",
+      "label": "Total liabilities",
       "section": "NoncurrentLiabilities",
       "concept": "us-gaap:Liabilities",
       "value": 13207,
@@ -222,7 +222,7 @@
     },
     {
       "idx": 22,
-      "label": "Common stock value",
+      "label": "Common stock",
       "section": "Equity",
       "concept": "us-gaap:CommonStockValue",
       "value": 0,
@@ -231,7 +231,7 @@
     },
     {
       "idx": 23,
-      "label": "Additional paid in capital",
+      "label": "Additional paid-in capital",
       "section": "Equity",
       "concept": "us-gaap:AdditionalPaidInCapital",
       "value": 42906,
@@ -240,7 +240,7 @@
     },
     {
       "idx": 24,
-      "label": "Accumulated other comprehensive income loss, net of tax",
+      "label": "Accumulated other comprehensive income (loss)",
       "section": "Equity",
       "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax",
       "value": -760,
@@ -249,7 +249,7 @@
     },
     {
       "idx": 25,
-      "label": "Retained earnings accumulated deficit",
+      "label": "Retained earnings",
       "section": "Equity",
       "concept": "us-gaap:RetainedEarningsAccumulatedDeficit",
       "value": 41981,
@@ -258,7 +258,7 @@
     },
     {
       "idx": 26,
-      "label": "Stockholders equity",
+      "label": "Total stockholders' equity",
       "section": "Equity",
       "concept": "us-gaap:StockholdersEquity",
       "value": 84127,
@@ -272,7 +272,7 @@
     },
     {
       "idx": 27,
-      "label": "Liabilities and stockholders equity",
+      "label": "Total liabilities and stockholders' equity",
       "section": "LiabilitiesAndEquity",
       "concept": "us-gaap:LiabilitiesAndStockholdersEquity",
       "value": 97334,
@@ -291,5 +291,9 @@
       ],
       "name": "accounting_equation"
     }
-  ]
+  ],
+  "normalization": {
+    "version": 1,
+    "notes": []
+  }
 }
