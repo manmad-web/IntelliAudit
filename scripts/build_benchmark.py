@@ -13,46 +13,77 @@ Outputs:
     data/benchmark/records.jsonl         one injected-error record per line
     data/benchmark/summary.json          counts + citation-tier breakdown
 """
-import argparse, json, os, random, sys
+import argparse, json, os, random, re, sys
 from collections import Counter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
 from edgar_ingest import get_company_facts
-from statement_builder import build_balance_sheet, build_income_statement, build_cash_flow
+from statement_builder import (build_balance_sheet, build_income_statement, build_cash_flow,
+                               build_balance_sheet_from_filing)
 from normalize import normalize_statement
 import injector
 
 BUILDERS = [("BS", build_balance_sheet), ("IS", build_income_statement), ("CF", build_cash_flow)]
 
 
+def _name_ok(expected, entity):
+    """Guard against a wrong CIK: the EDGAR entityName must share a word with the configured name."""
+    stop = {"inc", "corp", "co", "company", "the", "plc", "ltd", "sa", "ag", "nv", "se", "group",
+            "holdings", "corporation", "limited", "of", "and", "&"}
+    tok = lambda x: {w for w in re.findall(r"[a-z0-9]+", (x or "").lower()) if w not in stop and len(w) > 1}
+    return bool(tok(expected) & tok(entity))
+
+
 def main():
-    cfg = json.load(open(os.path.join(ROOT, "config.json")))
-    rulebook = json.load(open(os.path.join(ROOT, "rulebook.json")))
     ap = argparse.ArgumentParser()
+    ap.add_argument("--config", default="config.json",
+                    help="config file (config.json = the US-GAAP core set; configs/ifrs.json = IFRS edition)")
     ap.add_argument("--companies", nargs="*", help="tickers to include (default: all)")
     ap.add_argument("--years", nargs="*", type=int, help="fiscal years (default: config)")
     ap.add_argument("--no-citations", action="store_true", help="skip linkbase cross-check")
+    ap.add_argument("--phase", type=int, default=1,
+                    help="include companies up to this phase (phase 2 = banks/insurers/REITs/utilities; "
+                         "needs templates that do not exist yet)")
     ap.add_argument("--offline", action="store_true",
                     help="build from committed data/clean/*.json and data/reference linkbase cache")
     args = ap.parse_args()
+    cfg = json.load(open(os.path.join(ROOT, args.config)))
+    framework = cfg.get("framework", "us-gaap")
+    from frameworks import get as _fw
+    fw = _fw(framework)
+    rulebook = json.load(open(os.path.join(ROOT, fw["rulebook"])))
+    if framework != "us-gaap":
+        # The IFRS edition is a separate dataset. Balance sheets only for now:
+        # the income-statement and cash-flow builders are us-gaap templates.
+        global BUILDERS
+        BUILDERS = [("BS", lambda f, y, c=None: build_balance_sheet_from_filing(f, y, c, framework=framework))]
+        rulebook["rules"] = [r for r in rulebook["rules"] if r.get("status") == "ready"]
+        if args.offline:
+            injector._RESOLVER = None
+        elif cfg.get("taxonomy_zip"):
+            from citation_resolver import IfrsCitationResolver
+            injector._RESOLVER = IfrsCitationResolver(cfg["taxonomy_zip"])
+        else:
+            injector._RESOLVER = None
+            print("[warn] no IFRS taxonomy_zip in the config: citations will not be linkbase-checked")
 
     if args.no_citations:
         injector._RESOLVER = None
-    elif args.offline:
+    elif args.offline and framework == "us-gaap":
         from citation_resolver import CachedResolver
         injector._RESOLVER = CachedResolver()
 
-    companies = cfg["companies"]
+    companies = [c for c in cfg["companies"] if c.get("phase", 1) <= args.phase]
     if args.companies:
         want = {c.upper() for c in args.companies}
         companies = [c for c in companies if c["ticker"] in want]
     years = args.years or cfg["fiscal_years"]
     rng = random.Random(cfg.get("seed", 13))
 
-    clean_dir = os.path.join(ROOT, "data", "clean")
-    bench_dir = os.path.join(ROOT, "data", "benchmark")
+    clean_dir = os.path.join(ROOT, fw["clean_dir"])
+    bench_dir = os.path.join(ROOT, fw["out_dir"])
     os.makedirs(clean_dir, exist_ok=True); os.makedirs(bench_dir, exist_ok=True)
 
     records, tier = [], Counter()
@@ -64,13 +95,18 @@ def main():
                 facts = get_company_facts(co["cik"])
             except Exception as e:
                 print(f"[skip] {co['ticker']}: EDGAR fetch failed: {e}"); continue
+            if not _name_ok(co["name"], facts.get("entityName")):
+                print(f"[skip] {co['ticker']}: CIK {co['cik']} is {facts.get('entityName')!r}, "
+                      f"not {co['name']!r} — fix the CIK in {args.config}"); continue
         for yr in years:
             for tag, build in BUILDERS:
                 clean_path = os.path.join(clean_dir, f"{co['cik']}_{yr}_{tag}.json")
                 if args.offline:
                     stmt = json.load(open(clean_path)) if os.path.exists(clean_path) else None
-                else:
+                elif framework == "us-gaap":
                     stmt = build(facts, yr)
+                else:
+                    stmt = build(facts, yr, co["cik"])
                 if not stmt:
                     skipped_year += 1; continue
                 stmt["ticker"] = co["ticker"]
@@ -100,6 +136,7 @@ def main():
         for r in records:
             f.write(json.dumps(r) + "\n")
     summary = {
+        "framework": framework,
         "companies": [c["ticker"] for c in companies], "years": years,
         "clean_statements_built": built, "company_years_skipped": skipped_year,
         "records": len(records),

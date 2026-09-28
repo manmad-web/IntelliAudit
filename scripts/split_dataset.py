@@ -23,9 +23,14 @@ v0.4 exam changes (second audit):
 """
 import collections, hashlib, json, os, random, re
 
+import argparse, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BENCH = os.path.join(ROOT, "data", "benchmark")
-cfg = json.load(open(os.path.join(ROOT, "config.json")))
+sys.path.insert(0, os.path.join(ROOT, "src"))
+from frameworks import get as _fw  # noqa: E402
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--config", default="config.json")
+cfg = json.load(open(os.path.join(ROOT, _ap.parse_args().config)))
+BENCH = os.path.join(ROOT, _fw(cfg.get("framework", "us-gaap"))["out_dir"])
 SALT = str(cfg.get("exam_salt", "intelliaudit-v0.4"))
 recs = [json.loads(l) for l in open(os.path.join(BENCH, "records.jsonl"))]
 

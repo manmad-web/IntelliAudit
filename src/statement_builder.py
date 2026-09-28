@@ -427,28 +427,34 @@ _SECT_HEADER = {"CurrentAssets": "Current assets:", "NoncurrentAssets": "Non-cur
 _GRAND = {"Assets": "Assets", "LiabilitiesAndStockholdersEquity": "LiabilitiesAndEquity"}
 
 
-def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000):
+def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000, framework="us-gaap"):
+    """framework='ifrs' reads ifrs-full facts from 20-F/40-F filings (UNTESTED
+    until the first online IFRS build; see docs/EXPANSION_PLAN.md)."""
     from filing_structure import balance_sheet_tree, flatten
+    from frameworks import get as _fw
+    fw = _fw(framework)
+    ns, anc = fw["namespace"], fw["anchors"]
+    grand = {anc["assets"]: "Assets", anc["liabilities_and_equity"]: "LiabilitiesAndEquity"}
     meta = company_meta(facts)
-    anchor = concept_value(facts, "us-gaap:Assets", fiscal_year)
+    anchor = concept_value(facts, f"{ns}:{anc['assets']}", fiscal_year, unit=fw["currency"], forms=fw["forms"])
     if not anchor:
         return None
     try:
-        tree = balance_sheet_tree(cik, anchor["accn"])
+        tree = balance_sheet_tree(cik, anchor["accn"], framework=framework)
     except Exception:
         return None
-    if not tree or "AssetsCurrent" not in tree:
+    if not tree or anc["assets_current"] not in tree:
         return None
-    flat = flatten(tree)
+    flat = flatten(tree, framework=framework)
 
     def val(c):
-        cv = concept_value(facts, "us-gaap:" + c, fiscal_year)
+        cv = concept_value(facts, f"{ns}:{c}", fiscal_year, unit=fw["currency"], forms=fw["forms"])
         return round(cv["value"] / scale) if cv else None
 
     # assign each concept its display section (grand totals get their own)
     entries = []
     for c, s, k, p in flat:
-        entries.append((c, _GRAND.get(c, s), k))
+        entries.append((c, grand.get(c, s), k))
     # calculation weights: a weight -1 child (treasury stock, contra accounts)
     # is shown negative. v0.3 ignored weights and plugged -2x the balance
     # into a residual line; src/normalize.py repairs the committed v0.3 data.
@@ -471,7 +477,7 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000):
             if weight.get((parent_of.get(c), c), 1) < 0:
                 v = -abs(v)
             rows.append({"idx": idx, "label": _label_for(c), "section": sect,
-                         "concept": "us-gaap:" + c, "value": v, "kind": "line",
+                         "concept": f"{ns}:{c}", "value": v, "kind": "line",
                          "injectable": True}); at[c] = idx; idx += 1
         for c, s, k in subs:
             v = val(c)
@@ -479,8 +485,8 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000):
                 continue
             kids = [at[ch] for ch, _w in tree.get(c, []) if ch in at]
             rows.append({"idx": idx, "label": _label_for(c), "section": sect,
-                         "concept": "us-gaap:" + c, "value": v,
-                         "kind": "total" if c in _GRAND else "subtotal",
+                         "concept": f"{ns}:{c}", "value": v,
+                         "kind": "total" if c in grand else "subtotal",
                          "sums": kids}); at[c] = idx; idx += 1
 
     # close any gap with ONE labelled residual per subtotal (usually none now)
@@ -510,13 +516,16 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000):
                         if j not in rr["sums"]:
                             rr["sums"].append(j)
 
-    if not any(r.get("concept") == "us-gaap:Assets" for r in rows):
+    if not any(r.get("concept") == f"{ns}:{anc['assets']}" for r in rows):
         return None
+    ccy = anchor.get("unit") or "USD"
     return {"company": meta["company"], "ticker": None, "cik": meta["cik"],
             "statement_type": "BalanceSheet", "fiscal_year": fiscal_year,
-            "period": anchor["end"], "unit": "USD millions",
-            "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
+            "period": anchor["end"], "unit": f"{ccy} millions", "currency": ccy,
+            "framework": framework,
+            "source": (f"SEC EDGAR companyfacts + filing calculation linkbase "
+                       f"(real {anchor.get('form') or '10-K'})"),
             "rows": rows,
-            "identities": [{"lhs": "us-gaap:Assets",
-                            "rhs": ["us-gaap:LiabilitiesAndStockholdersEquity"],
+            "identities": [{"lhs": f"{ns}:{anc['assets']}",
+                            "rhs": [f"{ns}:{anc['liabilities_and_equity']}"],
                             "name": "accounting_equation"}]}

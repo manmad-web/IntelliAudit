@@ -119,6 +119,17 @@ DISPLAY = {
     "StockholdersEquity": "Total stockholders' equity",
     "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest": "Total equity",
     "LiabilitiesAndStockholdersEquity": "Total liabilities and stockholders' equity",
+    # ifrs-full subtotals (names that do not collide with us-gaap ones)
+    "CurrentAssets": "Total current assets",
+    "NoncurrentAssets": "Total non-current assets",
+    "CurrentLiabilities": "Total current liabilities",
+    "NoncurrentLiabilities": "Total non-current liabilities",
+    "Equity": "Total equity",
+    "EquityAttributableToOwnersOfParent": "Equity attributable to owners of the parent",
+    "EquityAndLiabilities": "Total equity and liabilities",
+    "RightofuseAssets": "Right-of-use assets",
+    "TradeAndOtherCurrentReceivables": "Trade and other receivables",
+    "TradeAndOtherCurrentPayables": "Trade and other payables",
 }
 
 RESIDUAL = {

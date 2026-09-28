@@ -48,6 +48,15 @@ KIND_BY_CONCEPT = {
     "us-gaap:DeferredIncomeTaxAssetsNet": "dta",
     "us-gaap:DeferredTaxAssetsNetNoncurrent": "dta",
     "us-gaap:ResearchAndDevelopmentExpense": "rnd",
+    # IFRS edition: only kinds whose facts read the same under IFRS. Goodwill,
+    # PP&E, DTA, debt and R&D facts are US-GAAP-worded (reporting-unit fair
+    # value, undiscounted flows, valuation allowance, waiver timing, 730) and
+    # need IFRS templates first (rulebook_ifrs.json status needs-ifrs-facts).
+    "ifrs-full:Inventories": "inventory",
+    "ifrs-full:TradeAndOtherCurrentReceivables": "receivable",
+    "ifrs-full:CurrentTradeReceivables": "receivable",
+    "ifrs-full:Revenue": "revenue",
+    "ifrs-full:RevenueFromContractsWithCustomers": "revenue",
 }
 
 P_DECOY = 0.5

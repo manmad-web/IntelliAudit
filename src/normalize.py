@@ -38,7 +38,8 @@ _HEADER = {"CurrentAssets": "Current assets:", "NoncurrentAssets": "Non-current 
            "NoncurrentLiabilities": "Non-current liabilities:",
            "TemporaryEquity": "Temporary equity:", "Equity": "Stockholders' equity:"}
 _EQUITY = re.compile(r"(CommonStock|AdditionalPaidInCapital|PreferredStock|RetainedEarnings|"
-                     r"AccumulatedOtherComprehensive|TreasuryStock|MinorityInterest|StockholdersEquity)")
+                     r"AccumulatedOtherComprehensive|TreasuryStock|MinorityInterest|StockholdersEquity|"
+                     r"IssuedCapital|SharePremium|OtherReserves|TreasuryShares|NoncontrollingInterests)")
 _TEMP = re.compile(r"(TemporaryEquity|RedeemableNoncontrollingInterest)")
 _IS_CF_RESIDUAL = {
     "Other operating expenses, net (residual)": "Other operating expenses, net",
@@ -76,7 +77,7 @@ def _fix_negative_weights(stmt, notes):
                 x = by[i]
                 if (i != r["idx"] and x.get("kind") == "line" and x.get("value")
                         and x["value"] > 0 and x["value"] * -2 == r["value"]
-                        and _bare(x.get("concept")) == "TreasuryStockValue"):
+                        and _bare(x.get("concept")) in ("TreasuryStockValue", "TreasuryShares")):
                     x["value"] = -x["value"]
                     drop.add(r["idx"])
                     notes.append(f"sign: {_bare(x['concept'])} weight -1 applied; "

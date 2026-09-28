@@ -188,6 +188,85 @@ class CitationResolver:
         return "expert-authored-UNVALIDATED"
 
 
+# ---------------------------------------------------------------- IFRS -----
+# The IFRS Accounting Taxonomy ships reference linkbases in the same XBRL 2.1
+# shape as the US-GAAP one (referenceLink / loc / reference / referenceArc), but
+# a reference names a standard and paragraph instead of Topic-SubTopic-Section-
+# Paragraph:   ref:Name "IAS", ref:Number "1", ref:Paragraph "66",
+#              ref:Subparagraph "a"   ->  'IAS 1.66(a)'
+_IFRS_NAMES = ("IAS", "IFRS", "IFRIC", "SIC")
+_IFRS_RE = re.compile(r"\b(IAS|IFRS|IFRIC|SIC)\s*(\d{1,2})(?:\s*(?:\.|,?\s*para(?:graph|\.)?\s*)\s*"
+                      r"([0-9]+(?:\.[0-9]+)*[A-Z]{0,2}))?(?:\s*\(([a-z]{1,4}|[ivx]+)\))?", re.I)
+# IFRS 9 numbers paragraphs 4.1.2A, 5.5.15, ... hence the dotted group.
+
+
+def ifrs_code_from_parts(parts):
+    """Reference parts -> 'IAS 1.66(a)', 'IFRS 15.31', or None if not an IFRS standard."""
+    d = {k: v for k, v in parts}
+    name, number = (d.get("Name") or "").strip(), (d.get("Number") or "").strip()
+    if name not in _IFRS_NAMES or not number:
+        return None
+    code = f"{name} {number}"
+    if d.get("Paragraph"):
+        code += f".{d['Paragraph'].strip()}"
+        if d.get("Subparagraph"):
+            code += f"({d['Subparagraph'].strip().strip('()')})"
+    return code
+
+
+def ifrs_paragraph_of(text):
+    """'IAS 1 paragraph 66(a)' / 'IAS 1.66' -> 'IAS 1.66'; a standard alone -> None."""
+    m = _IFRS_RE.search(str(text or ""))
+    if not m or not m.group(3):
+        return None
+    return f"{m.group(1).upper()} {int(m.group(2))}.{m.group(3).upper()}"
+
+
+def ifrs_standard_of(text):
+    m = _IFRS_RE.search(str(text or ""))
+    return f"{m.group(1).upper()} {int(m.group(2))}" if m else None
+
+
+class IfrsCitationResolver(CitationResolver):
+    """Concept -> IAS/IFRS paragraphs from the IFRS Accounting Taxonomy.
+
+    The taxonomy zip is published by the IFRS Foundation; pass its local path
+    (downloads can need a login, so nothing is fetched automatically). Every
+    XML file carrying a referenceLink is read, so the resolver does not depend
+    on the taxonomy's file naming, which has changed between releases.
+    """
+
+    def __init__(self, zip_path):
+        super().__init__(zip_url=None)
+        self.zip_path = zip_path
+
+    def _zip_bytes(self):
+        return open(self.zip_path, "rb").read()
+
+    def _build(self):
+        if self._index is not None:
+            return
+        index = {}
+        with zipfile.ZipFile(io.BytesIO(self._zip_bytes())) as z:
+            for name in z.namelist():
+                if not name.endswith(".xml"):
+                    continue
+                raw = z.read(name)
+                if b"referenceLink" in raw:
+                    self._parse_ref_linkbase(raw, index)
+        self._index = index
+
+    def _asc_from_parts(self, parts):          # same call site, IFRS grammar
+        return ifrs_code_from_parts(parts)
+
+    def paragraph_verified(self, concept_id, code):
+        want = ifrs_paragraph_of(code)
+        if want is None:
+            return False
+        concept = (concept_id or "").split(":")[-1]
+        return any(ifrs_paragraph_of(c) == want for c in self.citations(concept))
+
+
 REF_CACHE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                          "data", "reference", "us-gaap-2023_ref_cache.json")
 

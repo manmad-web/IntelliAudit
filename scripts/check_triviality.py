@@ -12,8 +12,15 @@ every check it ran read the ANSWER KEY's error type, never the exam. Checks
 """
 import collections, glob, json, os, re, sys
 
+import argparse
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BENCH = os.path.join(ROOT, "data", "benchmark")
+sys.path.insert(0, os.path.join(ROOT, "src"))
+from frameworks import get as _fw  # noqa: E402
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--config", default="config.json")
+_FW = _fw(json.load(open(os.path.join(ROOT, _ap.parse_args().config))).get("framework", "us-gaap"))
+BENCH = os.path.join(ROOT, _FW["out_dir"])
+CLEAN = os.path.join(ROOT, _FW["clean_dir"])
 recs = [json.loads(l) for l in open(os.path.join(BENCH, "records.jsonl"))]
 exam = [json.loads(l) for l in open(os.path.join(BENCH, "exam.jsonl"))]
 key = {k["exam_id"]: k for k in (json.loads(l) for l in open(os.path.join(BENCH, "answer_key.jsonl")))}
@@ -81,7 +88,7 @@ check("5 moved rows sitting directly after a subtotal", 100 * after_sub / max(1,
 
 # 6 — residual filler share of balance sheets
 tot = fil = 0
-for f in glob.glob(os.path.join(ROOT, "data", "clean", "*_BS.json")):
+for f in glob.glob(os.path.join(CLEAN, "*_BS.json")):
     s = json.load(open(f))
     ln = [r for r in s["rows"] if r.get("kind") == "line" and r.get("value")]
     tot += sum(abs(r["value"]) for r in ln)
@@ -89,7 +96,7 @@ for f in glob.glob(os.path.join(ROOT, "data", "clean", "*_BS.json")):
 check("6 balance-sheet magnitude that is unnamed filler", 100 * fil / max(1, tot), 15)
 for tag, name in (("IS", "income statement"), ("CF", "cash flow")):
     t2 = f2 = 0
-    for f in glob.glob(os.path.join(ROOT, "data", "clean", f"*_{tag}.json")):
+    for f in glob.glob(os.path.join(CLEAN, f"*_{tag}.json")):
         ln = [r for r in json.load(open(f))["rows"] if r.get("kind") == "line" and r.get("value")]
         t2 += sum(abs(r["value"]) for r in ln)
         f2 += sum(abs(r["value"]) for r in ln if r.get("residual"))

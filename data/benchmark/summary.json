@@ -1,4 +1,5 @@
 {
+  "framework": "us-gaap",
   "companies": [
     "AAPL",
     "MSFT",

@@ -51,7 +51,7 @@ def calc_linkbase(cik, accn):
     return raw
 
 
-def balance_sheet_tree(cik, accn):
+def balance_sheet_tree(cik, accn, framework="us-gaap"):
     """
     Return (tree, roots) for the filing's balance-sheet role.
       tree : parent concept -> [(child concept, weight)] in presentation order
@@ -80,13 +80,25 @@ def balance_sheet_tree(cik, accn):
             if p and c:
                 tree[p].append((c, w))
         # prefer the role that actually contains the asset side
-        score = len(tree.get("Assets", [])) + len(tree.get("AssetsCurrent", []))
+        cur = "CurrentAssets" if framework == "ifrs" else "AssetsCurrent"
+        score = len(tree.get("Assets", [])) + len(tree.get(cur, []))
         if best is None or score > best:
             best, best_tree = score, tree
     return best_tree or {}
 
 
-# section inference from the filing's own tree
+# section inference from the filing's own tree (ifrs-full names in the second map)
+_SECTION_BY_PARENT_IFRS = {
+    "CurrentAssets": "CurrentAssets",
+    "NoncurrentAssets": "NoncurrentAssets",
+    "CurrentLiabilities": "CurrentLiabilities",
+    "NoncurrentLiabilities": "NoncurrentLiabilities",
+    "Equity": "Equity",
+    "EquityAttributableToOwnersOfParent": "Equity",
+    "Liabilities": "NoncurrentLiabilities",
+    "Assets": "NoncurrentAssets",
+    "EquityAndLiabilities": "LiabilitiesAndEquity",
+}
 _SECTION_BY_PARENT = {
     "AssetsCurrent": "CurrentAssets",
     "LiabilitiesCurrent": "CurrentLiabilities",
@@ -98,26 +110,29 @@ _SECTION_BY_PARENT = {
 }
 
 
-def flatten(tree):
+def flatten(tree, framework="us-gaap"):
     """
     Walk the filing's tree and yield ordered (concept, section, kind, parent).
     A concept that is itself a parent becomes a subtotal; leaves become lines.
     """
     out = []
+    by_parent = _SECTION_BY_PARENT_IFRS if framework == "ifrs" else _SECTION_BY_PARENT
+    root_names = ("EquityAndLiabilities", "Assets") if framework == "ifrs" else \
+        ("LiabilitiesAndStockholdersEquity", "Assets")
 
     def walk(node, section):
         for child, _w in tree.get(node, []):
-            sect = _SECTION_BY_PARENT.get(child, section)
+            sect = by_parent.get(child, section)
             if child in tree:                     # it's a subtotal
                 walk(child, sect)
-                out.append((child, _SECTION_BY_PARENT.get(child, section), "subtotal", node))
+                out.append((child, by_parent.get(child, section), "subtotal", node))
             else:
                 out.append((child, section, "line", node))
 
-    roots = [r for r in ("LiabilitiesAndStockholdersEquity", "Assets") if r in tree]
+    roots = [r for r in root_names if r in tree]
     for r in roots:
-        walk(r, _SECTION_BY_PARENT.get(r, "Other"))
-        out.append((r, _SECTION_BY_PARENT.get(r, "Other"), "total", None))
+        walk(r, by_parent.get(r, "Other"))
+        out.append((r, by_parent.get(r, "Other"), "total", None))
     return out
 
 
