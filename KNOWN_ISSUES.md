@@ -1,5 +1,75 @@
 # Known issues — external audit, September 2026
 
+## v0.4 status (re-audit after the v0.3 fixes)
+
+v0.3's regression gate passed, but every check it ran read the **answer key**.
+Re-auditing v0.3 from the **exam side only** found that the fixes had not reached
+the thing a system under test sees:
+
+| v0.3 exam-side finding | measured on v0.3 | v0.4 |
+|---|---|---|
+| exam-only keyword script (fact phrase → paragraph), no number read | **455/492 = 92.5%** citation | **36.4%** (gate check 8) |
+| supporting facts appeared only on the four rules they identified | presence ⇒ error | on every statement incl. controls; max gap 4.0% per statement type (check 10) |
+| evidence `[row i]` numbers from the clean statement located structural errors | 606/631 moved/deleted/inserted cases | caption-keyed evidence, no row numbers |
+| R06 fabricated rows had their own "posting to this caption" line | 140/140 | removed; fabricated rows have no evidence, like ~35% of real rows |
+| exam ids contained the rule name; exam 100% Incorrect | `IA-AAPL-2015-BS-R07_…` | opaque `EX-…` ids; 220 clean controls (12.5%) |
+| every citable fault broke footing → arithmetic found it | 100% of moves | **0.0%**: moves recompute subtotals, measurement faults post the other side (check 13) |
+| each statement appears ~17 times → diff the copies | not addressed | 17 exam forms, max one version per statement (check 15) |
+| `scripts/make_predictions.py` "blind" baselines read the answer key (gold row, `rule_id`) | 2 results files | moved to `results/legacy_v0.3/`; new baselines read `exam.jsonl` only |
+| treasury stock added with weight +1, plugged by a −2× residual | 18 balance sheets (J&J FY2023 plug −$151bn) | sign fixed, plug removed; BS filler 4.1% → **1.0%** |
+| Walmart/NVIDIA/Alphabet liabilities filed under L&SE shown after equity with no header | 11 balance sheets | re-sectioned under "Non-current liabilities:" |
+| captions derived from concept names ("Accounts payable, current" under non-current) | all balance sheets | ordinary captions; the section header carries current/non-current |
+| IS/CF evidence signs: "cost of goods sold +108,831; overhead credit −322,968" | every expense/outflow line | expense and outflow lines oriented; contra events 3–25% |
+
+### Mohsen's seven findings — where each stands
+
+| # | Finding | v0.4 | What is left |
+|---|---|---|---|
+| 1 | Detection trivial | **Fixed in construction.** Citable faults are invisible to arithmetic; controls are on the exam; no id or format tells. | Unverified until the blind LLM run is repeated on v0.4 (one form per model is enough). Detection-only faults (R04/R05/R06/R07/R12) still break footing — by design, they are the arithmetic gate's job. |
+| 2 | Citations guessable | **Fixed.** (error type × statement type) 79% → 34%; exam-only keyword 92.5% → 36%; leave-one-company-out 32%. | See "the citation task is narrow" below. |
+| 3 | Answer leaks into the evidence | **Fixed.** Ledger restates the original value in 0.0% of numeric cases; no row numbers; no R06 tell. | Measurement facts state the measurement datum (e.g. NRV = the correct carrying amount). That is the evidence, not a leak; the same template appears as a consistent decoy elsewhere. |
+| 4 | Transactions aren't accounting | **Partly.** Signs and contra sizes fixed on every statement. | Still two synthetic movements per line with no opening balance; an accountant will still call it thin. Real ledgers are not published, so evidence stays synthetic. |
+| 5 | Citations don't govern the error | **Partly.** `docs/CITATION_POLICY.md` states the governing-paragraph principle; 15 paragraphs, each with a rationale; 178 records paragraph-verified against the linkbase. | 648 records are `expert-authored-UNVALIDATED`. No accountant has reviewed the 15 decisions; the LLM cross-check has not been run on v0.4. |
+| 6 | Statements unrealistic | **Partly.** Balance sheets 1.0% filler, real captions. | Cash-flow statements are still a 6-line template: **22.7% filler** (NVIDIA FY2021 77%). Income statements 3.3% overall, but J&J FY2023 shows R&D $457m (real ≈ $15bn) with a −$21.5bn plug — the first matching concept is not always the line the filer used. Row order follows the calculation linkbase, not the presentation linkbase (J&J lists inventories before cash). Needs the filing-linkbase approach applied to IS/CF roles: an online rebuild. |
+| 7 | Sample and rule bias | **Open (built set).** Still 8 companies. | `configs/usgaap_expansion.json` has 60 phase-1 companies across 10 sectors plus 11 phase-2 (banks, insurers, REITs, utilities). Needs SEC access to build; phase 2 needs an unclassified-balance-sheet template and bank/insurance rule families. |
+
+### The citation task is narrow — say this before a reviewer does
+
+`scripts/identifiability_check.py` is a ~150-line hand-written rule system that
+reads only `exam.jsonl`. It cites **826/826** citable items correctly with **0/220**
+false alarms. That was the point (the v0.3 audit found R09/R11 unidentifiable), but
+it has a consequence: with 15 governing paragraphs, a system that encodes those 15
+rules solves the citation task. The benchmark measures whether a model **knows and
+applies** these rules from evidence (compare NRV to carrying amount, apply the
+75%/90% lease bright lines, apply the undiscounted-cash-flow step before fair value,
+know that a >12-month waiver keeps debt non-current). It does not measure open-ended
+standards knowledge.
+
+For a deterministic pipeline this means a high score **on this benchmark alone is
+not evidence**: the same team wrote the generator. Credible options, in order of
+strength: (1) evaluate the pipeline on benchmarks it was not built against (AuditBench's
+original split, FinAuditing); (2) hold out rules — develop the pipeline without
+reading `rulebook.json`/`src/evidence.py`, and freeze it before R17–R21 are revealed;
+(3) grow the rule set with an accountant well past 15 paragraphs.
+
+### Cannot be fixed (say so in the paper)
+
+- **Real transactions.** Companies do not publish general ledgers. Evidence stays synthetic.
+- **Ten years of IFRS XBRL.** SEC required IFRS XBRL from fiscal periods ending after
+  15 December 2017; EU ESEF from FY2020. Earlier years exist only as PDFs, which breaks
+  the "every value is a tagged fact" guarantee.
+- **Proving a governing paragraph.** Which paragraph governs is an accounting judgement.
+  It can be made principled (the policy) and validated (accountant agreement, ideally
+  two accountants and an agreement statistic). It cannot be made deterministic.
+- **Ruling out memorisation** of mega-cap figures. Mitigate with mid/small caps; the
+  citation task does not depend on remembering the numbers.
+- **DQC ids as labels.** DQC rules are XBRL data-quality checks; they do not describe
+  recognition/measurement faults. They could label R07/R12-style faults at most.
+
+---
+
+## Earlier status (kept for the record)
+
 An independent reviewer (with an accountant) audited v0.1: ran three LLMs blind
 (Sonnet 5, Haiku 4.5, Qwen3-8B; 132 stratified cases + 30 clean), ran our own
 Stage 0/1 pipeline blind, rebuilt the dataset from scratch and verified values

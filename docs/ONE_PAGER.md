@@ -1,5 +1,11 @@
 # IntelliAudit — One Pager
 
+> **Superseded in parts (v0.4, Sept 2026).** The recoverability table below describes v0.3 and a
+> citation selector that branched on `rule_id`; it is not a result. The "concept × violation"
+> finding is now shown by the data (R03 vs R19 on the same concept), but the citations are
+> still unreviewed by an accountant, and "first benchmark" must be checked against FinRule-Bench
+> (arXiv 2603.11339). Current numbers: `README.md`; status: `KNOWN_ISSUES.md`.
+
 ## The question
 Can an AI auditor not just **find** an error in a financial statement, but **cite the exact accounting rule it breaks** (the FASB ASC codification section)?
 

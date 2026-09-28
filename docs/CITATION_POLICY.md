@@ -26,6 +26,7 @@ Presentation topics say **where a line is shown**. They win when the injected fa
 | Classified balance sheet, operating-cycle liability placed in noncurrent | **210-10-45-8** (payables for materials and supplies, collections in advance of delivery, accruals that arise from operations) | 405, 606. Deferred revenue’s *recognition* is 606; its *current vs noncurrent caption* is 210-10-45-8(b). |
 | Classified balance sheet, long-term debt presented entirely as current, with no due-on-demand, callable, or refinancing fact in the record | **210-10-45-12** (current liabilities are not long-term obligations incurred to provide working capital for long periods) | 470. See the debt exception below. |
 | Statement of cash flows, a PPE acquisition payment shown in operating rather than investing | **230-10-45-13** (subparagraph (c): payments to acquire property, plant, and equipment are investing outflows) | 360. Topic 360 measures PPE. It does not classify the cash flow. |
+| Statement of cash flows, a dividend payment or share repurchase shown in operating rather than financing (R16) | **230-10-45-15** (subparagraph (a): payments of dividends and outlays to reacquire the entity's equity instruments are financing outflows) | 505. Topic 505 governs the equity accounts, not the cash-flow class. Paragraph-verified against the linkbase. |
 | Income statement, an amount in the wrong **caption** (operating vs nonoperating display) and not a recognition or measurement miss | **220-10-45** | 606, 330, and the other subject topics. No current rule injects a pure caption error, so 220 is not asserted. |
 
 ## When subject wins (330 / 350 / 606 / 842, and the short debt list)
@@ -39,12 +40,18 @@ Subject topics say **what the amount is and when it exists**. They win even thou
 | Goodwill carried without the required impairment | **350-20-35-1** (goodwill is not amortized; it is tested for impairment) | 210 does not measure goodwill. 350-10 (other intangibles) is a different subtopic. |
 | Available-for-sale **debt** securities not at fair value | **320-10-35-1** | 210-10-45-1(f) only says marketable securities *of cash available for current operations* are current assets. |
 | Operating lease labelled finance, or the reverse | **842-10-25-2** (lessee classification criteria) | 210 classifies current vs noncurrent. It does not decide finance vs operating. This is a classification fault whose sentence lives in the subject topic, so subject wins. |
+| Allowance for credit losses below the expected credit losses the entity itself estimated (R17) | **326-20-30-1** (the allowance presents the net amount expected to be collected) | 210 classifies receivables; 310-10-45 is presentation. |
+| Asset group not recoverable on undiscounted cash flows **and** carried above fair value, no loss recorded (R18) | **360-10-35-17** (recognize an impairment loss only if the carrying amount is not recoverable and exceeds fair value) | 210 does not measure PP&E. Decoys include groups recoverable on undiscounted flows but with fair value below carrying amount: no loss under 360 (a loss under IAS 36). |
+| Net deferred tax asset above the amount more likely than not to be realized (R20) | **740-10-30-5** (subparagraph (e): valuation allowance) | 210 classifies; it does not measure the asset. |
+| Research and development costs capitalized instead of expensed (R21) | **730-10-25-1** (R&D costs charged to expense when incurred) | 220 is display. Under IFRS development costs meeting IAS 38.57 must be capitalized; that difference is kept for the IFRS edition. |
 
 ### The only presentation→subject handoff on the balance sheet
 
 ASC **210-10-45-7** does not itself classify debt. It points at Section 470-10-45 for exactly three transactions: due-on-demand loans, callable debt, and short-term obligations expected to be refinanced. **470-10-45-14** (intent and ability to refinance) wins over 210 **only when the record contains that fact**.
 
-This dataset does not. R03 moves `LongTermDebtNoncurrent` into current liabilities and supplies no refinancing, demand, or callable fact (those facts belong to the evidence work, not this policy). Until one of the three facts is in the record, 470 does not win, and the citation is 210-10-45-12.
+R03 moves `LongTermDebtNoncurrent` into current liabilities and supplies no refinancing, demand, or callable fact, so 470 does not win and the citation is 210-10-45-12.
+
+**R19 (v0.4) supplies the fact.** The statement is left exactly as filed (debt in non-current liabilities) and the supporting facts state a covenant breach at period-end with no waiver, or a waiver of six months only. The debt is callable within a year, 210-10-45-7 hands the question to 470, and **470-10-45-11** governs. Consistent decoys include a breach waived for more than twelve months before issuance, which keeps the debt non-current under 470-10-45-11 (and would not under IAS 1.74). R03 and R19 are the same concept with opposite facts and different paragraphs: the clearest case in the dataset that the violation, not the concept, selects the citation.
 
 ## When neither wins
 
@@ -74,7 +81,9 @@ DQC rule ids are not ground truth. They are not emitted, and the rulebook does n
 
 `scripts/check_triviality.py` scores citation guessability as the majority `asc_full` inside each `(error type × statement type)` bucket, on citable rows only, and **fails above 60%**. That limit stays. The script is not changed here.
 
-The limit does not detect a citation that is constant for a rule but identical for every account on that statement. A new rule that maps “everything on the income statement” to one paragraph fails the spirit of the gate even if the percentage still passes. Any rule added after this policy must **vary by account** (inventory → 330, goodwill → 350, leases → 842), not by statement type alone. This branch does not regenerate `exam.jsonl` or `records.jsonl`, so the gate still measures the previous build.
+The limit does not detect a citation that is constant for a rule but identical for every account on that statement. A new rule that maps “everything on the income statement” to one paragraph fails the spirit of the gate even if the percentage still passes. Any rule added after this policy must **vary by account** (inventory → 330, goodwill → 350, leases → 842), not by statement type alone.
+
+v0.4 adds exam-side checks (8–15) that read only `exam.jsonl`: a script that maps supporting-fact keywords to paragraphs without comparing numbers scores 36.4% (v0.3: 92.5%), and a leave-one-company-out majority over (statement type, fact kinds) scores 32.2%.
 
 ## Where an accountant should disagree
 
@@ -87,3 +96,7 @@ These are decided, not hedged. Push back here:
 5. **Goodwill.** The loss *amount* after ASU 2017-04 is developed in later paragraphs of 350-20-35. 350-20-35-1 is the “test, do not amortize” sentence. A reviewer can call that one step too high.
 6. **Marketable securities vs AFS debt.** 320-10-35-1 is the AFS debt subsequent-measurement sentence. Equity securities are ASC 321. R15’s eligible set still contains unlabeled `MarketableSecurities*` concepts, which is why the rule is `expert-authored-UNVALIDATED` and not verified.
 7. **Lease paragraph.** 842-10-25-2 is the criteria list. A reviewer may prefer 842-10-25-1 (the requirement to classify) as the sentence that failed.
+8. **Credit losses (R17).** 326-20-30-1 is the initial-measurement sentence; a reviewer may prefer 326-20-35-1 (subsequent measurement at each reporting date).
+9. **PP&E impairment (R18).** 360-10-35-17 is the recognition/measurement sentence; 360-10-35-21 lists triggering events and 360-10-35-29 the test for assets held and used. A reviewer may argue for either.
+10. **Covenant breach (R19).** 470-10-45-11 is the callable-obligation paragraph; some reviewers cite 470-10-45-1 for the general rule. The six-month-waiver variant relies on the "more than one year" condition in 470-10-45-11(a).
+11. **R&D (R21).** 730-10-25-1 applies to research and development costs as defined in 730-10-20; software development costs (985-20, 350-40) are outside it. The facts do not say whether the deferred costs were software.

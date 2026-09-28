@@ -1,161 +1,119 @@
 # IntelliAudit-Bench
 
-A **standards-citation benchmark** for LLM financial auditing. Unlike AuditBench
-(synthetic tables, GPT-4-authored vague citations) and FinAuditing / AuditFlow
-(real XBRL, but *detection / numerical* tasks — no citation output), this
-benchmark scores whether a system can name the **governing ASC codification
-reference** for a financial-statement violation, on **real 10-K data**, with a
-**deterministic, cross-checkable citation ground truth**.
+A **standards-citation benchmark** for LLM financial auditing. Real 10-K statements
+(SEC EDGAR); each exam item is either a clean control or carries one injected fault,
+with ledger evidence and period-end supporting facts. For a citable fault, the
+answer is the **one FASB ASC paragraph that governs the violation**
+(`ASC 330-10-35-1B`, `ASC 470-10-45-11`, …), selected by a written policy and
+cross-checked against the FASB reference linkbase.
 
-> One-line thesis: *citation is a function of concept × violation, the taxonomy
-> linkbase alone under-determines it, LLMs fail it (~26%, cf. AuditBench), and a
-> taxonomy-grounded pipeline solves it deterministically.*
+> **Status (v0.4, Sept 2026).** Mohsen's audit findings on detection triviality, citation guessability and leakage are fixed, and the regression gate now also reads the exam. Still open: 8 companies (expansion configs ready, need SEC access), cash-flow statements still templated (23% filler), and no accountant has reviewed the 15 governing paragraphs. Read [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) before quoting a number.
 
-## How the dataset is built (pipeline)
+## What an item looks like
 
 ```
-config.json (real companies + 10 fiscal years)
+[row 1]: Inventories | $13,565 [SEP]             <- statement as shown (foots; arithmetic finds nothing)
+...
+Transaction evidence — Johnson & Johnson FY2023 (BalanceSheet) ...
+[Accounts payable] purchases on credit: +11,128 (increase); payments to vendors: −1,496 (decrease)
+...
+Supporting facts (period-end reviews):
+- Inventories: period-end valuation memo — inventories at cost 13,565; estimated selling
+  prices less costs of completion, disposal and transportation 11,181.
+- Goodwill: impairment test ... reporting unit fair value 145,960; carrying amount 122,184.
+- Long-term debt (25,881): covenant compliance review — was in compliance ...
+```
+Answer key: `Incorrect`, Numerical Error, row 1, **ASC 330-10-35-1B**. The goodwill and
+debt facts are consistent decoys; clean controls carry the same kinds of facts.
+
+## How the dataset is built
+
+```
+config.json (companies × fiscal years)             configs/usgaap_expansion.json, configs/ifrs.json
       │
-      ▼
-edgar_ingest.py ──► REAL 10-K facts from SEC EDGAR companyfacts  (values are never fabricated)
+edgar_ingest.py ─► real 10-K facts (SEC companyfacts)
+statement_builder.py ─► BS from each filing's own calculation linkbase (IS/CF: template)
+normalize.py ─► calc-weight signs, sectioning, real captions (values unchanged)
       │
-      ▼
-statement_builder.py ──► canonical, RECONCILING balance sheet
-      │                   (real reported subtotals as anchors + transparent
-      │                    residual "Other, net" lines so Assets == Liab + Equity)
-      ▼
-injector.py ──► RULE-FIRST error injection (rulebook.json)
-      │           the rule pre-specifies the violated standard, so the citation
-      │           ground truth is known BY CONSTRUCTION (no LLM in the label loop)
+injector.py + rulebook.json ─► one fault per item (or a clean control)
+      │   citable faults keep the statement footing:
+      │     moves recompute subtotals; measurement faults post the other side of the entry
+      ├─► citation_resolver.py: paragraph-level check vs the FASB reference linkbase
+      │                         (offline: data/reference/us-gaap-2023_ref_cache.json)
+      ├─► transactions.py: ledger movements keyed by caption
+      └─► evidence.py: contrastive supporting facts on every statement
       │
-      ├──► citation_resolver.py cross-checks each citation against the OFFICIAL
-      │     US-GAAP reference linkbase → tags it linkbase-verified vs expert-authored
-      │
-      ▼
-transactions.py ──► synthetic transactions summing to each real line (optional)
-      │
-      ▼
-data/benchmark/records.jsonl   +   scorer.py (hierarchical citation EM)
+split_dataset.py ─► exam.jsonl (opaque ids, forms) | answer_key.jsonl | statements_clean.jsonl
+check_triviality.py ─► 15-check gate, 8 of them exam-only
 ```
 
-## Why these choices (correcting common assumptions)
-
-| Decision | Why |
-|---|---|
-| **Real statement values** (SEC EDGAR) | Kills the "synthetic toy" critique that sinks AuditBench-derived work. Every number is a real reported 10-K fact. |
-| **Synthetic transactions** | Real filings never publish ledgers. Transactions are optional flavor for the *detection* sub-task; the *citation* task doesn't need them. |
-| **Rule-first injection** | The citation must be known *before* injection. If a model authored the citation, "improving citation" would be circular. |
-| **Citation cross-checked, two-tier** | A concept has many linkbase references; the *violation* selects the governing one. `linkbase-verified` = deterministic; `expert-authored` = the hard recognition/classification citations the linkbase doesn't tag on the line. |
-| **Hierarchical scoring** | Exact-match on one fuzzy string (AuditBench's 26%) is brittle. Score EM at topic / subtopic / full. |
-
-## Record schema (`data/benchmark/records.jsonl`, one JSON per line)
-
-```jsonc
-{
-  "sample_id": "IA-AAPL-2023-R01_current_noncurrent_asset_misclass-00",
-  "metadata": {"company":"Apple Inc.","cik":"0000320193","fiscal_year":2023,
-               "statement_type":"BalanceSheet","period":"2023-09-30",
-               "unit":"USD millions","source":"SEC EDGAR companyfacts (real 10-K)"},
-  "general_judgement": "Incorrect",
-  "rule_id": "R01_current_noncurrent_asset_misclass",
-  "error_type": "Misclassification",
-  "error_identification": {"error_type":"Misclassification","problematic_entry":11,
-                           "affected_xbrl_concept":"us-gaap:InventoryNet"},
-  "injection_detail": {"row_concept":"us-gaap:InventoryNet","from_section":"CurrentAssets",
-                       "to_section":"NoncurrentAssets"},
-  "ground_truth_citations": {
-    "asc_full":"ASC 210-10-45-1", "asc_subtopic":"ASC 210-10", "asc_topic":"ASC 210",
-    "dqc_rule":"DQC_0015", "dqc_verified": false,
-    "linkbase_reference_set":["ASC 852-10-55-10","ASC 210-10-45-1((b))","ASC 210-10-S99-1(...)"],
-    "linkbase_verified": true,           // rule ASC IS in the concept's real linkbase set
-    "citation_tier": "linkbase-verified",
-    "weak_citation": false,
-    "rationale": "Current assets are ... a current item under non-current misstates classification."
-  },
-  "modified_statement_text": "[Time]: 2023-09-30 [SEP]\n[row 0]: ... [SEP] ...",  // AuditBench format
-  "gt_table_text": "...clean version...",
-  "gt_xbrl_json": {"entity":{...},"facts":[{"concept":"us-gaap:...","value":29965,...}]},
-  "self_check": {"clean_reconciles": true, "error_breaks_reconciliation": false}
-}
-```
-
-`linkbase_verified:true` records are **deterministic ground truth you can trust
-blindly**. `expert-authored` records are the hard cases — review those manually
-(that's your 50%-human-QC set, à la FinAuditing).
-
-## Install & run
+## Run
 
 ```bash
-python3 --version            # 3.9+; standard library only (no pip deps required)
+python3 --version                                   # 3.9+; standard library only
 
-# build the benchmark from real filings (small live test)
-python3 scripts/build_benchmark.py --companies AAPL MSFT --years 2022 2023
+python3 scripts/build_benchmark.py --offline        # rebuild from committed data/clean (no network)
+python3 scripts/build_benchmark.py                  # online: refetch SEC facts + filing linkbases
+python3 scripts/split_dataset.py
+python3 scripts/check_triviality.py                 # must print GATE PASSED
+python3 scripts/identifiability_check.py            # every citable item derivable from the exam?
+python3 scripts/make_dataset_card.py
+python3 -m unittest discover -s tests               # 36 tests
 
-# full config (8 companies x 10 years)
-python3 scripts/build_benchmark.py
-
-# offline / fast (skip the linkbase citation cross-check)
-python3 scripts/build_benchmark.py --no-citations
-
-# regression gate: fails loudly if the rebuild became guessable or leaks its own
-# answers again (see KNOWN_ISSUES.md for the failure modes it checks)
-python3 scripts/check_triviality.py
+python3 scripts/score_predictions.py results/<your_predictions>.jsonl [--form N]
 ```
 
-Outputs land in `data/clean/` (real reconciling statements) and
-`data/benchmark/records.jsonl` + `summary.json`.
+Rebuilds are byte-identical.
 
-## Error taxonomy (rulebook.json)
+## Numbers (v0.4, `data/benchmark/summary.json`)
 
-AuditBench's 4 structural types (Missing Row, Numerical Error, Redundant Row,
-Misclassification) **plus** domain rules where citation actually bites — current/
-non-current classification (ASC 210-10-45), debt refinancing (ASC 470-10-45),
-cash-flow classification (ASC 230-10-45), revenue timing (ASC 606-10-25), leases
-(ASC 842-10-25), inventory NRV (ASC 330-10-35), the accounting-equation break
-(DQC_0004), negative-value (DQC_0015). Each rule carries an injection recipe, a
-detection predicate, and its ASC + DQC citation.
+1,756 items = 1,536 injected + 220 clean controls, from 220 real statements
+(8 companies × FY2015–2024 × BS/IS/CF). 826 citable items over **15 governing
+paragraphs in 11 topics**; 178 paragraph-verified against the linkbase, 648
+`expert-authored-UNVALIDATED`; 710 detection-only (no single paragraph governs).
 
-## Evaluation
+| Gate check | v0.3 | v0.4 |
+|---|---|---|
+| citation guessable from (error type × statement type) | 79.2% | 34.3% |
+| exam-only: fact keyword → paragraph, no number read | 92.5% | 36.4% |
+| citable faults visible to arithmetic | 100% of moves | 0.0% |
+| evidence row numbers locating the injected row | 606/631 | none printed |
+| balance-sheet unnamed filler | 4.1% | 1.0% |
+| clean controls on the exam | 0 | 220 |
 
-See [`docs/EVAL.md`](docs/EVAL.md) for the short protocol (exam in, key only at
-score time, never parse `sample_id` for the rule, score citation only over
-`citable: true` records).
+Exam-only reference points: a statement-type prior scores **25.4%** exact paragraph;
+the authors' hand-written rule system scores **100%** (see "narrow task" in KNOWN_ISSUES).
 
-```python
-from src.scorer import score_citation, score_detection
-# citation EM @ topic / subtopic / full, crediting the concept's valid linkbase set
-```
+## Error taxonomy
 
-Experiment design: run baseline LLMs (reproduce AuditBench's ~26% Top-1) vs. your
-taxonomy pipeline (deterministic) on the same records; the citation-accuracy gap
-is the contribution.
+AuditBench's four types (Missing Row, Numerical Error, Redundant Row, Misclassification)
+split into **detection-only** faults (R04, R05, R06, R07, R12: arithmetic, existence,
+sign, identity) and **citable** faults:
 
-## Known limitations / roadmap (be honest in the paper)
+| Clause | Rules → paragraph |
+|---|---|
+| presentation | R01 → 210-10-45-1 · R02 → 210-10-45-8 · R03 → 210-10-45-12 · R08 → 230-10-45-13 · R16 → 230-10-45-15 |
+| subject | R09 → 606-10-25-23 · R10 → 842-10-25-2 · R11 → 330-10-35-1B · R14 → 350-20-35-1 · R15 → 320-10-35-1 · R17 → 326-20-30-1 · R18 → 360-10-35-17 · R19 → 470-10-45-11 · R20 → 740-10-30-5 · R21 → 730-10-25-1 |
 
-1. **Statement builder** uses a fixed concept template + residual plug lines;
-   full **presentation-linkbase** fidelity (exact company line ordering) is a TODO.
-2. **DQC ids are `verified:false`** — cross-check against the official XBRL-US DQC
-   ruleset before publishing them as ground truth.
-3. **`expert-authored` citations need human validation** (recognition/classification
-   standards the linkbase doesn't attach to the line). Note `linkbase_verified` is
-   checked at **subtopic** granularity (e.g. ASC 606-10), so a rule citing 606-10-25
-   verifies against a linkbase 606-10-50 disclosure ref — tighten to paragraph if needed.
-4. Overlapping-concept residuals can go negative (e.g. lease liab inside "other");
-   a concept-overlap check is a refinement.
-5. **R10 (lease op↔finance relabel)** recipe not yet implemented (needs a
-   `relabel_concept` op + lease-terms datum).
+Why each paragraph wins: [`docs/CITATION_POLICY.md`](docs/CITATION_POLICY.md).
 
-## Dataset scale (current build: BS + IS + CF)
+## IFRS edition (separate dataset, scaffolded)
 
-1,089 records over 223 real statements (8 companies × 10 years × 3 statements).
-Each record carries `gt_transaction_data` (synthetic transactions summing to the
-real line values). Breakdown: BalanceSheet 577 / IncomeStatement 282 / CashFlow 230;
-citation tiers 675 linkbase-verified / 271 expert-authored / 143 unresolved.
+`rulebook_ifrs.json` (23 draft rules, 8 of them framework contrasts where the same facts
+flip the verdict), `configs/ifrs.json` (36 SEC 20-F/40-F IFRS filers), IFRS citation
+grammar and linkbase resolver, output under `data/ifrs/`. Not built yet. See
+[`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md).
 
-## Provenance vs. the three baseline papers
+## Documents
 
-- **AuditBench** (2506.17282): format + task ancestor; we fix its broken citation GT.
-- **FinAuditing** (2510.08886): real-XBRL + DQC grounding we borrow; we add citation.
-- **AuditFlow** (2606.03031): deterministic-verification method; we target citation,
-  which it doesn't score — our differentiation.
-```
+[`docs/EVAL.md`](docs/EVAL.md) protocol · [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) ·
+[`docs/CITATION_POLICY.md`](docs/CITATION_POLICY.md) · [`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md) ·
+[`docs/DATASHEET.md`](docs/DATASHEET.md) · [`docs/PROVENANCE.md`](docs/PROVENANCE.md) ·
+[`data/dataset_card.json`](data/dataset_card.json)
+
+## Relation to the baseline papers
+
+- **AuditBench** (2506.17282): format and task ancestor; its GPT-4 prose citations are replaced by paragraph identifiers.
+- **FinAuditing / FinMR** (2510.08886): real XBRL filings with DQC labels; use it as the out-of-distribution test for any pipeline tuned here.
+- **AuditFlow** (2606.03031): symbolic verification, LLM search; it does not score citations.
+- **FinRule-Bench** (2603.11339): closest prior work on "which principle is violated" (closed rule set, US GAAP and IFRS). Must be cited and contrasted.

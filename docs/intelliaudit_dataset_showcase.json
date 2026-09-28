@@ -1,4 +1,5 @@
 {
+  "_status": "SUPERSEDED (v0.1-v0.3 snapshot). Numbers and claims here predate the external audit and v0.4; see README.md, KNOWN_ISSUES.md and docs/EXPANSION_PLAN.md.",
   "dataset": "IntelliAudit-Bench",
   "one_line": "A standards-CITATION benchmark for LLM financial auditing: real 10-K statements, injected errors, and deterministic FASB ASC citation ground truth cross-checked against the official US-GAAP taxonomy.",
   "authors_note_to_supervisors": "This bundle shows the dataset shape (identical to AuditBench, upgraded with real values + taxonomy-verified citations). Full generator + 1,089 records live in the repo; here are the schema, stats, three full sample records, and the novelty argument.",

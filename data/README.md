@@ -11,30 +11,34 @@ data/benchmark/ the actual test: exam + answer key       (what you ship)
 ```
 
 ## `data/raw/`  — the source material (not shipped; re-downloadable)
-- **8 files**, `companyfacts_CIK<10digits>.json`, one per company.
+- **8 files** (not committed), `companyfacts_CIK<10digits>.json`, one per company.
 - Real financial facts pulled straight from the **SEC EDGAR** database (every number a company officially reported). Everything else is built from these. Cached so we download once; git-ignored because anyone can re-fetch them.
 
 ## `data/clean/`  — the correct statements, no errors ("ground truth")
-- **223 files**, named `<CIK>_<YEAR>_<TYPE>.json` — e.g. `104169_2015_BS.json` = Walmart's 2015 **B**alance **S**heet. `IS` = Income Statement, `CF` = Cash Flow.
-- Each is one financial statement, assembled from the real numbers above and made to **reconcile** (Assets = Liabilities + Equity, subtotals add up). This is the "before" — the truth with **no errors injected**. We inject errors into copies of these to make the exam.
+- **220 files**, named `<CIK>_<YEAR>_<TYPE>.json` — e.g. `104169_2015_BS.json` = Walmart's 2015 **B**alance **S**heet. `IS` = Income Statement, `CF` = Cash Flow.
+- Each is one financial statement, assembled from the real numbers above and made to **reconcile** (Assets = Liabilities + Equity, subtotals add up). This is the "before" — the truth with **no errors injected**, after `src/normalize.py` (sign, section and caption fixes; values unchanged). We inject errors into copies of these to make the exam.
 
 ## `data/benchmark/`  — the benchmark itself (this is what the paper releases)
 
 | File | Lines | Plain meaning | Used for |
 |---|---|---|---|
-| **`exam.jsonl`** | 1089 | **THE EXAM.** Each line = a statement **with one hidden error** + its transactions, and **nothing else** (no answers, no citation). | Hand this to the auditor/LLM. It must find the error and cite the rule from this alone. |
-| **`answer_key.jsonl`** | 1089 | **THE ANSWER KEY.** Each line = the correct answers: is it wrong, what error type, which row, and the exact **FASB ASC citation**. | Kept hidden from the system; used only to **grade** its predictions. |
-| **`statements_clean.jsonl`** | 223 | All 223 clean statements in one file (same content as `data/clean/`, consolidated). | (a) a **no-error control set** to check the auditor doesn't false-alarm on clean statements; (b) the "corrected" target for the repair task. |
-| **`records.jsonl`** | 1089 | **THE MASTER FILE.** Each line = one complete case with **everything joined**: clean version + error version + transactions + error details + citation. | Convenience / regenerating the split; internal use. `exam` + `answer_key` are just this file cut in two. |
-| **`summary.json`** | — | Dataset statistics (counts per company / error-type / citation-tier). | A quick data card. |
-| **`PREVIEW.txt`** | — | A few human-readable sample records. | Eyeball the data without opening the big files. |
+| **`exam.jsonl`** | 1756 | **THE EXAM.** Opaque `exam_id`, `form`, statement, ledger evidence and supporting facts. 1,536 items have one hidden fault, 220 are clean. No answers. | Hand this to the auditor/LLM. Score one form at a time or item by item. |
+| **`answer_key.jsonl`** | 1756 | **THE ANSWER KEY.** `exam_id` → `sample_id`, judgement, error type, row, and the governing **ASC paragraph** (or null). | Withheld; used only to grade. |
+| **`statements_clean.jsonl`** | 220 | The clean statements. | Repair target; reference. |
+| **`records.jsonl`** | 1756 | Generator output: exam and key joined. | Regenerating the split; internal. |
+| **`summary.json`** | — | Counts per rule, statement type, tier; distinct paragraphs. | Authoritative statistics. |
+| **`PREVIEW.txt`** | — | One item per rule with its key. | Eyeballing. |
+
+`data/reference/us-gaap-2023_ref_cache.json` — concept → ASC references from the FASB
+reference linkbase, so the benchmark can be rebuilt with no network (`--offline`).
 
 ## Why `exam` and `answer_key` are separate
-To stop the system from **cheating (leakage)**: you give it the exam, you withhold the key. A model that could see the citation in its input isn't being tested. (We verified `exam.jsonl` contains **0** ASC codes.)
+To stop the system from **cheating (leakage)**: you give it the exam, you withhold the key. A model that could see the citation in its input isn't being tested. (`scripts/check_triviality.py` verifies `exam.jsonl` contains no ASC code, rule id or generator tell.)
 
 ## How to regenerate everything
 ```bash
-python3 scripts/build_benchmark.py   # raw → clean → records   (deterministic, byte-identical)
-python3 scripts/split_dataset.py     # records → exam / answer_key / statements_clean
+python3 scripts/build_benchmark.py --offline   # clean → records (no network; byte-identical)
+python3 scripts/build_benchmark.py             # raw → clean → records (needs SEC access)
+python3 scripts/split_dataset.py               # records → exam / answer_key / statements_clean
 ```
 No LLM is used — the generator is the reproducibility guarantee.
