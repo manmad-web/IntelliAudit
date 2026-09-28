@@ -188,6 +188,42 @@ class CitationResolver:
         return "expert-authored-UNVALIDATED"
 
 
+REF_CACHE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "data", "reference", "us-gaap-2023_ref_cache.json")
+
+
+class CachedResolver(CitationResolver):
+    """Offline stand-in: concept -> ASC codes read from a committed JSON cache.
+
+    Used when the FASB taxonomy zip cannot be downloaded (e.g. a sandbox with no
+    egress). A concept missing from the cache returns [] and `covers()` is False,
+    so callers can tell "no reference" apart from "not cached".
+    """
+
+    def __init__(self, path=REF_CACHE):
+        import json
+        super().__init__()
+        self.path = path
+        self._cache = json.load(open(path))["concepts"]
+
+    def covers(self, concept_id):
+        return (concept_id or "").replace("us-gaap:", "") in self._cache
+
+    def citations(self, concept_id):
+        return list(self._cache.get((concept_id or "").replace("us-gaap:", ""), []))
+
+
+def build_ref_cache(concepts, path=REF_CACHE):
+    """Online: write the cache for `concepts` from the real linkbase."""
+    import json
+    cr = CitationResolver()
+    data = {c.replace("us-gaap:", ""): cr.citations(c.replace("us-gaap:", "")) for c in sorted(set(concepts))}
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    json.dump({"_meta": {"source": ZIP_URL, "built_by": "citation_resolver.build_ref_cache"},
+               "concepts": data}, open(path, "w"), indent=1)
+    return len(data)
+
+
 if __name__ == "__main__":
     cr = CitationResolver()
     tests = [

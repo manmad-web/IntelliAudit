@@ -1,0 +1,333 @@
+{
+ "_meta": {
+  "source": "https://xbrl.fasb.org/us-gaap/2023/us-gaap-2023.zip (reference linkbase, FASB ASC parts only)",
+  "built_by": "scripts/build_linkbase_cache.py (online) \u2014 seeded from the v0.3 records, which were built online",
+  "note": "Offline stand-in for CitationResolver. A concept absent from this file has no cached references; it is NOT evidence that the linkbase has none. Regenerate online with scripts/build_linkbase_cache.py."
+ },
+ "concepts": {
+  "AccountsPayableCurrent": [
+   "ASC 852-10-55-10",
+   "ASC 210-10-S99-1((SX 210.5-02.19(a)))"
+  ],
+  "AccountsPayableOtherCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02.19(a)))"
+  ],
+  "AccountsPayableTradeCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02.19(a)))",
+   "ASC 210-10-45-8"
+  ],
+  "AccountsReceivableNetCurrent": [
+   "ASC 310-10-45-2",
+   "ASC 310-10-45-9"
+  ],
+  "AccruedIncomeTaxesCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(20)))",
+   "ASC 942-210-S99-1((SX 210.9-03(15)(1)))"
+  ],
+  "AccruedIncomeTaxesNoncurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(24)))",
+   "ASC 942-210-S99-1((SX 210.9-03(15)(1)))"
+  ],
+  "AccruedLiabilitiesCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02.20))"
+  ],
+  "AccumulatedOtherComprehensiveIncomeLossNetOfTax": [
+   "ASC 220-10-45-14A",
+   "ASC 220-10-45-11",
+   "ASC 944-40-65-2((g)(2)(ii))",
+   "ASC 944-40-65-2((h)(2))",
+   "ASC 210-10-S99-1((SX 210.5-02(30)(a)(4)))",
+   "ASC 944-210-S99-1((SX 210.7-03(a)(23)(a)(3)))",
+   "ASC 220-10-45-14"
+  ],
+  "AdditionalPaidInCapital": [
+   "ASC 852-10-55-10",
+   "ASC 946-210-S99-1((SX 210.6-04(18)))",
+   "ASC 210-10-S99-1((SX 210.5-02(30)(a)(1)))"
+  ],
+  "AssetsHeldForSaleNotPartOfDisposalGroupCurrentOther": [
+   "ASC 360-10-15-4((b)(2))"
+  ],
+  "AvailableForSaleSecuritiesCurrent": [],
+  "AvailableForSaleSecuritiesDebtSecuritiesCurrent": [
+   "ASC 320-10-45-2",
+   "ASC 326-30-45-1"
+  ],
+  "AvailableForSaleSecuritiesNoncurrent": [],
+  "CapitalLeaseObligationsNoncurrent": [
+   "ASC 840-30-50-1((b))",
+   "ASC 840-30-45-2",
+   "ASC 210-10-S99-1((SX 210.5-02.22))"
+  ],
+  "CashAndCashEquivalentsAtCarryingValue": [
+   "ASC 210-10-S99-1((SX 210.5-02(1)))",
+   "ASC 210-10-45-1((a))",
+   "ASC 230-10-45-4"
+  ],
+  "CommercialPaper": [
+   "ASC 944-210-S99-1((SX 210.7-03(a)(16)(a)(1)))",
+   "ASC 942-210-S99-1((SX 210.9-03(13)(2)))",
+   "ASC 210-10-S99-1((SX 210.5-02(19)(a)(3)))"
+  ],
+  "CommonStockValue": [
+   "ASC 852-10-55-10",
+   "ASC 944-210-S99-1((SX 210.7-03(a)(22)))",
+   "ASC 210-10-S99-1((SX 210.5-02(29)))"
+  ],
+  "CommonStocksIncludingAdditionalPaidInCapital": [
+   "ASC 505-10-S99-1((SX 210.3-04))",
+   "ASC 210-10-S99-1((SX 210.5-02(29)))",
+   "ASC 210-10-S99-1((SX 210.5-02(30)(a)(1)))"
+  ],
+  "ContractWithCustomerLiabilityCurrent": [
+   "ASC 606-10-45-1",
+   "ASC 606-10-50-8((a))",
+   "ASC 606-10-45-2"
+  ],
+  "ContractWithCustomerLiabilityNoncurrent": [
+   "ASC 606-10-45-1",
+   "ASC 606-10-50-8((a))",
+   "ASC 606-10-45-2"
+  ],
+  "ConvertiblePreferredStockNonredeemableOrRedeemableIssuerOptionValue": [
+   "ASC 210-10-S99-1((SX 210.5-02(28)))",
+   "ASC 505-10-50-3"
+  ],
+  "CostOfGoodsAndServicesSold": [
+   "ASC 924-10-S99-1((SAB Topic 11.L))",
+   "ASC 220-10-S99-2((SX 210.5-03.2(a),(d)))"
+  ],
+  "DeferredIncomeTaxAssetsNet": [
+   "ASC 740-10-45-4",
+   "ASC 740-10-45-6"
+  ],
+  "DeferredIncomeTaxLiabilitiesNet": [
+   "ASC 944-210-S99-1((SX 210.7-03(a)(15)(b)(2)))",
+   "ASC 740-10-45-4",
+   "ASC 740-10-45-6"
+  ],
+  "DeferredRevenueCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(20)))"
+  ],
+  "DeferredTaxAssetsLiabilitiesNetCurrent": [],
+  "DeferredTaxAssetsNetCurrent": [],
+  "DepreciationDepletionAndAmortization": [
+   "ASC 230-10-45-28((b))",
+   "ASC 280-10-50-22((e))"
+  ],
+  "EmployeeRelatedLiabilitiesCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02.20))"
+  ],
+  "FinanceLeaseLiabilityCurrent": [
+   "ASC 842-20-45-1((b))"
+  ],
+  "FinanceLeaseLiabilityNoncurrent": [
+   "ASC 842-20-45-1((b))"
+  ],
+  "FinanceLeaseRightOfUseAsset": [
+   "ASC 842-20-45-1((a))"
+  ],
+  "FiniteLivedIntangibleAssetsNet": [
+   "ASC 926-20-50-5",
+   "ASC 350-30-50-2((a)(1))"
+  ],
+  "Goodwill": [
+   "ASC 852-10-55-10",
+   "ASC 350-20-55-24",
+   "ASC 210-10-S99-1((SX 210.5-02(15)))",
+   "ASC 350-20-45-1",
+   "ASC 350-20-50-1((a))",
+   "ASC 350-20-50-1((h))",
+   "ASC 942-210-S99-1((SX 210.9-03(10)(1)))"
+  ],
+  "IncomeTaxExpenseBenefit": [
+   "ASC 250-10-50-8",
+   "ASC 250-10-50-9",
+   "ASC 740-10-50-10",
+   "ASC 740-10-S99-1((SAB TOPIC 6.I.7))",
+   "ASC 280-10-50-22((h))",
+   "ASC 944-220-S99-1((SX 210.7-04(9)))",
+   "ASC 740-20-45-2((a))",
+   "ASC 235-10-S99-1((SX 210.4-08(h)))"
+  ],
+  "IntangibleAssetsNetExcludingGoodwill": [
+   "ASC 350-30-50-2(((a)(1),(b)))",
+   "ASC 350-30-45-1"
+  ],
+  "InventoryNet": [
+   "ASC 852-10-55-10",
+   "ASC 210-10-45-1((b))",
+   "ASC 210-10-S99-1((SX 210.5-02(6)))"
+  ],
+  "LongTermDebtCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(20)))"
+  ],
+  "LongTermDebtNoncurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(22)))"
+  ],
+  "MarketableSecuritiesCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(2)))"
+  ],
+  "MarketableSecuritiesNoncurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(2)))"
+  ],
+  "NetIncomeLoss": [
+   "ASC 235-10-S99-1((SX 210.4-08(g)(1)(ii)))",
+   "ASC 323-10-50-3((c))",
+   "ASC 825-10-50-28((f))",
+   "ASC 220-10-50-6",
+   "ASC 250-10-50-3",
+   "ASC 250-10-50-1((b)(2))",
+   "ASC 815-40-65-1((f))",
+   "ASC 250-10-50-8",
+   "ASC 250-10-50-9",
+   "ASC 250-10-50-11((a))",
+   "ASC 250-10-50-11((b))",
+   "ASC 250-10-50-4",
+   "ASC 946-830-55-10",
+   "ASC 946-220-45-7",
+   "ASC 944-220-S99-1((SX 210.7-04(18)))",
+   "ASC 280-10-50-22",
+   "ASC 946-220-S99-1((SX 210.6-07(9)))",
+   "ASC 946-220-S99-3((SX 210.6-09(1)(d)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(i)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(ii)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(iii)(A)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(iv)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(5)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(i)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(iii)(A)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(iii)(B)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(iv)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(5)))",
+   "ASC 280-10-50-30((b))",
+   "ASC 280-10-50-32((f))",
+   "ASC 260-10-45-60B((a))",
+   "ASC 280-10-50-31",
+   "ASC 280-10-50-32((c))",
+   "ASC 205-20-50-7",
+   "ASC 230-10-45-28",
+   "ASC 220-10-45-1A((a))",
+   "ASC 220-10-45-1B((a))",
+   "ASC 220-10-S99-2((SX 210.5-03(20)))",
+   "ASC 942-220-S99-1((SX 210.9-04(22)))"
+  ],
+  "OperatingLeaseLiabilityCurrent": [
+   "ASC 842-20-45-1((b))"
+  ],
+  "OperatingLeaseLiabilityNoncurrent": [
+   "ASC 842-20-45-1((b))"
+  ],
+  "OperatingLeaseRightOfUseAsset": [
+   "ASC 842-20-45-1((a))"
+  ],
+  "OtherAssetsCurrent": [
+   "ASC 852-10-55-10",
+   "ASC 210-10-S99-1((SX 210.5-02(8)))"
+  ],
+  "OtherAssetsNoncurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(17)))"
+  ],
+  "OtherLiabilitiesCurrent": [
+   "ASC 852-10-55-10",
+   "ASC 210-10-S99-1((SX 210.5-02.20))"
+  ],
+  "OtherLiabilitiesNoncurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02.24))"
+  ],
+  "OtherLongTermInvestments": [
+   "ASC 944-210-S99-1((SX 210.7-03(a)(1)(f)))",
+   "ASC 210-10-S99-1((SX 210.5-02(12)))"
+  ],
+  "PaymentsForRepurchaseOfCommonStock": [
+   "ASC 230-10-45-15((a))"
+  ],
+  "PaymentsOfDividendsCommonStock": [
+   "ASC 230-10-45-15((a))"
+  ],
+  "PaymentsToAcquirePropertyPlantAndEquipment": [
+   "ASC 230-10-45-13((c))"
+  ],
+  "PrepaidExpenseAndOtherAssetsCurrent": [
+   "ASC 210-10-S99-1((SX 210.5-02(9)))"
+  ],
+  "PropertyPlantAndEquipmentNet": [
+   "ASC 360-10-50-1",
+   "ASC 852-10-55-10",
+   "ASC 944-210-S99-1((SX 210.7-03(a)(8)))",
+   "ASC 942-360-50-1"
+  ],
+  "ReceivablesNetCurrent": [
+   "ASC 852-10-55-10"
+  ],
+  "ResearchAndDevelopmentExpense": [
+   "ASC 730-10-50-1",
+   "ASC 912-730-25-1",
+   "ASC 985-20-50-1"
+  ],
+  "RetainedEarningsAccumulatedDeficit": [
+   "ASC 852-10-55-10",
+   "ASC 944-40-65-2((g)(2)(i))",
+   "ASC 944-40-65-2((h)(2))",
+   "ASC 946-20-50-11",
+   "ASC 944-210-S99-1((SX 210.7-03(a)(23)(a)(4)))",
+   "ASC 946-210-S99-1((SX 210.6-04(17)))",
+   "ASC 505-10-S99-1((SX 210.3-04))",
+   "ASC 210-10-S99-1((SX 210.5-02(30)(a)(3)))"
+  ],
+  "RevenueFromContractWithCustomerExcludingAssessedTax": [
+   "ASC 924-10-S99-1((SAB Topic 11.L))",
+   "ASC 606-10-50-5",
+   "ASC 280-10-50-30((a))",
+   "ASC 280-10-50-42",
+   "ASC 280-10-50-22((b))",
+   "ASC 280-10-50-32((b))",
+   "ASC 280-10-50-40",
+   "ASC 280-10-50-22((a))",
+   "ASC 280-10-50-32((a))",
+   "ASC 280-10-50-41((a))",
+   "ASC 606-10-50-4((a))"
+  ],
+  "Revenues": [
+   "ASC 235-10-S99-1((SX 210.4-08(g)(1)(ii)))",
+   "ASC 323-10-50-3((c))",
+   "ASC 825-10-50-28((f))",
+   "ASC 220-10-S99-2((SX 210.5-03(1)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(i)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(ii)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(iii)(A)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(4)(iv)))",
+   "ASC 470-10-S99-1A((SX 210.13-01(a)(5)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(i)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(iii)(A)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(iii)(B)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(4)(iv)))",
+   "ASC 470-10-S99-1B((SX 210.13-02(a)(5)))",
+   "ASC 280-10-50-30((a))",
+   "ASC 280-10-50-42",
+   "ASC 280-10-50-22((b))",
+   "ASC 280-10-50-32((b))",
+   "ASC 280-10-50-40",
+   "ASC 280-10-50-22((a))",
+   "ASC 280-10-50-32((a))",
+   "ASC 280-10-50-41((a))",
+   "ASC 942-235-S99-1((SX 210.9-05(b)(2)))"
+  ],
+  "SellingGeneralAndAdministrativeExpense": [
+   "ASC 220-10-S99-2((SX 210.5-03.4))"
+  ],
+  "ShareBasedCompensation": [
+   "ASC 230-10-45-28((a))"
+  ],
+  "ShortTermInvestments": [
+   "ASC 210-10-S99-1((SX 210.5-02(8)))",
+   "ASC 942-210-S99-1((SX 210.9-03(5)))",
+   "ASC 942-210-S99-1((SX 210.9-03(4)))"
+  ],
+  "TreasuryStockValue": [
+   "ASC 505-30-50-4",
+   "ASC 505-30-45-1",
+   "ASC 210-10-S99-1((SX 210.5-02.29,30))"
+  ]
+ }
+}

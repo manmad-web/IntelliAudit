@@ -5,6 +5,8 @@ Orchestrator: real EDGAR statements  ->  rule-first error injection  ->  benchma
     python3 scripts/build_benchmark.py                  # full config
     python3 scripts/build_benchmark.py --companies AAPL MSFT --years 2022 2023
     python3 scripts/build_benchmark.py --no-citations    # skip linkbase cross-check (offline/fast)
+    python3 scripts/build_benchmark.py --offline         # rebuild from committed data/clean + cached
+                                                         # linkbase refs (no SEC / FASB network needed)
 
 Outputs:
     data/clean/<CIK>_<YEAR>_BS.json      clean reconciling statements (real)
@@ -31,10 +33,15 @@ def main():
     ap.add_argument("--companies", nargs="*", help="tickers to include (default: all)")
     ap.add_argument("--years", nargs="*", type=int, help="fiscal years (default: config)")
     ap.add_argument("--no-citations", action="store_true", help="skip linkbase cross-check")
+    ap.add_argument("--offline", action="store_true",
+                    help="build from committed data/clean/*.json and data/reference linkbase cache")
     args = ap.parse_args()
 
     if args.no_citations:
         injector._RESOLVER = None
+    elif args.offline:
+        from citation_resolver import CachedResolver
+        injector._RESOLVER = CachedResolver()
 
     companies = cfg["companies"]
     if args.companies:
@@ -50,19 +57,26 @@ def main():
     records, tier = [], Counter()
     built, skipped_year = 0, 0
     for co in companies:
-        try:
-            facts = get_company_facts(co["cik"])
-        except Exception as e:
-            print(f"[skip] {co['ticker']}: EDGAR fetch failed: {e}"); continue
+        facts = None
+        if not args.offline:
+            try:
+                facts = get_company_facts(co["cik"])
+            except Exception as e:
+                print(f"[skip] {co['ticker']}: EDGAR fetch failed: {e}"); continue
         for yr in years:
             for tag, build in BUILDERS:
-                stmt = build(facts, yr)
+                clean_path = os.path.join(clean_dir, f"{co['cik']}_{yr}_{tag}.json")
+                if args.offline:
+                    stmt = json.load(open(clean_path)) if os.path.exists(clean_path) else None
+                else:
+                    stmt = build(facts, yr)
                 if not stmt:
                     skipped_year += 1; continue
                 stmt["ticker"] = co["ticker"]
                 if not injector.check_reconciles(stmt):
                     print(f"[warn] {co['ticker']} FY{yr} {tag}: does not reconcile, skipping"); continue
-                json.dump(stmt, open(os.path.join(clean_dir, f"{co['cik']}_{yr}_{tag}.json"), "w"), indent=2)
+                if not args.offline:
+                    json.dump(stmt, open(clean_path, "w"), indent=2)
                 built += 1
                 for rule in rulebook["rules"]:
                     if stmt["statement_type"] not in rule["statements"]:
