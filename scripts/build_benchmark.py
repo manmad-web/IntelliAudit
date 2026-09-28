@@ -72,9 +72,18 @@ def main():
 
     if args.no_citations:
         injector._RESOLVER = None
-    elif args.offline and framework == "us-gaap":
+    elif framework == "us-gaap":
         from citation_resolver import CachedResolver
-        injector._RESOLVER = CachedResolver()
+        use_cache = args.offline
+        if not use_cache:
+            try:                               # FASB taxonomy reachable / cached?
+                injector._RESOLVER._zip_bytes()
+            except Exception as e:
+                print(f"[warn] FASB taxonomy unavailable ({e.__class__.__name__}); "
+                      f"using the committed reference cache for linkbase checks")
+                use_cache = True
+        if use_cache:
+            injector._RESOLVER = CachedResolver()
 
     companies = [c for c in cfg["companies"] if c.get("phase", 1) <= args.phase]
     if args.companies:

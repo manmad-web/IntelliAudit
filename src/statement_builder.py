@@ -497,10 +497,15 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000, fr
             gap = r["value"] - sum(by[i]["value"] for i in r["sums"])
             if gap:
                 extra.append((r, gap))
-    for r, gap in extra:
-        rows.insert(rows.index(r), {"idx": -1, "label": "Other " + r["section"] + ", net (residual)",
-                                    "section": r["section"], "concept": None, "value": gap,
-                                    "kind": "line", "injectable": False, "residual": True})
+    # Each residual belongs to exactly the subtotal whose gap it closes. (v0.4
+    # attached every residual to every later subtotal of the same section, which
+    # double-counted it and rejected e.g. Colgate and SAP balance sheets.)
+    for n, (r, gap) in enumerate(extra):
+        res = {"idx": -1000 - n, "label": "Other " + r["section"] + ", net (residual)",
+               "section": r["section"], "concept": None, "value": gap,
+               "kind": "line", "injectable": False, "residual": True}
+        rows.insert(rows.index(r), res)
+        r["sums"] = r["sums"] + [res["idx"]]
     if extra:
         remap = {}
         for i, rr in enumerate(rows):
@@ -508,13 +513,6 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000, fr
         for rr in rows:
             if rr.get("sums"):
                 rr["sums"] = [remap[s] for s in rr["sums"] if s in remap]
-        # attach each new residual to its subtotal
-        for rr in rows:
-            if rr.get("kind") in ("subtotal", "total") and rr.get("sums"):
-                for j, cand in enumerate(rows):
-                    if cand.get("residual") and cand["section"] == rr["section"] and j < rows.index(rr):
-                        if j not in rr["sums"]:
-                            rr["sums"].append(j)
 
     if not any(r.get("concept") == f"{ns}:{anc['assets']}" for r in rows):
         return None

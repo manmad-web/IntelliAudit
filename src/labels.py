@@ -128,6 +128,28 @@ DISPLAY = {
     "EquityAttributableToOwnersOfParent": "Equity attributable to owners of the parent",
     "EquityAndLiabilities": "Total equity and liabilities",
     "RightofuseAssets": "Right-of-use assets",
+    "CurrentTaxAssetsNoncurrent": "Non-current tax assets",
+    "CurrentTaxLiabilitiesNoncurrent": "Non-current tax liabilities",
+    "CurrentTaxAssetsCurrent": "Current tax assets",
+    "CurrentTaxLiabilitiesCurrent": "Current tax liabilities",
+    "AdditionalPaidinCapital": "Additional paid-in capital",
+    "PropertyPlantAndEquipmentIncludingRightofuseAssets": "Property, plant and equipment (incl. right-of-use assets)",
+    "NoncontrollingInterests": "Non-controlling interests",
+    "IssuedCapital": "Issued capital",
+    "SharePremium": "Share premium",
+    "TreasuryShares": "Treasury shares",
+    "OtherReserves": "Other reserves",
+    "CashAndCashEquivalents": "Cash and cash equivalents",
+    "Inventories": "Inventories",
+    "NetDeferredTaxAssets": "Deferred tax assets",
+    "NetDeferredTaxLiabilities": "Deferred tax liabilities",
+    "DeferredTaxAssets": "Deferred tax assets",
+    "DeferredTaxLiabilities": "Deferred tax liabilities",
+    "LeaseLiabilities": "Lease liabilities",
+    "CurrentLeaseLiabilities": "Lease liabilities",
+    "NoncurrentLeaseLiabilities": "Lease liabilities",
+    "IntangibleAssetsOtherThanGoodwill": "Intangible assets other than goodwill",
+    "PropertyPlantAndEquipment": "Property, plant and equipment",
     "TradeAndOtherCurrentReceivables": "Trade and other receivables",
     "TradeAndOtherCurrentPayables": "Trade and other payables",
 }
@@ -149,6 +171,9 @@ _SUFFIX = re.compile(r",\s*(?:non-current|noncurrent|current)$", re.I)
 def derived_label(concept):
     """Fallback: split the concept name, drop the current/non-current suffix."""
     n = (concept or "").split(":")[-1]
+    if n.startswith("Current") and n.endswith("Noncurrent"):     # ifrs-full 'CurrentXNoncurrent'
+        return "Non-current " + derived_label(n[len("Current"):-len("Noncurrent")]).lower()
+    n = n.replace("Rightofuse", "RightOfUse").replace("Paidin", "PaidIn")
     words = re.findall(r"[A-Z][a-z0-9]*|[A-Z]+(?![a-z])", n)
     s = " ".join(words)
     s = s.replace(" Net Current", ", net").replace(" Net Noncurrent", ", net")
