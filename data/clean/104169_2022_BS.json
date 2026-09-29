@@ -6,6 +6,8 @@
   "fiscal_year": 2022,
   "period": "2022-01-31",
   "unit": "USD millions",
+  "currency": "USD",
+  "framework": "us-gaap",
   "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
   "rows": [
     {
@@ -373,7 +375,7 @@
     }
   ],
   "normalization": {
-    "version": 1,
+    "version": 2,
     "notes": [
       "re-sectioned lines filed directly under LiabilitiesAndStockholdersEquity"
     ]

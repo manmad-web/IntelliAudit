@@ -153,6 +153,8 @@ def main():
     with open(os.path.join(bench_dir, "records.jsonl"), "w") as f:
         for r in records:
             f.write(json.dumps(r) + "\n")
+    from jsonl import gzip_copy
+    gzip_copy(os.path.join(bench_dir, "records.jsonl"))     # committed; the plain file is git-ignored
     summary = {
         "framework": framework,
         "companies": [c["ticker"] for c in companies], "years": years,

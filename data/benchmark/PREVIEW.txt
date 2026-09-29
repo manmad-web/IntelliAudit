@@ -57,12 +57,10 @@ EX-ed64eea390bf  (R09, Apple Inc. FY2016 IncomeStatement)
   judgement: Incorrect   error: Numerical Error   citation: ASC 606-10-25-23  [expert-authored-UNVALIDATED]
   supporting facts:- Revenue: cut-off review — consideration billed or received during the period for performance obligations not yet satisfied at period-end 41,994; of which recorded as contract liabilities (deferred revenue) 2,054.
 ######################################################################
-EX-6119cc22a292  (R10, Alphabet Inc. FY2019 BalanceSheet)
+EX-2fe52c838f13  (R10, ADOBE INC. FY2020 BalanceSheet)
   judgement: Incorrect   error: Misclassification   citation: ASC 842-10-25-2  [expert-authored-UNVALIDATED]
-  supporting facts:- Marketable securities: available-for-sale debt portfolio at period-end — fair value 101,177; amortized cost basis 97,751.
-    - Accounts receivable, net: expected-credit-loss model output — amortized cost of receivables 26,134; expected credit losses 808; allowance on the books 808.
-    - Goodwill: annual impairment test of the reporting unit to which this goodwill is assigned — carrying amount of the reporting unit including goodwill 78,483; fair value of the reporting unit 84,692.
-    - Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 
+  supporting facts:- Property, plant and equipment, net: one asset group within this line was tested after a triggering event (sustained operating losses) — carrying amount of the asset group 362; sum of undiscounted future cash flows 481; fair value of the asset group 298. No impairment loss was recorded.
+    - Finance lease right-of-use assets: classification tests for the underlying leases — ownership transfers to the lessee: no; purchase option reasonably certain to be exercised: no; lease term as % of remaining economic life: 54%; present value of lease payments as % of fair value of the underlying assets: 47%;
 ######################################################################
 EX-9e0e53e96088  (R11, Apple Inc. FY2015 BalanceSheet)
   judgement: Incorrect   error: Numerical Error   citation: ASC 330-10-35-1B  [expert-authored-UNVALIDATED]
@@ -114,12 +112,11 @@ EX-9b869ce3076b  (R19, Apple Inc. FY2015 BalanceSheet)
     - Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 1,368; undiscounted cash flows expected from use and disposal 1,795; fair value 1,234. No impairment loss was recorded.
     - Goodwill: ann
 ######################################################################
-EX-d15647b942c0  (R20, Alphabet Inc. FY2017 BalanceSheet)
+EX-37caae39e967  (R20, ADOBE INC. FY2020 BalanceSheet)
   judgement: Incorrect   error: Numerical Error   citation: ASC 740-10-30-5  [expert-authored-UNVALIDATED]
-  supporting facts:- Available-for-sale securities: available-for-sale debt portfolio at period-end — fair value 91,156; amortized cost basis 87,159.
-    - Inventories: period-end valuation memo — inventories at cost 749; estimated selling prices less costs of completion, disposal and transportation 815.
-    - Deferred income taxes (non-current asset): realizability assessment — gross deferred tax assets 1,216; valuation allowance recorded 400; amount management concludes is more likely than not to be realized 680.
-    - Goodwill: annual impairment test of the reporting unit to which this goodwill is assigned — carrying amo
+  supporting facts:- Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 328; undiscounted cash flows expected from use and disposal 388; fair value 242. No impairment loss was recorded.
+    - Operating lease right-of-use assets: classification tests for the underlying leases — ownership transfers to the lessee: no; purchase option reasonably certain to be exercised: no; lease term as % of remaining economic life: 55%; present value of lease payments as % of fair value of the underlying assets: 33%; asset of a specialized nature: no.
+    - Deferred income t
 ######################################################################
 EX-9263e14bbe98  (R21, Apple Inc. FY2016 IncomeStatement)
   judgement: Incorrect   error: Numerical Error   citation: ASC 730-10-25-1  [expert-authored-UNVALIDATED]

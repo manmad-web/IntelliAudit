@@ -134,6 +134,10 @@ def flatten(tree, framework="us-gaap"):
                 out.append((child, section, "line", node))
 
     roots = [r for r in root_names if r in tree]
+    if framework == "ifrs" and "EquityAndLiabilities" not in tree:
+        # UK/EU "net assets" layout: Assets - Liabilities = Equity, no combined
+        # equity-and-liabilities total. Walk the two sides as separate roots.
+        roots = [r for r in ("Liabilities", "Equity", "Assets") if r in tree]
     for r in roots:
         walk(r, by_parent.get(r, "Other"))
         out.append((r, by_parent.get(r, "Other"), "total", None))

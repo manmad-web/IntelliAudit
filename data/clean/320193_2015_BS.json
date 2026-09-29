@@ -6,6 +6,8 @@
   "fiscal_year": 2015,
   "period": "2015-09-26",
   "unit": "USD millions",
+  "currency": "USD",
+  "framework": "us-gaap",
   "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
   "rows": [
     {
@@ -353,7 +355,7 @@
     }
   ],
   "normalization": {
-    "version": 1,
+    "version": 2,
     "notes": []
   }
 }

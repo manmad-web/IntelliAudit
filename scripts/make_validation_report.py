@@ -25,7 +25,8 @@ def main():
     cfg = json.load(open(os.path.join(ROOT, a.config)))
     fw = _fw(cfg.get("framework", "us-gaap"))
     out, clean = os.path.join(ROOT, fw["out_dir"]), os.path.join(ROOT, fw["clean_dir"])
-    recs = [json.loads(l) for l in open(os.path.join(out, "records.jsonl"))]
+    from jsonl import open_text
+    recs = [json.loads(l) for l in open_text(os.path.join(out, "records.jsonl"))]
     summary = json.load(open(os.path.join(out, "summary.json")))
     inj = [r for r in recs if r.get("record_type") == "injected"]
 

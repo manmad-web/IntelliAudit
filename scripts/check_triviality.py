@@ -21,7 +21,8 @@ _ap.add_argument("--config", default="config.json")
 _FW = _fw(json.load(open(os.path.join(ROOT, _ap.parse_args().config))).get("framework", "us-gaap"))
 BENCH = os.path.join(ROOT, _FW["out_dir"])
 CLEAN = os.path.join(ROOT, _FW["clean_dir"])
-recs = [json.loads(l) for l in open(os.path.join(BENCH, "records.jsonl"))]
+from jsonl import open_text  # noqa: E402
+recs = [json.loads(l) for l in open_text(os.path.join(BENCH, "records.jsonl"))]
 exam = [json.loads(l) for l in open(os.path.join(BENCH, "exam.jsonl"))]
 key = {k["exam_id"]: k for k in (json.loads(l) for l in open(os.path.join(BENCH, "answer_key.jsonl")))}
 inj = [r for r in recs if r.get("record_type", "injected") == "injected"]
@@ -102,6 +103,12 @@ for tag, name in (("IS", "income statement"), ("CF", "cash flow")):
         f2 += sum(abs(r["value"]) for r in ln if r.get("residual"))
     print(f"  info  6{tag[0].lower()} {name} magnitude that is unnamed filler".ljust(66)
           + f"{100 * f2 / max(1, t2):>5.1f}%   (OPEN: IS/CF still use a fixed template, see KNOWN_ISSUES)")
+
+# 16 — every detection-only fault must be visible to arithmetic (else the item
+# has no answer: a missing/perturbed line that no subtotal sums)
+det = [r for r in inj if not r["ground_truth_citations"].get("citable")]
+inv = sum(1 for r in det if not r["self_check"]["error_breaks_reconciliation"])
+check("16 detection-only faults invisible to arithmetic", 100 * inv / max(1, len(det)), 0)
 
 # 7 — citation tier honesty (paragraph-level)
 v = [r for r in inj if r["ground_truth_citations"]["citation_tier"] == "linkbase-verified"]

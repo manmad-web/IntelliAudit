@@ -160,12 +160,12 @@ def _labels(stmt):
 
 def normalize_statement(stmt):
     """Normalize one clean statement in place and return it."""
-    if stmt.get("normalization", {}).get("version") == 1:
+    if stmt.get("normalization", {}).get("version") == 2:
         return stmt
     notes = []
     if stmt["statement_type"] == "BalanceSheet":
         _fix_negative_weights(stmt, notes)
         _resection_balance_sheet(stmt, notes)
     _labels(stmt)
-    stmt["normalization"] = {"version": 1, "notes": notes}
+    stmt["normalization"] = {"version": 2, "notes": notes}
     return stmt

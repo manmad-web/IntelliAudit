@@ -157,12 +157,111 @@
       "rule_id": "I06_redundant_fabricated_row",
       "error_type": "Redundant Row",
       "statements": [
-        "BalanceSheet",
-        "IncomeStatement"
+        "BalanceSheet"
       ],
       "eligible_concepts": [],
       "injection": {
-        "op": "insert_row"
+        "op": "insert_row",
+        "value_pct_of_subtotal": [
+          0.02,
+          0.08
+        ],
+        "fabricated_labels": {
+          "CurrentAssets": [
+            [
+              "Contract assets",
+              1
+            ],
+            [
+              "Current tax receivables",
+              1
+            ],
+            [
+              "Restricted cash",
+              1
+            ],
+            [
+              "Derivative financial assets",
+              1
+            ],
+            [
+              "Short-term deposits",
+              1
+            ]
+          ],
+          "NoncurrentAssets": [
+            [
+              "Capitalised contract costs",
+              1
+            ],
+            [
+              "Investments in associates",
+              1
+            ],
+            [
+              "Customer relationships",
+              1
+            ],
+            [
+              "Long-term deposits",
+              1
+            ],
+            [
+              "Emission rights",
+              1
+            ]
+          ],
+          "Assets": [
+            [
+              "Capitalised contract costs",
+              1
+            ],
+            [
+              "Investments in associates",
+              1
+            ],
+            [
+              "Long-term deposits",
+              1
+            ]
+          ],
+          "CurrentLiabilities": [
+            [
+              "Customer deposits",
+              1
+            ],
+            [
+              "Warranty provisions",
+              1
+            ],
+            [
+              "Dividends payable",
+              1
+            ],
+            [
+              "Restructuring provisions",
+              1
+            ],
+            [
+              "Derivative financial liabilities",
+              1
+            ]
+          ],
+          "NoncurrentLiabilities": [
+            [
+              "Decommissioning provisions",
+              1
+            ],
+            [
+              "Long-term warranty provisions",
+              1
+            ],
+            [
+              "Deferred government grants",
+              1
+            ]
+          ]
+        }
       },
       "citation": {
         "asc": null,
@@ -432,9 +531,9 @@
         "rationale": "IAS 36.90: a cash-generating unit to which goodwill is allocated is tested annually and impaired when its carrying amount exceeds its recoverable amount (higher of fair value less costs of disposal and value in use). Facts must be stated in recoverable-amount terms, not US 'reporting unit fair value'."
       },
       "us_gaap_counterpart": "R14",
-      "status": "needs-ifrs-facts",
+      "status": "ready",
       "expected_judgement": "Incorrect",
-      "facts": "ifrs_cgu_recoverable_amount",
+      "facts": "ifrs_goodwill",
       "ledger": "as_booked"
     },
     {
@@ -444,7 +543,8 @@
         "BalanceSheet"
       ],
       "eligible_concepts": [
-        "ifrs-full:FinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome"
+        "ifrs-full:CurrentFinancialAssetsAtFairValueThroughOtherComprehensiveIncome",
+        "ifrs-full:NoncurrentFinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome"
       ],
       "injection": {
         "op": "perturb_value",
@@ -453,7 +553,8 @@
           0.1
         ],
         "balance_with": [
-          "ifrs-full:OtherReserves"
+          "ifrs-full:OtherReserves",
+          "ifrs-full:AccumulatedOtherComprehensiveIncome"
         ],
         "keep_totals": false
       },
@@ -534,10 +635,10 @@
         "rationale": "IAS 36.59: if the recoverable amount of an asset (or CGU) is less than its carrying amount, the carrying amount is reduced to recoverable amount. There is no undiscounted-cash-flow recoverability step."
       },
       "us_gaap_counterpart": "R18",
-      "status": "needs-ifrs-facts",
+      "status": "ready",
       "expected_judgement": "Incorrect",
       "framework_contrast": "US GAAP decoy 'undiscounted flows above carrying amount, fair value below' is NOT impaired under ASC 360-10-35-17 but IS impaired under IAS 36.59 when recoverable amount is below carrying amount.",
-      "facts": "ifrs_asset_recoverable_amount",
+      "facts": "ifrs_ppe",
       "ledger": "as_booked"
     },
     {

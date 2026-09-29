@@ -1,5 +1,21 @@
 # Known issues — external audit, September 2026
 
+## v0.5 — built from SEC (Sept 2026)
+
+- US GAAP: 70/70 companies, 1,989 statements, 14,963 items; gate passes (16 checks);
+  rule system identifies 6,388/6,388 citable items with 1 false alarm in 1,989 controls.
+- IFRS: 31/33 companies, 161 balance sheets, 1,382 items. **Gate fails check 14**
+  (8 distinct paragraphs, limit 12) because only balance-sheet rules run. All IFRS citations
+  are UNVALIDATED: ifrs.org requires a login for the taxonomy and xbrl.ifrs.org was blocked.
+- Builder fixes found by the real data: residual plugs were double-counted (dropped Colgate,
+  SAP, Molson Coors statements); net-assets IFRS layout (AstraZeneca, BP, Diageo, Rio) was
+  unsupported; non-current receivables were captioned like current ones (Caterpillar);
+  arithmetic faults could land on lines no subtotal sums (now excluded, gate check 16).
+- Filler got WORSE with more companies: income statements 15.9%, cash flows **33.4%** of
+  line magnitude (US). The IS/CF template is now the biggest realism problem.
+- US linkbase checks used the committed cache (xbrl.fasb.org blocked): concepts first seen in
+  the new companies are not cached, so some records that could verify are UNVALIDATED.
+
 ## v0.4 status (re-audit after the v0.3 fixes)
 
 v0.3's regression gate passed, but every check it ran read the **answer key**.
@@ -31,7 +47,7 @@ the thing a system under test sees:
 | 4 | Transactions aren't accounting | **Partly.** Signs and contra sizes fixed on every statement. | Still two synthetic movements per line with no opening balance; an accountant will still call it thin. Real ledgers are not published, so evidence stays synthetic. |
 | 5 | Citations don't govern the error | **Partly.** `docs/CITATION_POLICY.md` states the governing-paragraph principle; 15 paragraphs, each with a rationale; 177 records paragraph-verified against the linkbase. | 649 records are `expert-authored-UNVALIDATED`. No accountant has reviewed the 15 decisions; the LLM cross-check has not been run on v0.4. |
 | 6 | Statements unrealistic | **Partly.** Balance sheets 1.0% filler, real captions. | Cash-flow statements are still a 6-line template: **22.7% filler** (NVIDIA FY2021 77%). Income statements 3.3% overall, but J&J FY2023 shows R&D $457m (real ≈ $15bn) with a −$21.5bn plug — the first matching concept is not always the line the filer used. Row order follows the calculation linkbase, not the presentation linkbase (J&J lists inventories before cash). Needs the filing-linkbase approach applied to IS/CF roles: an online rebuild. |
-| 7 | Sample and rule bias | **Open (built set).** Still 8 companies. | `configs/usgaap_expansion.json` has 60 phase-1 companies across 10 sectors plus 11 phase-2 (banks, insurers, REITs, utilities). Needs SEC access to build; phase 2 needs an unclassified-balance-sheet template and bank/insurance rule families. |
+| 7 | Sample and rule bias | **Largely fixed (v0.5).** 70 US companies across 10 sectors, mid/small caps and loss-makers included; 1,989 statements, 70 clusters. IFRS: 31 filers, 161 balance sheets. | Still no banks, insurers, REITs or utilities (phase 2 needs an unclassified-balance-sheet template). Still 15 US paragraphs. |
 
 ### The citation task is narrow — say this before a reviewer does
 

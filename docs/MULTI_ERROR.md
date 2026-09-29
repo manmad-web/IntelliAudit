@@ -1,15 +1,15 @@
 # Multi-error split (US GAAP)
 
-`data/benchmark_multi/` — built by `python3 scripts/build_multi.py` from the same 220
-real statements, rules and evidence generator as the single-error benchmark, which it
+`data/benchmark_multi/` — built by `python3 scripts/build_multi.py` from the same 1,989
+real US GAAP statements, rules and evidence generator as the single-error benchmark, which it
 does not change. Gate: `python3 scripts/check_multi.py`. Scoring:
 `python3 scripts/score_multi.py <pred.jsonl> [--form N]`.
 
 | | |
 |---|---|
-| items | 1,100 = 880 with faults + 220 clean controls |
-| faults per item | 1 (187), 2 (344), 3 (349); the count is not given away |
-| faults | 1,922, of which 911 citable; 218 items carry 2+ citable faults |
+| items | 9,945 = 7,956 with faults + 1,989 clean controls |
+| faults per item | 1 (1,725), 2 (3,301), 3 (2,930); the count is not given away |
+| faults | 17,117, of which 7,481 citable |
 | forms | 5, one version of each statement per form |
 
 ## Composition rules
@@ -25,7 +25,7 @@ does not change. Gate: `python3 scripts/check_multi.py`. Scoring:
 
 ## What it tests that the single-error set cannot
 Whether a pipeline stops after the first finding. The rule system in
-`scripts/identifiability_check.py` finds all 911 citable faults (row-agnostic) with no
+`scripts/identifiability_check.py` finds all 7,481 citable faults (row-agnostic) with no
 spurious citation; it does not locate rows and misses the 205 items whose faults are all
 arithmetic. That is the ceiling for rules written by the benchmark authors, not a result.
 

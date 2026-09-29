@@ -6,6 +6,8 @@
   "fiscal_year": 2018,
   "period": "2018-09-29",
   "unit": "USD millions",
+  "currency": "USD",
+  "framework": "us-gaap",
   "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
   "rows": [
     {
@@ -345,7 +347,7 @@
     }
   ],
   "normalization": {
-    "version": 1,
+    "version": 2,
     "notes": []
   }
 }

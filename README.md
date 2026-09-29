@@ -7,7 +7,7 @@ answer is the **one FASB ASC paragraph that governs the violation**
 (`ASC 330-10-35-1B`, `ASC 470-10-45-11`, …), selected by a written policy and
 cross-checked against the FASB reference linkbase.
 
-> **Status (v0.4, Sept 2026).** Mohsen's audit findings on detection triviality, citation guessability and leakage are fixed, and the regression gate now also reads the exam. Still open: 8 companies (expansion configs ready, need SEC access), cash-flow statements still templated (23% filler), and no accountant has reviewed the 15 governing paragraphs. Read [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) before quoting a number.
+> **Status (v0.5, Sept 2026).** Built from SEC EDGAR: **US GAAP** 70 companies, 1,989 real statements (FY2015–2024); **IFRS** 31 SEC 20-F/40-F filers, 161 real balance sheets (FY2018–2024), a separate dataset. Mohsen's detection, guessability and leakage findings are fixed; the US gate passes. Still open: cash-flow statements templated (33% filler), no accountant review of the paragraphs, IFRS covers balance sheets only and fails the gate's 12-paragraph breadth check (8). Read [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) before quoting a number.
 
 ## What an item looks like
 
@@ -65,12 +65,18 @@ python3 scripts/score_predictions.py results/<your_predictions>.jsonl [--form N]
 
 Rebuilds are byte-identical.
 
-## Numbers (v0.4, `data/benchmark/summary.json`)
+## Numbers (v0.5 — from `data/benchmark/validation_report.json`)
 
-1,756 items = 1,536 injected + 220 clean controls, from 220 real statements
-(8 companies × FY2015–2024 × BS/IS/CF). 826 citable items over **15 governing
-paragraphs in 11 topics**; 177 paragraph-verified against the linkbase, 649
-`expert-authored-UNVALIDATED`; 710 detection-only (no single paragraph governs).
+**US GAAP** (`data/clean/`, `data/benchmark/`): 70 companies (`config.json`) × FY2015–2024;
+1,989 real statements (677 BS, 621 IS, 691 CF). 14,963 items = 12,974 injected (one fault
+each) + 1,989 clean controls. 6,388 citable over **15 governing paragraphs in 11 topics**
+(1,363 linkbase-verified, 5,025 `expert-authored-UNVALIDATED`); 6,586 detection-only.
+
+**IFRS** (`data/ifrs/clean/`, `data/ifrs/benchmark/`): 31 of 33 phase-1 SEC filers built
+(Toyota and Sony skipped: no Liabilities total in their XBRL) × FY2018–2024; 161 real
+balance sheets in the filer's currency. 1,382 items = 1,221 injected + 161 controls; 648
+citable over 8 IAS/IFRS paragraphs (all UNVALIDATED: the IFRS Taxonomy download needs an
+ifrs.org login); 573 detection-only.
 
 | Gate check | v0.3 | v0.4 |
 |---|---|---|
@@ -99,16 +105,17 @@ Why each paragraph wins: [`docs/CITATION_POLICY.md`](docs/CITATION_POLICY.md).
 
 ## Multi-error split
 
-`data/benchmark_multi/`: 1,100 items (1–3 faults each, plus 220 clean controls) on the same
-real statements; the single-error benchmark is unchanged. See
+`data/benchmark_multi/` (US GAAP): 9,945 items — 1,989 clean controls and 1,725 / 3,301 /
+2,930 items with 1 / 2 / 3 faults (17,117 faults, 7,481 citable) on the same 1,989 real
+statements. See
 [`docs/MULTI_ERROR.md`](docs/MULTI_ERROR.md).
 
-## IFRS edition (separate dataset, scaffolded)
+## IFRS edition (separate dataset)
 
-`rulebook_ifrs.json` (23 draft rules, 8 of them framework contrasts where the same facts
-flip the verdict), `configs/ifrs.json` (36 SEC 20-F/40-F IFRS filers), IFRS citation
-grammar and linkbase resolver, output under `data/ifrs/`. Not built yet. See
-[`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md).
+Built from SEC 20-F/40-F `ifrs-full` facts: see the Numbers section. `rulebook_ifrs.json`
+(23 rules, 8 of them framework contrasts; 15 runnable on balance sheets), `configs/ifrs.json`,
+IFRS citation grammar and resolver. Balance sheets only; runbook in
+[`docs/IFRS_BUILD.md`](docs/IFRS_BUILD.md), plan in [`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md).
 
 ## Documents
 

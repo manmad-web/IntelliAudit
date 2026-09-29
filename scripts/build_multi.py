@@ -58,14 +58,18 @@ def main():
                 recs.append(build_multi_control(clean, f"IAM-{co['ticker']}-{yr}-{tag}-CONTROL-00"))
                 for i in range(MULTI_PER_STATEMENT):
                     k = min(rng.choice(K_CHOICES), len(rs))
-                    rec = build_multi_record(clean, rs, k, rng, f"IAM-{co['ticker']}-{yr}-{tag}-M{i:02d}")
-                    if rec:
-                        recs.append(rec)
+                    for _attempt in range(5):          # redraw if faults cancel each other
+                        rec = build_multi_record(clean, rs, k, rng, f"IAM-{co['ticker']}-{yr}-{tag}-M{i:02d}")
+                        if rec:
+                            recs.append(rec)
+                            break
 
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "records.jsonl"), "w") as f:
         for r in recs:
             f.write(json.dumps(r) + "\n")
+    from jsonl import gzip_copy
+    gzip_copy(os.path.join(OUT, "records.jsonl"))
 
     # split: opaque ids, one version of a statement per form
     eid = lambda sid: "EXM-" + hashlib.sha256((SALT + sid).encode()).hexdigest()[:12]

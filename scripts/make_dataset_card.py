@@ -7,13 +7,15 @@ edited and still described the v0.1 schema).
 
     python3 scripts/make_dataset_card.py
 """
-import collections, json, os
+import collections, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 B = os.path.join(ROOT, "data", "benchmark")
 summary = json.load(open(os.path.join(B, "summary.json")))
 rules = json.load(open(os.path.join(ROOT, "rulebook.json")))
-recs = [json.loads(l) for l in open(os.path.join(B, "records.jsonl"))]
+sys.path.insert(0, os.path.join(ROOT, "src"))
+from jsonl import open_text  # noqa: E402
+recs = [json.loads(l) for l in open_text(os.path.join(B, "records.jsonl"))]
 exam = [json.loads(l) for l in open(os.path.join(B, "exam.jsonl"))]
 key = {json.loads(l)["sample_id"]: json.loads(l) for l in open(os.path.join(B, "answer_key.jsonl"))}
 n_rec, n_ctrl = len(recs), summary["controls"]

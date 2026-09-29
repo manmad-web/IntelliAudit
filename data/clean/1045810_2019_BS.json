@@ -6,6 +6,8 @@
   "fiscal_year": 2019,
   "period": "2019-01-27",
   "unit": "USD millions",
+  "currency": "USD",
+  "framework": "us-gaap",
   "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
   "rows": [
     {
@@ -323,9 +325,7 @@
     }
   ],
   "normalization": {
-    "version": 1,
-    "notes": [
-      "sign: TreasuryStockValue weight -1 applied; removed residual -18,526"
-    ]
+    "version": 2,
+    "notes": []
   }
 }

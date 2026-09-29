@@ -1,0 +1,55 @@
+{
+  "framework": "ifrs",
+  "config": "configs/ifrs.json",
+  "companies_in_config": 39,
+  "companies_targeted": 33,
+  "companies_built": 31,
+  "companies_skipped": [
+    {
+      "ticker": "TM",
+      "status": "skipped",
+      "statements": 0,
+      "reason": "no statement could be built"
+    },
+    {
+      "ticker": "SONY",
+      "status": "skipped",
+      "statements": 0,
+      "reason": "no statement could be built"
+    }
+  ],
+  "clean_statements_on_disk": 161,
+  "clean_statements_by_type": {
+    "BS": 161
+  },
+  "fiscal_years_present": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "items": 1382,
+  "clean_controls": 161,
+  "injected": 1221,
+  "single_error_verified": 1221,
+  "single_error_violations": 0,
+  "citation_tiers": {
+    "no-error": 161,
+    "expert-authored-UNVALIDATED": 648,
+    "no-governing-paragraph": 573
+  },
+  "distinct_citable_paragraphs": 8,
+  "triviality_gate": {
+    "passed": false,
+    "last_line": "GATE FAILED \u2014 1 issue(s): 14 distinct citable paragraphs"
+  },
+  "identifiability": {
+    "passed": null,
+    "last_line": "not run for this framework yet"
+  },
+  "llm_in_ground_truth_loop": false,
+  "accountant_review_of_citations": "not done"
+}

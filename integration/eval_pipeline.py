@@ -43,7 +43,8 @@ def norm(x):
 
 
 def main():
-    recs = [json.loads(l) for l in open(RECORDS)]
+    from jsonl import open_text
+    recs = [json.loads(l) for l in open_text(RECORDS)]
     agg = collections.Counter(); n = 0
     for r in recs:
         if not r["ground_truth_citations"].get("citable"):

@@ -87,6 +87,11 @@ def build_multi_record(clean, rules, k, rng, sid):
     if got is None:
         return None
     booked, shown, applied = got
+    # faults can cancel (a fabricated +156 and a deleted 156 in one subtotal):
+    # the statement must break footing iff an arithmetic fault is present
+    det = ("R04", "R05", "R06", "R07", "R12")
+    if (not injector.check_reconciles(shown)) != any(r["rule_id"].startswith(det) for r, _ in applied):
+        return None
 
     corrected = copy.deepcopy(clean)
     errors, violations, no_decoy, orig_vals = [], {}, set(), []

@@ -525,5 +525,7 @@ def build_balance_sheet_from_filing(facts, fiscal_year, cik, scale=1_000_000, fr
                        f"(real {anchor.get('form') or '10-K'})"),
             "rows": rows,
             "identities": [{"lhs": f"{ns}:{anc['assets']}",
-                            "rhs": [f"{ns}:{anc['liabilities_and_equity']}"],
+                            "rhs": ([f"{ns}:{anc['liabilities_and_equity']}"]
+                                    if anc["liabilities_and_equity"] in tree
+                                    else [f"{ns}:Liabilities", f"{ns}:Equity"]),
                             "name": "accounting_equation"}]}

@@ -6,6 +6,8 @@
   "fiscal_year": 2015,
   "period": "2015-01-25",
   "unit": "USD millions",
+  "currency": "USD",
+  "framework": "us-gaap",
   "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
   "rows": [
     {
@@ -322,9 +324,8 @@
     }
   ],
   "normalization": {
-    "version": 1,
+    "version": 2,
     "notes": [
-      "sign: TreasuryStockValue weight -1 applied; removed residual -6,790",
       "dropped zero 'Commitments and contingencies' caption",
       "re-sectioned lines filed directly under LiabilitiesAndStockholdersEquity"
     ]

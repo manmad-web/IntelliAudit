@@ -128,7 +128,10 @@ def solve_all(e):
             yield r
     for label, v, sect in rows:
         lab = label.lower()
-        if sect and sect.startswith("non-current assets") and re.search(r"inventor|receivable", lab):
+        # exact current-asset captions only: real statements legitimately carry
+        # non-current receivables ("Long term investments and receivables")
+        if sect and sect.startswith("non-current assets") and re.fullmatch(
+                r"inventories|accounts receivable, net|receivables, net", lab):
             yield "ASC 210-10-45-1"
         if sect and sect.startswith("non-current liab") and re.search(r"accounts payable|accrued liab|accrued comp", lab):
             yield "ASC 210-10-45-8"

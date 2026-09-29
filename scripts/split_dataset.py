@@ -32,7 +32,8 @@ _ap.add_argument("--config", default="config.json")
 cfg = json.load(open(os.path.join(ROOT, _ap.parse_args().config)))
 BENCH = os.path.join(ROOT, _fw(cfg.get("framework", "us-gaap"))["out_dir"])
 SALT = str(cfg.get("exam_salt", "intelliaudit-v0.4"))
-recs = [json.loads(l) for l in open(os.path.join(BENCH, "records.jsonl"))]
+from jsonl import open_text  # noqa: E402
+recs = [json.loads(l) for l in open_text(os.path.join(BENCH, "records.jsonl"))]
 
 
 def exam_id(sid):

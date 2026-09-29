@@ -136,6 +136,15 @@ def inject(stmt, rule, rng, exclude=()):
     if exclude:
         cands = [r for r in cands if (r.get("concept"), r.get("label")) not in exclude]
     inj = rule["injection"]
+    arithmetic = op in ("delete_row", "flip_sign") or (
+        op == "perturb_value" and inj.get("keep_totals", True)
+        and not inj.get("balance_with") and not inj.get("recompute"))
+    if arithmetic:
+        # an arithmetic fault is only detectable on a line that rolls into a
+        # subtotal; some filings' calculation trees leave lines unsummed
+        summed = {i for p in m["rows"] if p.get("sums") for i in p["sums"]}
+        cands = [r for r in cands if r["idx"] in summed]
+    inj = rule["injection"]
 
     if op == "move_row":
         to_section = inj.get("to_section")
@@ -152,6 +161,10 @@ def inject(stmt, rule, rng, exclude=()):
         if pos is not None and pos > m["rows"].index(row):
             pos -= 1
         move_and_recompute(m, row, to_section, pos)
+        if inj.get("recompute") and not check_reconciles(m):
+            # the filing's calculation tree does not connect the target section to
+            # the grand total, so a footing misclassification cannot be built here
+            return None, "statement structure cannot absorb a footing move"
         return m, {"row_concept": row["concept"], "row_label": row["label"], "from_section": src,
                    "to_section": to_section}
 
@@ -191,6 +204,9 @@ def inject(stmt, rule, rng, exclude=()):
         row["value"] = new
         if bal or inj.get("recompute") or not inj.get("keep_totals", True):
             _recompute(m)
+        if bal and not check_reconciles(m):
+            # balancing line not connected to the grand total in this filing's tree
+            return None, "statement structure cannot absorb a balanced entry"
         return m, meta
 
     if op == "flip_sign":

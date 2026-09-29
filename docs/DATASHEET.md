@@ -12,10 +12,12 @@ financial-statement violation — a task AuditBench scored with broken labels an
 FinAuditing/AuditFlow do not score at all.
 
 ## 2. Composition
-1,756 exam items over 220 real statements (8 companies × FY2015–2024 × {balance
-sheet, income statement, cash flow}): 1,536 injected faults (one per applicable rule
-per statement) and 220 clean controls. 826 injected items are citable (15 governing
-paragraphs); 710 are detection-only. `data/benchmark/summary.json` is authoritative.
+US GAAP: 14,963 exam items over 1,989 real statements (70 companies × FY2015–2024 ×
+{balance sheet, income statement, cash flow}): 12,974 injected faults (one per applicable
+rule per statement) and 1,989 clean controls; 6,388 citable (15 governing paragraphs),
+6,586 detection-only. IFRS (separate): 1,382 items over 161 real balance sheets from 31
+SEC 20-F/40-F filers, FY2018–2024. `validation_report.json` in each output folder is
+authoritative.
 
 ## 3. Collection & construction process (deterministic)
 1. **Real values** — `src/edgar_ingest.py` reads SEC companyfacts (10-K, `fp=FY`).
@@ -72,7 +74,7 @@ blind LLM baselines on v0.4. Until the first is done, every
 For citation-attribution and error-detection evaluation. Limitations: single
 statements (not multi-document like FinAuditing); injected, not naturally occurring,
 errors; 15 governing paragraphs (a hand-written rule system solves the citation task);
-8 companies; cash-flow statements templated; row order from calculation, not
+70 US / 31 IFRS companies (no banks, insurers, REITs, utilities); cash-flow statements templated; row order from calculation, not
 presentation, linkbases; DQC ids not used as labels.
 
 ## 8. Distribution & maintenance

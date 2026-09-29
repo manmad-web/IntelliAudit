@@ -53,6 +53,10 @@ KIND_BY_CONCEPT = {
     # value, undiscounted flows, valuation allowance, waiver timing, 730) and
     # need IFRS templates first (rulebook_ifrs.json status needs-ifrs-facts).
     "ifrs-full:Inventories": "inventory",
+    "ifrs-full:Goodwill": "ifrs_goodwill",
+    "ifrs-full:PropertyPlantAndEquipment": "ifrs_ppe",
+    "ifrs-full:CurrentFinancialAssetsAtFairValueThroughOtherComprehensiveIncome": "securities",
+    "ifrs-full:NoncurrentFinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome": "securities",
     "ifrs-full:TradeAndOtherCurrentReceivables": "receivable",
     "ifrs-full:CurrentTradeReceivables": "receivable",
     "ifrs-full:Revenue": "revenue",
@@ -154,6 +158,26 @@ def _ppe(L, ca, ucf, fv, rng):
     ])
 
 
+def _ifrs_goodwill(L, ca, ra, rng):
+    return rng.choice([
+        f"{L}: annual impairment test of the cash-generating unit to which this goodwill is "
+        f"allocated — carrying amount of the CGU including goodwill {ca:,}; recoverable amount "
+        f"(higher of fair value less costs of disposal and value in use) {ra:,}.",
+        f"{L}: CGU impairment test — recoverable amount {ra:,}; carrying amount including the "
+        f"goodwill shown {ca:,}.",
+    ])
+
+
+def _ifrs_ppe(L, ca, viu, fvlcd, rng):
+    return rng.choice([
+        f"{L}: one cash-generating unit within this line showed an impairment indicator — "
+        f"carrying amount {ca:,}; value in use (discounted cash flows) {viu:,}; fair value less "
+        f"costs of disposal {fvlcd:,}. No impairment loss was recorded.",
+        f"{L}: impairment review of a CGU with an indicator — carrying amount {ca:,}; fair value "
+        f"less costs of disposal {fvlcd:,}; value in use {viu:,}. No impairment loss was recorded.",
+    ])
+
+
 def _debt(L, v, status, rng):
     return rng.choice([
         f"{L} ({v:,}): at period-end the entity {status} Under the credit agreement a covenant "
@@ -229,6 +253,15 @@ def consistent_fact(kind, row, rng, label):
         return _dta(label, g, g - v, v, rng)
     if kind == "rnd" and v < 0:
         return _rnd(label, abs(v), abs(v), 0, rng)
+    if kind == "ifrs_goodwill" and v > 0:
+        ca = _up(v, rng, 0.5, 3.0)
+        return _ifrs_goodwill(label, ca, _up(ca, rng, 0.05, 0.4), rng)
+    if kind == "ifrs_ppe" and v > 0:
+        ca = max(2, int(round(v * _pct(rng, 0.05, 0.25))))
+        hi = _up(ca, rng, 0.02, 0.4)                  # recoverable amount above carrying amount
+        lo = ca - max(1, int(round(ca * _pct(rng, 0.05, 0.3))))
+        viu, fv = (hi, lo) if rng.random() < 0.5 else (lo, hi)
+        return _ifrs_ppe(label, ca, viu, fv, rng)
     return None
 
 
@@ -266,6 +299,17 @@ def violating_fact(kind, meta, row, rng, label):
         return _dta(label, g, g - err, orig, rng)
     if kind == "rnd":
         return _rnd(label, abs(orig), abs(err), abs(orig) - abs(err), rng)
+    if kind == "ifrs_goodwill":
+        d = err - orig
+        ca = _up(err, rng, 0.5, 3.0)
+        return _ifrs_goodwill(label, ca, ca - d, rng)
+    if kind == "ifrs_ppe":
+        d = err - orig
+        ca = max(2 * d, int(round(err * _pct(rng, 0.05, 0.25))))
+        ra = ca - d                                   # recoverable amount = higher of the two
+        other = ra - max(1, int(round(ra * _pct(rng, 0.02, 0.2))))
+        viu, fv = (ra, other) if rng.random() < 0.5 else (other, ra)
+        return _ifrs_ppe(label, ca, viu, fv, rng)
     return None
 
 

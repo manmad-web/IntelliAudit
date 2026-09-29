@@ -174,6 +174,10 @@ def derived_label(concept):
     if n.startswith("Current") and n.endswith("Noncurrent"):     # ifrs-full 'CurrentXNoncurrent'
         return "Non-current " + derived_label(n[len("Current"):-len("Noncurrent")]).lower()
     n = n.replace("Rightofuse", "RightOfUse").replace("Paidin", "PaidIn")
+    if n.endswith("Noncurrent") and len(n) > len("Noncurrent"):
+        # a genuinely non-current line keeps its qualifier (Caterpillar's long-term
+        # finance receivables must not read like a misplaced current receivable)
+        return derived_label(n[:-len("Noncurrent")]) + ", non-current"
     words = re.findall(r"[A-Z][a-z0-9]*|[A-Z]+(?![a-z])", n)
     s = " ".join(words)
     s = s.replace(" Net Current", ", net").replace(" Net Noncurrent", ", net")

@@ -12,7 +12,9 @@ sys.path.insert(0, HERE)
 from identifiability_check import solve_all  # noqa: E402
 
 B = os.path.join(ROOT, "data", "benchmark_multi")
-recs = [json.loads(l) for l in open(os.path.join(B, "records.jsonl"))]
+sys.path.insert(0, os.path.join(ROOT, "src"))
+from jsonl import open_text  # noqa: E402
+recs = [json.loads(l) for l in open_text(os.path.join(B, "records.jsonl"))]
 exam = [json.loads(l) for l in open(os.path.join(B, "exam.jsonl"))]
 key = {k["exam_id"]: k for k in (json.loads(l) for l in open(os.path.join(B, "answer_key.jsonl")))}
 DET_ONLY = ("R04", "R05", "R06", "R07", "R12")
