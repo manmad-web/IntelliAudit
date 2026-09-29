@@ -1,16 +1,575 @@
 {
-  "companies": [
-    {"name": "Apple Inc.", "ticker": "AAPL", "cik": "320193"},
-    {"name": "Microsoft Corp.", "ticker": "MSFT", "cik": "789019"},
-    {"name": "NVIDIA Corp.", "ticker": "NVDA", "cik": "1045810"},
-    {"name": "Alphabet Inc.", "ticker": "GOOGL", "cik": "1652044"},
-    {"name": "Meta Platforms Inc.", "ticker": "META", "cik": "1326801"},
-    {"name": "Coca-Cola Co.", "ticker": "KO", "cik": "21344"},
-    {"name": "Johnson & Johnson", "ticker": "JNJ", "cik": "200406"},
-    {"name": "Walmart Inc.", "ticker": "WMT", "cik": "104169"}
-  ],
-  "fiscal_years": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
-  "n_per_rule_per_statement": 1,
-  "seed": 13,
-  "notes": "Real 10-K balance sheets from SEC EDGAR companyfacts; transactions synthetic (see transactions.py); errors injected rule-first; citations cross-checked vs official US-GAAP linkbase."
+ "companies": [
+  {
+   "name": "Apple Inc.",
+   "ticker": "AAPL",
+   "cik": "320193"
+  },
+  {
+   "name": "Microsoft Corp.",
+   "ticker": "MSFT",
+   "cik": "789019"
+  },
+  {
+   "name": "NVIDIA Corp.",
+   "ticker": "NVDA",
+   "cik": "1045810"
+  },
+  {
+   "name": "Alphabet Inc.",
+   "ticker": "GOOGL",
+   "cik": "1652044"
+  },
+  {
+   "name": "Meta Platforms Inc.",
+   "ticker": "META",
+   "cik": "1326801"
+  },
+  {
+   "name": "Coca-Cola Co.",
+   "ticker": "KO",
+   "cik": "21344"
+  },
+  {
+   "name": "Johnson & Johnson",
+   "ticker": "JNJ",
+   "cik": "200406"
+  },
+  {
+   "name": "Walmart Inc.",
+   "ticker": "WMT",
+   "cik": "104169"
+  },
+  {
+   "name": "Visa Inc.",
+   "ticker": "V",
+   "cik": "1403161",
+   "sector": "Financials",
+   "why": "payments network with a CLASSIFIED balance sheet: AFS securities (320), settlement receivables/payables; Sept FYE",
+   "fiscal_year_end": "Sep",
+   "phase": 1
+  },
+  {
+   "name": "UnitedHealth Group Inc.",
+   "ticker": "UNH",
+   "cik": "731766",
+   "sector": "Health Care",
+   "why": "goodwill-heavy acquirer (Optum); medical cost payables; classified balance sheet",
+   "phase": 1
+  },
+  {
+   "name": "Procter & Gamble Co.",
+   "ticker": "PG",
+   "cik": "80424",
+   "sector": "Consumer Staples",
+   "why": "large goodwill (Gillette); June FYE",
+   "phase": 1,
+   "fiscal_year_end": "Jun"
+  },
+  {
+   "name": "Colgate-Palmolive Co.",
+   "ticker": "CL",
+   "cik": "21665",
+   "sector": "Consumer Staples",
+   "why": "inventory, receivables; mid-size balance sheet",
+   "phase": 1
+  },
+  {
+   "name": "Hershey Co.",
+   "ticker": "HSY",
+   "cik": "47111",
+   "sector": "Consumer Staples",
+   "why": "inventory-heavy, LIFO for part of inventory (tests the 330-10-35-1B carve-out)",
+   "phase": 1
+  },
+  {
+   "name": "Molson Coors Beverage Co.",
+   "ticker": "TAP",
+   "cik": "24545",
+   "sector": "Consumer Staples",
+   "why": "large goodwill/brand impairments (2019, 2020, 2023)",
+   "phase": 1
+  },
+  {
+   "name": "Boston Beer Co.",
+   "ticker": "SAM",
+   "cik": "949870",
+   "sector": "Consumer Staples",
+   "why": "small cap, unlikely to be memorised; inventory write-downs 2021",
+   "phase": 1
+  },
+  {
+   "name": "Home Depot Inc.",
+   "ticker": "HD",
+   "cik": "354950",
+   "sector": "Consumer Discretionary",
+   "why": "inventory, operating leases; Jan/Feb FYE",
+   "phase": 1,
+   "fiscal_year_end": "Jan"
+  },
+  {
+   "name": "Target Corp.",
+   "ticker": "TGT",
+   "cik": "27419",
+   "sector": "Consumer Discretionary",
+   "why": "inventory, leases; Jan/Feb FYE",
+   "phase": 1,
+   "fiscal_year_end": "Jan"
+  },
+  {
+   "name": "Nike Inc.",
+   "ticker": "NKE",
+   "cik": "320187",
+   "sector": "Consumer Discretionary",
+   "why": "May FYE; inventory build-up 2022",
+   "phase": 1,
+   "fiscal_year_end": "May"
+  },
+  {
+   "name": "Dollar General Corp.",
+   "ticker": "DG",
+   "cik": "29534",
+   "sector": "Consumer Discretionary",
+   "why": "lease-heavy retailer; LIFO inventory",
+   "phase": 1,
+   "fiscal_year_end": "Jan"
+  },
+  {
+   "name": "Lululemon Athletica Inc.",
+   "ticker": "LULU",
+   "cik": "1397187",
+   "sector": "Consumer Discretionary",
+   "why": "mid cap; inventory; Jan FYE",
+   "phase": 1,
+   "fiscal_year_end": "Jan"
+  },
+  {
+   "name": "Crocs Inc.",
+   "ticker": "CROX",
+   "cik": "1334036",
+   "sector": "Consumer Discretionary",
+   "why": "mid cap; HEYDUDE goodwill/intangibles (2022)",
+   "phase": 1
+  },
+  {
+   "name": "Tractor Supply Co.",
+   "ticker": "TSCO",
+   "cik": "916365",
+   "sector": "Consumer Discretionary",
+   "why": "mid cap; inventory and leases",
+   "phase": 1
+  },
+  {
+   "name": "McDonald's Corp.",
+   "ticker": "MCD",
+   "cik": "63908",
+   "sector": "Consumer Discretionary",
+   "why": "negative equity; lease-heavy; franchise revenue",
+   "phase": 1
+  },
+  {
+   "name": "Darden Restaurants Inc.",
+   "ticker": "DRI",
+   "cik": "940944",
+   "sector": "Consumer Discretionary",
+   "why": "May FYE; lease-heavy",
+   "phase": 1,
+   "fiscal_year_end": "May"
+  },
+  {
+   "name": "Starbucks Corp.",
+   "ticker": "SBUX",
+   "cik": "829224",
+   "sector": "Consumer Discretionary",
+   "why": "deferred revenue (loyalty); negative equity; Sep/Oct FYE",
+   "phase": 1,
+   "fiscal_year_end": "Sep"
+  },
+  {
+   "name": "Shake Shack Inc.",
+   "ticker": "SHAK",
+   "cik": "1620533",
+   "sector": "Consumer Discretionary",
+   "why": "small cap; leases; loss years",
+   "phase": 1
+  },
+  {
+   "name": "Caterpillar Inc.",
+   "ticker": "CAT",
+   "cik": "18230",
+   "sector": "Industrials",
+   "why": "inventory (LIFO), receivables incl. finance receivables",
+   "phase": 1
+  },
+  {
+   "name": "3M Co.",
+   "ticker": "MMM",
+   "cik": "66740",
+   "sector": "Industrials",
+   "why": "litigation contingencies; goodwill",
+   "phase": 1
+  },
+  {
+   "name": "Snap-on Inc.",
+   "ticker": "SNA",
+   "cik": "91440",
+   "sector": "Industrials",
+   "why": "mid cap; finance receivables with credit losses",
+   "phase": 1
+  },
+  {
+   "name": "Owens Corning",
+   "ticker": "OC",
+   "cik": "1370946",
+   "sector": "Industrials",
+   "why": "goodwill impairment history; mid cap",
+   "phase": 1
+  },
+  {
+   "name": "Polaris Inc.",
+   "ticker": "PII",
+   "cik": "931015",
+   "sector": "Industrials",
+   "why": "mid cap; inventory; goodwill impairment (2020)",
+   "phase": 1
+  },
+  {
+   "name": "Lockheed Martin Corp.",
+   "ticker": "LMT",
+   "cik": "936468",
+   "sector": "Industrials",
+   "why": "over-time revenue, contract assets/liabilities",
+   "phase": 1
+  },
+  {
+   "name": "General Dynamics Corp.",
+   "ticker": "GD",
+   "cik": "40533",
+   "sector": "Industrials",
+   "why": "over-time revenue; goodwill",
+   "phase": 1
+  },
+  {
+   "name": "Boeing Co.",
+   "ticker": "BA",
+   "cik": "12927",
+   "sector": "Industrials",
+   "why": "losses, negative equity, inventory/program accounting, DTA",
+   "phase": 1
+  },
+  {
+   "name": "Delta Air Lines Inc.",
+   "ticker": "DAL",
+   "cik": "27904",
+   "sector": "Industrials",
+   "why": "2020 losses; leases; debt covenants",
+   "phase": 1
+  },
+  {
+   "name": "United Airlines Holdings Inc.",
+   "ticker": "UAL",
+   "cik": "100517",
+   "sector": "Industrials",
+   "why": "2020 losses; leases; DTA",
+   "phase": 1
+  },
+  {
+   "name": "FedEx Corp.",
+   "ticker": "FDX",
+   "cik": "1048911",
+   "sector": "Industrials",
+   "why": "May FYE; lease-heavy",
+   "phase": 1,
+   "fiscal_year_end": "May"
+  },
+  {
+   "name": "Union Pacific Corp.",
+   "ticker": "UNP",
+   "cik": "100885",
+   "sector": "Industrials",
+   "why": "PP&E-heavy; debt",
+   "phase": 1
+  },
+  {
+   "name": "Carnival Corp.",
+   "ticker": "CCL",
+   "cik": "815097",
+   "sector": "Consumer Discretionary",
+   "why": "Nov FYE; 2020-22 covenant waivers and impairments",
+   "phase": 1,
+   "fiscal_year_end": "Nov"
+  },
+  {
+   "name": "Royal Caribbean Cruises Ltd.",
+   "ticker": "RCL",
+   "cik": "884887",
+   "sector": "Consumer Discretionary",
+   "why": "2020-21 covenant waivers; ship impairments",
+   "phase": 1
+  },
+  {
+   "name": "Exxon Mobil Corp.",
+   "ticker": "XOM",
+   "cik": "34088",
+   "sector": "Energy",
+   "why": "LIFO inventory; asset impairments (2020)",
+   "phase": 1
+  },
+  {
+   "name": "Chevron Corp.",
+   "ticker": "CVX",
+   "cik": "93410",
+   "sector": "Energy",
+   "why": "LIFO inventory; impairments",
+   "phase": 1
+  },
+  {
+   "name": "Halliburton Co.",
+   "ticker": "HAL",
+   "cik": "45012",
+   "sector": "Energy",
+   "why": "impairments 2020; receivables",
+   "phase": 1
+  },
+  {
+   "name": "Valero Energy Corp.",
+   "ticker": "VLO",
+   "cik": "1035002",
+   "sector": "Energy",
+   "why": "LIFO; LCM write-down 2020",
+   "phase": 1
+  },
+  {
+   "name": "Nucor Corp.",
+   "ticker": "NUE",
+   "cik": "73309",
+   "sector": "Materials",
+   "why": "inventory, PP&E",
+   "phase": 1
+  },
+  {
+   "name": "Sherwin-Williams Co.",
+   "ticker": "SHW",
+   "cik": "89800",
+   "sector": "Materials",
+   "why": "goodwill (Valspar); partial LIFO",
+   "phase": 1
+  },
+  {
+   "name": "International Paper Co.",
+   "ticker": "IP",
+   "cik": "51434",
+   "sector": "Materials",
+   "why": "impairments; pensions",
+   "phase": 1
+  },
+  {
+   "name": "Freeport-McMoRan Inc.",
+   "ticker": "FCX",
+   "cik": "831259",
+   "sector": "Materials",
+   "why": "mining PP&E, NCI",
+   "phase": 1
+  },
+  {
+   "name": "Pfizer Inc.",
+   "ticker": "PFE",
+   "cik": "78003",
+   "sector": "Health Care",
+   "why": "goodwill/intangibles; R&D",
+   "phase": 1
+  },
+  {
+   "name": "Merck & Co. Inc.",
+   "ticker": "MRK",
+   "cik": "310158",
+   "sector": "Health Care",
+   "why": "R&D; acquired IPR&D",
+   "phase": 1
+  },
+  {
+   "name": "AbbVie Inc.",
+   "ticker": "ABBV",
+   "cik": "1551152",
+   "sector": "Health Care",
+   "why": "Allergan goodwill; negative equity years",
+   "phase": 1
+  },
+  {
+   "name": "Abbott Laboratories",
+   "ticker": "ABT",
+   "cik": "1800",
+   "sector": "Health Care",
+   "why": "receivables, inventory, goodwill",
+   "phase": 1
+  },
+  {
+   "name": "HCA Healthcare Inc.",
+   "ticker": "HCA",
+   "cik": "860730",
+   "sector": "Health Care",
+   "why": "negative equity; patient receivables",
+   "phase": 1
+  },
+  {
+   "name": "McKesson Corp.",
+   "ticker": "MCK",
+   "cik": "927653",
+   "sector": "Health Care",
+   "why": "March FYE; huge receivables/payables; negative equity",
+   "phase": 1,
+   "fiscal_year_end": "Mar"
+  },
+  {
+   "name": "Cisco Systems Inc.",
+   "ticker": "CSCO",
+   "cik": "858877",
+   "sector": "Information Technology",
+   "why": "July FYE; deferred revenue; AFS portfolio",
+   "phase": 1,
+   "fiscal_year_end": "Jul"
+  },
+  {
+   "name": "Oracle Corp.",
+   "ticker": "ORCL",
+   "cik": "1341439",
+   "sector": "Information Technology",
+   "why": "May FYE; deferred revenue; negative equity",
+   "phase": 1,
+   "fiscal_year_end": "May"
+  },
+  {
+   "name": "Intel Corp.",
+   "ticker": "INTC",
+   "cik": "50863",
+   "sector": "Information Technology",
+   "why": "2024 impairments and DTA valuation allowance",
+   "phase": 1
+  },
+  {
+   "name": "Adobe Inc.",
+   "ticker": "ADBE",
+   "cik": "796343",
+   "sector": "Information Technology",
+   "why": "Nov FYE; deferred revenue",
+   "phase": 1,
+   "fiscal_year_end": "Nov"
+  },
+  {
+   "name": "Salesforce Inc.",
+   "ticker": "CRM",
+   "cik": "1108524",
+   "sector": "Information Technology",
+   "why": "Jan FYE; deferred revenue; capitalized commissions",
+   "phase": 1,
+   "fiscal_year_end": "Jan"
+  },
+  {
+   "name": "HP Inc.",
+   "ticker": "HPQ",
+   "cik": "47217",
+   "sector": "Information Technology",
+   "why": "Oct FYE; negative equity",
+   "phase": 1,
+   "fiscal_year_end": "Oct"
+  },
+  {
+   "name": "Micron Technology Inc.",
+   "ticker": "MU",
+   "cik": "723125",
+   "sector": "Information Technology",
+   "why": "Aug/Sep FYE; inventory write-downs 2023",
+   "phase": 1,
+   "fiscal_year_end": "Aug"
+  },
+  {
+   "name": "Verizon Communications Inc.",
+   "ticker": "VZ",
+   "cik": "732712",
+   "sector": "Communication Services",
+   "why": "debt-heavy; spectrum intangibles",
+   "phase": 1
+  },
+  {
+   "name": "AT&T Inc.",
+   "ticker": "T",
+   "cik": "732717",
+   "sector": "Communication Services",
+   "why": "goodwill impairments (2020, 2022, 2023)",
+   "phase": 1
+  },
+  {
+   "name": "Netflix Inc.",
+   "ticker": "NFLX",
+   "cik": "1065280",
+   "sector": "Communication Services",
+   "why": "content assets; debt",
+   "phase": 1
+  },
+  {
+   "name": "Comcast Corp.",
+   "ticker": "CMCSA",
+   "cik": "1166691",
+   "sector": "Communication Services",
+   "why": "Sky goodwill impairment (2022)",
+   "phase": 1
+  },
+  {
+   "name": "General Motors Co.",
+   "ticker": "GM",
+   "cik": "1467858",
+   "sector": "Consumer Discretionary",
+   "why": "GM Financial receivables; DTA",
+   "phase": 1
+  },
+  {
+   "name": "Tesla Inc.",
+   "ticker": "TSLA",
+   "cik": "1318605",
+   "sector": "Consumer Discretionary",
+   "why": "valuation allowance released 2023",
+   "phase": 1
+  },
+  {
+   "name": "Peloton Interactive Inc.",
+   "ticker": "PTON",
+   "cik": "1639825",
+   "sector": "Consumer Discretionary",
+   "why": "June FYE; losses; inventory write-downs; DTA VA",
+   "phase": 1,
+   "fiscal_year_end": "Jun"
+  },
+  {
+   "name": "Lucid Group Inc.",
+   "ticker": "LCID",
+   "cik": "1811210",
+   "sector": "Consumer Discretionary",
+   "why": "losses; full valuation allowance; inventory write-downs",
+   "phase": 1
+  },
+  {
+   "name": "Beyond Meat Inc.",
+   "ticker": "BYND",
+   "cik": "1655210",
+   "sector": "Consumer Staples",
+   "why": "small cap; inventory write-downs; losses",
+   "phase": 1
+  }
+ ],
+ "fiscal_years": [
+  2015,
+  2016,
+  2017,
+  2018,
+  2019,
+  2020,
+  2021,
+  2022,
+  2023,
+  2024
+ ],
+ "n_per_rule_per_statement": 1,
+ "seed": 13,
+ "notes": "US GAAP edition. First 8 companies are the original core set; the rest are phase-1 companies from configs/usgaap_expansion.json (phase 2 = banks/insurers/REITs/utilities, not buildable yet). Real 10-K facts from SEC EDGAR companyfacts; transactions synthetic; errors injected rule-first.",
+ "framework": "us-gaap"
 }

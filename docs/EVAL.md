@@ -1,46 +1,58 @@
-# Evaluation protocol
+# Evaluation protocol (v0.4)
 
-How to take this benchmark honestly, in three rules.
+## 1. Give a system the exam, never the key
 
-## 1. Score from content, never from the ID
+1. Input: `data/benchmark/exam.jsonl`. Each item has an opaque `exam_id`, a `form`,
+   `metadata`, `statement_text` and `transaction_data` (ledger movements plus
+   "Supporting facts (period-end reviews)"). No labels.
+2. The system writes one line per item:
+   ```json
+   {"exam_id": "EX-…", "predicted_judgement": "Correct" | "Incorrect",
+    "predicted_asc": "ASC 606-10-25-23" | null,
+    "predicted_error_type": "Numerical Error", "predicted_row": 12}
+   ```
+   `predicted_asc: null` means "no single paragraph governs" (or abstain).
+3. Only then run `python3 scripts/score_predictions.py <file> [--form N]`.
 
-`sample_id` looks like `IA-AAPL-2015-BS-R01_current_noncurrent_asset_misclass-00`
-— it literally contains the injected rule's name. **Never parse `sample_id` to
-recover `rule_id` or the error type.** A system (or a scorer) that does this is
-reading the answer off the filename, not auditing the statement. Only
-`error_identification`, `ground_truth_citations`, etc. inside `answer_key.jsonl`
-are legitimate labels, and only at scoring time (rule 2).
+If `answer_key.jsonl` or `records.jsonl` is readable by the process that produces
+predictions, the run is not blind. Separate the environments.
 
-## 2. Exam in, key only at score time
+## 2. One item at a time, or one form at a time
 
-1. Feed the system **only** `data/benchmark/exam.jsonl` — it has no labels, just
-   `modified_statement_text` + `gt_transaction_data` + `metadata`.
-2. Collect predictions: `{sample_id, predicted_asc, predicted_error_type, predicted_row}`.
-3. **Only then** load `data/benchmark/answer_key.jsonl` and run
-   `python3 scripts/score_predictions.py` to join on `sample_id` and grade.
+Every statement appears in ~17 versions (one per applicable rule plus a clean
+control). A system that reads several versions of the same statement can diff them
+and find the injected row with no accounting at all. Either feed items one at a time
+with no memory across items, or score one form (`--form N`); a form holds at most one
+version of each statement. Report which you did.
 
-If your evaluation harness has `answer_key.jsonl` in scope while the system is
-still producing predictions, that's a leak — split the process/environment so
-the key is genuinely unavailable during inference, not just "unused by convention."
+## 3. What is scored
 
-## 3. Read `citable` before scoring citation
+- **Judgement** over every item, including the 220 clean controls. Report false
+  alarms on controls separately; a system that calls everything Incorrect scores 87.5%
+  accuracy and 100% false alarms.
+- **Citation** only over `citable: true` items (826). Detection-only faults (no
+  governing paragraph) and controls are skipped, not counted as misses.
+  Exact match at topic / subtopic / paragraph; strict (the governing paragraph, not
+  any reference the concept carries).
+- **Error type and row** over injected items.
 
-`ground_truth_citations.citable` is `false` for ~59% of records (710/1202) —
-these are `no-governing-paragraph` cases (e.g. an arbitrary numeric
-perturbation) where no single ASC paragraph is the correct answer. Citation
-accuracy must be computed **only over `citable: true` records** (492/1202).
-Scoring citation over all 1202 records silently rewards/punishes systems for a
-question that has no right answer on 59% of the data.
+## 4. Reference points (exam-only, `scripts/make_predictions.py`)
 
-## Before quoting any number
+| System | Judgement acc. | False alarms | ASC paragraph EM |
+|---|---|---|---|
+| statement-type prior (always Incorrect, one paragraph per statement type) | 87.5% | 100% | 25.4% |
+| `identifiability_check.py` (hand-written rules by the benchmark authors) | — | 0% | 100% |
 
-Run the regression gate — it fails loudly if the benchmark has quietly become
-guessable or started leaking its own answers:
+The second row is a ceiling, not a result: it shows every citable item is derivable
+from the exam, and that 15 encoded rules are enough to solve the citation task. See
+`KNOWN_ISSUES.md` before comparing a deterministic pipeline against it.
+
+## 5. Before quoting a number
 
 ```bash
-python3 scripts/check_triviality.py
+python3 scripts/check_triviality.py        # must print GATE PASSED
 ```
 
-See `KNOWN_ISSUES.md` for what's still open (sample/rule bias, and the planned
-LLM cross-check + human review of `expert-authored-UNVALIDATED` citations,
-neither of which has been run yet) before treating any citation number as final.
+Say which items were scored (all / one form), which citation tier they fall in
+(`linkbase-verified` vs `expert-authored-UNVALIDATED`), and that the unvalidated
+tier has not been reviewed by an accountant.

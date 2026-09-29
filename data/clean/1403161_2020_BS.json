@@ -1,0 +1,406 @@
+{
+  "company": "VISA INC.",
+  "ticker": "V",
+  "cik": "0001403161",
+  "statement_type": "BalanceSheet",
+  "fiscal_year": 2020,
+  "period": "2020-09-30",
+  "unit": "USD millions",
+  "currency": "USD",
+  "framework": "us-gaap",
+  "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Current assets:",
+      "section": "CurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Cash and cash equivalents",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+      "value": 16289,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Investments",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:Investments",
+      "value": 3752,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Accounts receivable, net",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:AccountsReceivableNetCurrent",
+      "value": 1618,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Prepaid expenses and other current assets",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:PrepaidExpenseAndOtherAssetsCurrent",
+      "value": 757,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 5,
+      "label": "Other current assets, net",
+      "section": "CurrentAssets",
+      "concept": null,
+      "value": 5229,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 6,
+      "label": "Total current assets",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:AssetsCurrent",
+      "value": 27645,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "idx": 7,
+      "label": "Non-current assets:",
+      "section": "NoncurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 8,
+      "label": "Available-for-sale debt securities",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:AvailableForSaleSecuritiesDebtSecuritiesNoncurrent",
+      "value": 231,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 9,
+      "label": "Property, plant and equipment, net",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:PropertyPlantAndEquipmentNet",
+      "value": 2737,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 10,
+      "label": "Goodwill",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:Goodwill",
+      "value": 15910,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 11,
+      "label": "Intangible assets, net",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:IntangibleAssetsNetExcludingGoodwill",
+      "value": 27808,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 12,
+      "label": "Other non-current assets",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:OtherAssetsNoncurrent",
+      "value": 3413,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 13,
+      "label": "Other assets, net",
+      "section": "Assets",
+      "concept": null,
+      "value": 3175,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 14,
+      "label": "Total assets",
+      "section": "Assets",
+      "concept": "us-gaap:Assets",
+      "value": 80919,
+      "kind": "total",
+      "sums": [
+        6,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "idx": 15,
+      "label": "Current liabilities:",
+      "section": "CurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 16,
+      "label": "Accounts payable",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:AccountsPayableCurrent",
+      "value": 174,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 17,
+      "label": "Accrued compensation",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:EmployeeRelatedLiabilitiesCurrent",
+      "value": 821,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 18,
+      "label": "Accrued liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:AccruedLiabilitiesCurrent",
+      "value": 1840,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 19,
+      "label": "Current portion of long-term debt",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:LongTermDebtCurrent",
+      "value": 2999,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 20,
+      "label": "Other current liabilities, net",
+      "section": "CurrentLiabilities",
+      "concept": null,
+      "value": 8676,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 21,
+      "label": "Total current liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:LiabilitiesCurrent",
+      "value": 14510,
+      "kind": "subtotal",
+      "sums": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "idx": 22,
+      "label": "Non-current liabilities:",
+      "section": "NoncurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 23,
+      "label": "Long-term debt",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:LongTermDebtNoncurrent",
+      "value": 21071,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 24,
+      "label": "Deferred income taxes",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:DeferredIncomeTaxLiabilitiesNet",
+      "value": 5237,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 25,
+      "label": "Other non-current liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:OtherLiabilitiesNoncurrent",
+      "value": 3891,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 26,
+      "label": "Total liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:Liabilities",
+      "value": 44709,
+      "kind": "subtotal",
+      "sums": [
+        21,
+        23,
+        24,
+        25
+      ]
+    },
+    {
+      "idx": 27,
+      "label": "Stockholders' equity:",
+      "section": "Equity",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 28,
+      "label": "Additional paid-in capital",
+      "section": "Equity",
+      "concept": "us-gaap:AdditionalPaidInCapital",
+      "value": 16721,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 29,
+      "label": "Retained earnings",
+      "section": "Equity",
+      "concept": "us-gaap:RetainedEarningsAccumulatedDeficit",
+      "value": 14088,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 30,
+      "label": "Accumulated other comprehensive income loss available for sale securities adjustment, net of tax",
+      "section": "Equity",
+      "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossAvailableForSaleSecuritiesAdjustmentNetOfTax",
+      "value": 3,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 31,
+      "label": "Accumulated other comprehensive income loss defined benefit pension and other postretirement plans, net of tax",
+      "section": "Equity",
+      "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossDefinedBenefitPensionAndOtherPostretirementPlansNetOfTax",
+      "value": -196,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 32,
+      "label": "Aoci loss cash flow hedge cumulative gain loss after tax",
+      "section": "Equity",
+      "concept": "us-gaap:AociLossCashFlowHedgeCumulativeGainLossAfterTax",
+      "value": -291,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 33,
+      "label": "Accumulated other comprehensive income loss foreign currency translation adjustment, net of tax",
+      "section": "Equity",
+      "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossForeignCurrencyTranslationAdjustmentNetOfTax",
+      "value": 838,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 34,
+      "label": "Accumulated other comprehensive income (loss)",
+      "section": "Equity",
+      "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax",
+      "value": 354,
+      "kind": "subtotal",
+      "sums": [
+        30,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "idx": 35,
+      "label": "Other equity, net",
+      "section": "Equity",
+      "concept": null,
+      "value": 5047,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 36,
+      "label": "Total equity",
+      "section": "Equity",
+      "concept": "us-gaap:StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+      "value": 36210,
+      "kind": "subtotal",
+      "sums": [
+        28,
+        29,
+        34,
+        35
+      ]
+    },
+    {
+      "idx": 37,
+      "label": "Total liabilities and stockholders' equity",
+      "section": "LiabilitiesAndEquity",
+      "concept": "us-gaap:LiabilitiesAndStockholdersEquity",
+      "value": 80919,
+      "kind": "total",
+      "sums": [
+        26,
+        36
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "us-gaap:Assets",
+      "rhs": [
+        "us-gaap:LiabilitiesAndStockholdersEquity"
+      ],
+      "name": "accounting_equation"
+    }
+  ],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
+}

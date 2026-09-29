@@ -1,0 +1,395 @@
+{
+  "company": "Target Corporation",
+  "ticker": "TGT",
+  "cik": "0000027419",
+  "statement_type": "BalanceSheet",
+  "fiscal_year": 2016,
+  "period": "2017-01-28",
+  "unit": "USD millions",
+  "currency": "USD",
+  "framework": "us-gaap",
+  "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Current assets:",
+      "section": "CurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Cash, cash equivalents and short-term investments",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:CashCashEquivalentsAndShortTermInvestments",
+      "value": 2512,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Inventories",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:InventoryNet",
+      "value": 8309,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Assets of discontinued operations",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:AssetsOfDisposalGroupIncludingDiscontinuedOperationCurrent",
+      "value": 69,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Other current assets",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:OtherAssetsCurrent",
+      "value": 1100,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 5,
+      "label": "Total current assets",
+      "section": "CurrentAssets",
+      "concept": "us-gaap:AssetsCurrent",
+      "value": 11990,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "idx": 6,
+      "label": "Non-current assets:",
+      "section": "NoncurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 7,
+      "label": "Land",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:Land",
+      "value": 6106,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 8,
+      "label": "Buildings and improvements gross",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:BuildingsAndImprovementsGross",
+      "value": 27611,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 9,
+      "label": "Furniture and fixtures gross",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:FurnitureAndFixturesGross",
+      "value": 5503,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 10,
+      "label": "Capitalized computer software gross",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:CapitalizedComputerSoftwareGross",
+      "value": 2651,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 11,
+      "label": "Construction in progress gross",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:ConstructionInProgressGross",
+      "value": 200,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 12,
+      "label": "Accumulated depreciation depletion and amortization property plant and equipment",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:AccumulatedDepreciationDepletionAndAmortizationPropertyPlantAndEquipment",
+      "value": -17413,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 13,
+      "label": "Non-current assets of discontinued operations",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:DisposalGroupIncludingDiscontinuedOperationAssetsNoncurrent",
+      "value": 12,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 14,
+      "label": "Other non-current assets",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:OtherAssetsNoncurrent",
+      "value": 771,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 15,
+      "label": "Property, plant and equipment, net",
+      "section": "NoncurrentAssets",
+      "concept": "us-gaap:PropertyPlantAndEquipmentNet",
+      "value": 24658,
+      "kind": "subtotal",
+      "sums": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "idx": 16,
+      "label": "Total assets",
+      "section": "Assets",
+      "concept": "us-gaap:Assets",
+      "value": 37431,
+      "kind": "total",
+      "sums": [
+        5,
+        15,
+        13,
+        14
+      ]
+    },
+    {
+      "idx": 17,
+      "label": "Current liabilities:",
+      "section": "CurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 18,
+      "label": "Accounts payable",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:AccountsPayableCurrent",
+      "value": 7252,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 19,
+      "label": "Accrued liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:AccruedLiabilitiesCurrent",
+      "value": 3737,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 20,
+      "label": "Long term debt and capital lease obligations",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:LongTermDebtAndCapitalLeaseObligationsCurrent",
+      "value": 1718,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 21,
+      "label": "Liabilities of discontinued operations",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:LiabilitiesOfDisposalGroupIncludingDiscontinuedOperationCurrent",
+      "value": 1,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 22,
+      "label": "Total current liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "us-gaap:LiabilitiesCurrent",
+      "value": 12708,
+      "kind": "subtotal",
+      "sums": [
+        18,
+        19,
+        20,
+        21
+      ]
+    },
+    {
+      "idx": 23,
+      "label": "Non-current liabilities:",
+      "section": "NoncurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 24,
+      "label": "Long-term debt, including capital leases",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:LongTermDebtAndCapitalLeaseObligations",
+      "value": 11031,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 25,
+      "label": "Deferred income taxes",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:DeferredTaxLiabilitiesNoncurrent",
+      "value": 861,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 26,
+      "label": "Non-current liabilities of discontinued operations",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:LiabilitiesOfDisposalGroupIncludingDiscontinuedOperationNoncurrent",
+      "value": 18,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 27,
+      "label": "Other non-current liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "us-gaap:OtherLiabilitiesNoncurrent",
+      "value": 1860,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 28,
+      "label": "Stockholders' equity:",
+      "section": "Equity",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 29,
+      "label": "Common stock",
+      "section": "Equity",
+      "concept": "us-gaap:CommonStockValue",
+      "value": 46,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 30,
+      "label": "Additional paid in capital common stock",
+      "section": "Equity",
+      "concept": "us-gaap:AdditionalPaidInCapitalCommonStock",
+      "value": 5661,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 31,
+      "label": "Retained earnings",
+      "section": "Equity",
+      "concept": "us-gaap:RetainedEarningsAccumulatedDeficit",
+      "value": 5884,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 32,
+      "label": "Accumulated other comprehensive income loss defined benefit pension and other postretirement plans, net of tax",
+      "section": "Equity",
+      "concept": "us-gaap:AccumulatedOtherComprehensiveIncomeLossDefinedBenefitPensionAndOtherPostretirementPlansNetOfTax",
+      "value": -601,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 33,
+      "label": "Other equity, net",
+      "section": "Equity",
+      "concept": null,
+      "value": -37,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 34,
+      "label": "Total stockholders' equity",
+      "section": "Equity",
+      "concept": "us-gaap:StockholdersEquity",
+      "value": 10953,
+      "kind": "subtotal",
+      "sums": [
+        29,
+        30,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "idx": 35,
+      "label": "Total non-current liabilities",
+      "section": "LiabilitiesAndEquity",
+      "concept": "us-gaap:LiabilitiesNoncurrent",
+      "value": 13770,
+      "kind": "subtotal",
+      "sums": [
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "idx": 36,
+      "label": "Total liabilities and stockholders' equity",
+      "section": "LiabilitiesAndEquity",
+      "concept": "us-gaap:LiabilitiesAndStockholdersEquity",
+      "value": 37431,
+      "kind": "total",
+      "sums": [
+        22,
+        35,
+        34
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "us-gaap:Assets",
+      "rhs": [
+        "us-gaap:LiabilitiesAndStockholdersEquity"
+      ],
+      "name": "accounting_equation"
+    }
+  ],
+  "normalization": {
+    "version": 2,
+    "notes": [
+      "re-sectioned lines filed directly under LiabilitiesAndStockholdersEquity"
+    ]
+  }
+}

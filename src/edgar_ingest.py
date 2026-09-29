@@ -21,6 +21,10 @@ def get_company_facts(cik: str, refresh: bool = False) -> dict:
     path = os.path.join(CACHE, f"companyfacts_CIK{padded}.json")
     if os.path.exists(path) and not refresh:
         return json.load(open(path))
+    # committed snapshot (scripts/fetch_raw.py), for builds without SEC access
+    snap = os.path.join(os.path.dirname(CACHE), "raw_snapshot", f"companyfacts_CIK{padded}.json")
+    if os.path.exists(snap) and not refresh:
+        return json.load(open(snap))
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{padded}.json"
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     data = json.loads(urllib.request.urlopen(req, timeout=60).read())
@@ -38,23 +42,35 @@ def _days(f):
         return None
 
 
-def concept_value(facts: dict, concept: str, fiscal_year: int, unit: str = "USD", duration: bool = False):
+def _presentation_unit(node):
+    """IFRS filers report in their own currency: take the unit with most annual facts."""
+    units = node.get("units", {})
+    return max(units, key=lambda u: len(units[u])) if units else None
+
+
+def concept_value(facts: dict, concept: str, fiscal_year: int, unit: str = "USD", duration: bool = False,
+                  forms=("10-K",)):
     """
-    Return the 10-K value for a us-gaap concept in a fiscal year, or None.
-      duration=False  -> instant facts (balance sheet): take FY 10-K fact ending latest.
+    Return the annual-report value for a concept in a fiscal year, or None.
+      concept   'us-gaap:Assets' or 'ifrs-full:Assets' (no prefix = us-gaap)
+      unit      currency unit; None = the filer's presentation currency
+      forms     annual forms to accept: ('10-K',) for US GAAP, ('20-F', '40-F') for IFRS
+      duration=False  -> instant facts (balance sheet): take FY fact ending latest.
       duration=True   -> period facts (income stmt / cash flow): take the ANNUAL fact
                          (period span ~1 year), not a quarter/YTD.
     """
-    name = concept.replace("us-gaap:", "")
-    node = facts.get("facts", {}).get("us-gaap", {}).get(name)
+    ns, name = concept.split(":", 1) if ":" in concept else ("us-gaap", concept)
+    node = facts.get("facts", {}).get(ns, {}).get(name)
     if not node:
         return None
+    if unit is None:
+        unit = _presentation_unit(node)
     cands = []
     for u, flist in node.get("units", {}).items():
         if unit and u != unit:
             continue
         for f in flist:
-            if not f.get("form", "").startswith("10-K"):
+            if not f.get("form", "").startswith(tuple(forms)):
                 continue
             if f.get("fy") == fiscal_year and f.get("fp") == "FY":
                 if duration and "start" not in f:
@@ -69,7 +85,7 @@ def concept_value(facts: dict, concept: str, fiscal_year: int, unit: str = "USD"
             if unit and u != unit:
                 continue
             for f in flist:
-                if f.get("form", "").startswith("10-K") and str(f.get("end", "")).startswith(str(fiscal_year)):
+                if f.get("form", "").startswith(tuple(forms)) and str(f.get("end", "")).startswith(str(fiscal_year)):
                     if duration and (("start" not in f) or (_days(f) or 0) < 330 or (_days(f) or 999) > 380):
                         continue
                     cands.append(f)
@@ -77,7 +93,7 @@ def concept_value(facts: dict, concept: str, fiscal_year: int, unit: str = "USD"
         return None
     best = max(cands, key=lambda f: (f.get("end", ""), _days(f) or 0))
     return {"value": best["val"], "end": best["end"], "start": best.get("start"),
-            "accn": best.get("accn"), "form": best.get("form")}
+            "accn": best.get("accn"), "form": best.get("form"), "unit": unit}
 
 
 def company_meta(facts: dict) -> dict:

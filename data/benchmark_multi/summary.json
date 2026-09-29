@@ -1,0 +1,43 @@
+{
+  "split": "multi-error (US GAAP)",
+  "items": 9945,
+  "controls": 1989,
+  "n_errors_distribution": {
+    "0": 1989,
+    "1": 1725,
+    "2": 3301,
+    "3": 2930
+  },
+  "errors_total": 17117,
+  "citable_errors": 7481,
+  "items_with_2plus_citable": 1451,
+  "rule_breakdown": {
+    "R01": 397,
+    "R02": 406,
+    "R03": 205,
+    "R04": 3525,
+    "R05": 3510,
+    "R06": 1783,
+    "R07": 303,
+    "R08": 1110,
+    "R09": 1240,
+    "R10": 163,
+    "R11": 327,
+    "R12": 515,
+    "R14": 382,
+    "R15": 118,
+    "R16": 1476,
+    "R17": 420,
+    "R18": 377,
+    "R19": 225,
+    "R20": 121,
+    "R21": 514
+  },
+  "error_type_breakdown": {
+    "Redundant Row": 1783,
+    "Numerical Error": 7827,
+    "Misclassification": 3982,
+    "Missing Row": 3525
+  },
+  "forms": 5
+}

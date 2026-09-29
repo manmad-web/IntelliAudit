@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.join(ROOT, "src")); sys.path.insert(0, HERE)
 import pipeline_citation as pc
 from adapter import iab_to_item
 RECORDS = os.path.join(ROOT, "data", "benchmark", "records.jsonl")
-LABEL_LEAKING_RULES = {"R03", "R09", "R10", "R11"}   # recognition/measurement → subject
+LABEL_LEAKING_RULES = {"R09", "R10", "R11", "R14", "R15", "R17", "R18", "R19", "R20", "R21"}   # subject clause
 
 
 def norm(x):
@@ -43,9 +43,12 @@ def norm(x):
 
 
 def main():
-    recs = [json.loads(l) for l in open(RECORDS)]
+    from jsonl import open_text
+    recs = [json.loads(l) for l in open_text(RECORDS)]
     agg = collections.Counter(); n = 0
     for r in recs:
+        if not r["ground_truth_citations"].get("citable"):
+            continue            # detection-only rows and clean controls have no citation
         item = iab_to_item(r); concept, stype = item["gold_concept"], item["statement_type"]
         gt = norm(r["ground_truth_citations"]["asc_full"].replace("ASC ", ""))
 

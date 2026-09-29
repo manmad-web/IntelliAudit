@@ -1,62 +1,47 @@
 #!/usr/bin/env python3
 """
-Produce example prediction files (for scripts/score_predictions.py). Two systems:
+Exam-only reference baselines for scripts/score_predictions.py.
 
-  results/pred_conceptonly.jsonl  — Stage-1 single pick (best_topic), assumes a
-      perfect concept map. Honest baseline: topic-only, never abstains.
+Every prediction here is computed from data/benchmark/exam.jsonl alone. The
+answer key is never opened. (The v0.3 version of this script read the answer
+key — see results/legacy_v0.3/README.md.)
 
-  results/pred_stage0mapper.jsonl — RECONSTRUCTION of the blind Stage-0 + rulebook
-      mapper: fires only on arithmetically-detectable errors, maps to a rule via
-      table predicates, abstains otherwise. Emulates the real pipeline's decision
-      WITHOUT reading rule_id/citation as the prediction. (A truly blind run must
-      execute the real Stage 0 on exam.jsonl; this reproduces its numbers.)
+  results/pred_presentation_prior.jsonl
+      Always "Incorrect"; cites the presentation paragraph most people would
+      reach for first given only the statement type (210-10-45-1 / 606-10-25-23
+      / 230-10-45-13). A floor: what knowing the statement type is worth.
 
-Both write {sample_id, predicted_asc, predicted_error_type, predicted_row}.
+  results/pred_identifiability_solver.jsonl
+      scripts/identifiability_check.py's hand-written US-GAAP rule system. A
+      ceiling for deterministic rules written by the benchmark's own authors;
+      NOT a result for any pipeline.
+
+Output rows: {exam_id, predicted_judgement, predicted_asc (null = abstain)}.
 """
 import json, os, sys
+
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
-sys.path.insert(0, os.path.join(ROOT, "integration"))
-import pipeline_citation as pc
+sys.path.insert(0, HERE)
+from identifiability_check import solve  # noqa: E402
 
-recs = [json.loads(l) for l in open(os.path.join(ROOT, "data", "benchmark", "records.jsonl"))]
+exam = [json.loads(l) for l in open(os.path.join(ROOT, "data", "benchmark", "exam.jsonl"))]
+PRIOR = {"BalanceSheet": "ASC 210-10-45-1", "IncomeStatement": "ASC 606-10-25-23", "CashFlow": "ASC 230-10-45-13"}
+
+
+def prior(e):
+    return {"exam_id": e["exam_id"], "predicted_judgement": "Incorrect",
+            "predicted_asc": PRIOR[e["metadata"]["statement_type"]]}
+
+
+def solver(e):
+    asc = solve(e)
+    return {"exam_id": e["exam_id"], "predicted_judgement": "Incorrect" if asc else None,
+            "predicted_asc": asc}
+
+
 os.makedirs(os.path.join(ROOT, "results"), exist_ok=True)
-STMT = {"BalanceSheet": "balance_sheet", "IncomeStatement": "income_statement", "CashFlow": "cash_flow"}
-PRES = {"balance_sheet": "ASC 210-10-45-1", "income_statement": "ASC 220-10-45", "cash_flow": "ASC 230-10-45"}
-
-
-def conceptonly(r):
-    c = r["error_identification"]["affected_xbrl_concept"]; st = STMT[r["metadata"]["statement_type"]]
-    topic = pc.best_topic(c, st)
-    return {"sample_id": r["sample_id"], "predicted_asc": f"ASC {pc.topic_of(topic)}" if topic else None}
-
-
-def stage0mapper(r):
-    """Emulate Stage 0 detect + rulebook mapper (no rule_id/citation read as the answer)."""
-    et = r["error_type"]; concept = r["error_identification"]["affected_xbrl_concept"] or ""
-    st = STMT[r["metadata"]["statement_type"]]; op = r["injection_detail"].get("op", "")
-    detectable = r["self_check"]["error_breaks_reconciliation"]
-    # Stage 0 only fires on arithmetic types; abstains on classification/redundant/sign
-    if et not in ("Missing Row", "Numerical Error") or op == "flip_sign" or not detectable:
-        return {"sample_id": r["sample_id"], "predicted_asc": None, "predicted_error_type": None, "predicted_row": None}
-    # map fired error -> a rulebook rule via predicates
-    if et == "Missing Row":
-        asc = PRES[st]
-    elif "identity" in r.get("rule_id", "") or (st == "balance_sheet" and "Retained" in concept):
-        asc = "ASC 210-10-45-1"        # identity break
-    elif "Revenue" in concept:
-        asc = "ASC 606-10-25-1"
-    elif "Inventory" in concept:
-        asc = "ASC 330-10-35-1B"
-    else:
-        asc = PRES[st]
-    return {"sample_id": r["sample_id"], "predicted_asc": asc,
-            "predicted_error_type": et, "predicted_row": r["error_identification"].get("problematic_entry")}
-
-
-for name, fn in [("pred_conceptonly.jsonl", conceptonly), ("pred_stage0mapper.jsonl", stage0mapper)]:
-    out = os.path.join(ROOT, "results", name)
-    with open(out, "w") as f:
-        for r in recs:
-            f.write(json.dumps(fn(r)) + "\n")
-    fired = sum(1 for r in recs if fn(r).get("predicted_asc"))
-    print(f"  {name:<28} {len(recs)} preds, {fired} fired")
+for name, fn in [("pred_presentation_prior.jsonl", prior), ("pred_identifiability_solver.jsonl", solver)]:
+    with open(os.path.join(ROOT, "results", name), "w") as f:
+        for e in exam:
+            f.write(json.dumps(fn(e)) + "\n")
+    print(f"  results/{name}: {len(exam)} rows")

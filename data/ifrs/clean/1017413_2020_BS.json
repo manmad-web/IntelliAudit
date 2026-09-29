@@ -1,0 +1,341 @@
+{
+  "company": "CANADIAN NATURAL RESOURCES LIMITED",
+  "ticker": "CNQ",
+  "cik": "0001017413",
+  "statement_type": "BalanceSheet",
+  "fiscal_year": 2020,
+  "period": "2020-12-31",
+  "unit": "CAD millions",
+  "currency": "CAD",
+  "framework": "ifrs",
+  "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 40-F)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Current assets:",
+      "section": "CurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Cash and cash equivalents",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CashAndCashEquivalents",
+      "value": 184,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Current trade receivables",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentTradeReceivables",
+      "value": 2190,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Current tax assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentTaxAssetsCurrent",
+      "value": 309,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Inventories",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:Inventories",
+      "value": 1060,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 5,
+      "label": "Current prepayments and other assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentPrepaymentsAndOtherCurrentAssets",
+      "value": 231,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 6,
+      "label": "Current investments",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentInvestments",
+      "value": 305,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 7,
+      "label": "Other assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:OtherCurrentAssets",
+      "value": 82,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 8,
+      "label": "Total current assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentAssets",
+      "value": 4361,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "idx": 9,
+      "label": "Non-current assets:",
+      "section": "NoncurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 10,
+      "label": "Assets arising from exploration for and evaluation of mineral resources",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:AssetsArisingFromExplorationForAndEvaluationOfMineralResources",
+      "value": 2436,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 11,
+      "label": "Property, plant and equipment",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:PropertyPlantAndEquipment",
+      "value": 65752,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 12,
+      "label": "Right-of-use assets",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:RightofuseAssets",
+      "value": 1645,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 13,
+      "label": "Other assets",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:OtherNoncurrentAssets",
+      "value": 1082,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 14,
+      "label": "Total assets",
+      "section": "Assets",
+      "concept": "ifrs-full:Assets",
+      "value": 75276,
+      "kind": "total",
+      "sums": [
+        8,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "idx": 15,
+      "label": "Current liabilities:",
+      "section": "CurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 16,
+      "label": "Trade and other payables to trade suppliers",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:TradeAndOtherCurrentPayablesToTradeSuppliers",
+      "value": 667,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 17,
+      "label": "Accruals classified as",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:AccrualsClassifiedAsCurrent",
+      "value": 2346,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 18,
+      "label": "Current borrowings and portion of borrowings",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentBorrowingsAndCurrentPortionOfNoncurrentBorrowings",
+      "value": 1343,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 19,
+      "label": "Other liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:OtherCurrentLiabilities",
+      "value": 722,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 20,
+      "label": "Total current liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentLiabilities",
+      "value": 5078,
+      "kind": "subtotal",
+      "sums": [
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "idx": 21,
+      "label": "Non-current liabilities:",
+      "section": "NoncurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 22,
+      "label": "Longterm borrowings",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:LongtermBorrowings",
+      "value": 20110,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 23,
+      "label": "Other liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:OtherNoncurrentLiabilities",
+      "value": 7564,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 24,
+      "label": "Deferred tax liability asset",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:DeferredTaxLiabilityAsset",
+      "value": 10144,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 25,
+      "label": "Total liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:Liabilities",
+      "value": 42896,
+      "kind": "subtotal",
+      "sums": [
+        20,
+        22,
+        23,
+        24
+      ]
+    },
+    {
+      "idx": 26,
+      "label": "Stockholders' equity:",
+      "section": "Equity",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 27,
+      "label": "Issued capital",
+      "section": "Equity",
+      "concept": "ifrs-full:IssuedCapital",
+      "value": 9606,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 28,
+      "label": "Retained earnings",
+      "section": "Equity",
+      "concept": "ifrs-full:RetainedEarnings",
+      "value": 22766,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 29,
+      "label": "Accumulated other comprehensive income",
+      "section": "Equity",
+      "concept": "ifrs-full:AccumulatedOtherComprehensiveIncome",
+      "value": 8,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 30,
+      "label": "Total equity",
+      "section": "Equity",
+      "concept": "ifrs-full:Equity",
+      "value": 32380,
+      "kind": "subtotal",
+      "sums": [
+        27,
+        28,
+        29
+      ]
+    },
+    {
+      "idx": 31,
+      "label": "Total equity and liabilities",
+      "section": "LiabilitiesAndEquity",
+      "concept": "ifrs-full:EquityAndLiabilities",
+      "value": 75276,
+      "kind": "total",
+      "sums": [
+        25,
+        30
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "ifrs-full:Assets",
+      "rhs": [
+        "ifrs-full:EquityAndLiabilities"
+      ],
+      "name": "accounting_equation"
+    }
+  ],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
+}

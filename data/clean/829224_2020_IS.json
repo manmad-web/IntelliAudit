@@ -1,0 +1,112 @@
+{
+  "company": "Starbucks Corporation",
+  "ticker": "SBUX",
+  "cik": "0000829224",
+  "statement_type": "IncomeStatement",
+  "fiscal_year": 2020,
+  "period": "2020-09-27",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:Revenues",
+      "value": 23518,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 1,
+      "label": "Selling, general and administrative",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:SellingGeneralAndAdministrativeExpense",
+      "value": -1680,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Other operating expenses, net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -20276,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 3,
+      "label": "Operating income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:OperatingIncomeLoss",
+      "value": 1562,
+      "kind": "subtotal",
+      "sums": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "idx": 4,
+      "label": "Other income (expense), net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -398,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 5,
+      "label": "Income before income taxes",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+      "value": 1164,
+      "kind": "subtotal",
+      "sums": [
+        3,
+        4
+      ]
+    },
+    {
+      "idx": 6,
+      "label": "Income tax (expense) benefit",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeTaxExpenseBenefit",
+      "value": -240,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 7,
+      "label": "Other items, net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": 4,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 8,
+      "label": "Net income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 928,
+      "kind": "total",
+      "sums": [
+        5,
+        6,
+        7
+      ]
+    }
+  ],
+  "identities": [],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
+}

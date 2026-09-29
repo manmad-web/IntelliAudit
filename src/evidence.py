@@ -1,96 +1,354 @@
 #!/usr/bin/env python3
 """
-Exam-visible supporting facts for rules that are not identifiable from the
-table + ordinary transactions alone.
+Supporting facts: the period-end review data an auditor would hold.
 
-Attached on the exam (appended to transaction evidence). Never prints the
-clean/original line total. Never names an ASC paragraph — that would leak
-the answer key.
+v0.3 attached a "Supporting facts" line ONLY to R09/R10/R11/R14 records, each
+with a fixed phrase ("net realizable value is", "implied fair value of
+goodwill", "Classification indicated by these tests", "performance obligation
+unsatisfied"). An exam-only script that maps phrase -> paragraph and never
+reads a number scored 455/492 (92.5%) on citation, and "facts present" alone
+separated injected records from clean ones.
+
+v0.4 is contrastive:
+  * Every statement (clean controls included) gets CONSISTENT facts for a
+    random half of its fact-bearing lines. A fact's presence says nothing.
+  * The injected record's fact has exactly the same template as a consistent
+    one. Only the numbers differ, so a system has to compare the fact with the
+    statement (NRV vs carrying amount, fair value vs carrying amount, ...).
+  * Decoys include the look-alike cases that are NOT violations under US GAAP
+    (PP&E recoverable on undiscounted flows even though fair value is lower;
+    a covenant breach waived for more than a year).
+  * Two phrasings per fact kind.
+
+Facts never print an ASC code, and never state the conclusion.
 """
+import random
+
+KIND_BY_CONCEPT = {
+    "us-gaap:InventoryNet": "inventory",
+    "us-gaap:Goodwill": "goodwill",
+    "us-gaap:AvailableForSaleSecuritiesCurrent": "securities",
+    "us-gaap:AvailableForSaleSecuritiesNoncurrent": "securities",
+    "us-gaap:AvailableForSaleSecuritiesDebtSecuritiesCurrent": "securities",
+    "us-gaap:AvailableForSaleSecuritiesDebtSecuritiesNoncurrent": "securities",
+    "us-gaap:MarketableSecuritiesCurrent": "securities",
+    "us-gaap:MarketableSecuritiesNoncurrent": "securities",
+    "us-gaap:OperatingLeaseRightOfUseAsset": "lease",
+    "us-gaap:FinanceLeaseRightOfUseAsset": "lease",
+    "us-gaap:OperatingLeaseLiabilityNoncurrent": "lease",
+    "us-gaap:FinanceLeaseLiabilityNoncurrent": "lease",
+    "us-gaap:OperatingLeaseLiabilityCurrent": "lease",
+    "us-gaap:FinanceLeaseLiabilityCurrent": "lease",
+    "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax": "revenue",
+    "us-gaap:Revenues": "revenue",
+    "us-gaap:AccountsReceivableNetCurrent": "receivable",
+    "us-gaap:ReceivablesNetCurrent": "receivable",
+    "us-gaap:PropertyPlantAndEquipmentNet": "ppe",
+    "us-gaap:LongTermDebtNoncurrent": "debt",
+    "us-gaap:DeferredIncomeTaxAssetsNet": "dta",
+    "us-gaap:DeferredTaxAssetsNetNoncurrent": "dta",
+    "us-gaap:ResearchAndDevelopmentExpense": "rnd",
+    # IFRS edition: only kinds whose facts read the same under IFRS. Goodwill,
+    # PP&E, DTA, debt and R&D facts are US-GAAP-worded (reporting-unit fair
+    # value, undiscounted flows, valuation allowance, waiver timing, 730) and
+    # need IFRS templates first (rulebook_ifrs.json status needs-ifrs-facts).
+    "ifrs-full:Inventories": "inventory",
+    "ifrs-full:Goodwill": "ifrs_goodwill",
+    "ifrs-full:PropertyPlantAndEquipment": "ifrs_ppe",
+    "ifrs-full:CurrentFinancialAssetsAtFairValueThroughOtherComprehensiveIncome": "securities",
+    "ifrs-full:NoncurrentFinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome": "securities",
+    "ifrs-full:TradeAndOtherCurrentReceivables": "receivable",
+    "ifrs-full:CurrentTradeReceivables": "receivable",
+    "ifrs-full:Revenue": "revenue",
+    "ifrs-full:RevenueFromContractsWithCustomers": "revenue",
+}
+
+P_DECOY = 0.5
 
 
-def _not_orig(n, *banned):
-    """Choose a positive integer that is not any of the banned (clean) amounts."""
-    n = int(n)
-    banned = {int(x) for x in banned if x is not None}
-    if n > 0 and n not in banned:
-        return n
-    for bump in (1, 2, 3, 5, 7, 11, 13, 17, 19, 23):
-        for cand in (n - bump, n + bump, abs(n) // 2 - bump):
-            if cand > 0 and cand not in banned:
-                return cand
-    return 1
+def _pct(rng, lo, hi):
+    return rng.uniform(lo, hi)
 
 
-def facts_for_exam(rule, clean, mod, meta, row_idx=None):
-    """Return extra exam text for this injection, or ''."""
-    rid = rule.get("rule_id") or ""
-    label = meta.get("row_label") or meta.get("relabelled_label") or "the affected line"
-    parts = []
+def _up(v, rng, lo, hi):
+    return v + max(1, int(round(abs(v) * _pct(rng, lo, hi))))
 
-    if rid.startswith("R09"):
-        orig = int(meta["original_value"])
-        err = int(meta["erroneous_value"])
-        unsatisfied = abs(err - orig)
-        if unsatisfied <= 0:
-            return ""
-        parts.append(
-            f"Supporting facts — {label}: as of period-end, {unsatisfied:,} of the "
-            f"amount recognized on this line relates to goods and services for which "
-            f"the customer has not obtained control (performance obligation unsatisfied)."
-        )
 
-    elif rid.startswith("R11"):
-        orig = int(meta["original_value"])
-        err = int(meta["erroneous_value"])
-        nrv = orig - max(1, abs(orig) // 20)
-        nrv = _not_orig(nrv, orig, err)
-        if nrv >= err:
-            nrv = _not_orig(err - 1, orig, err)
-        parts.append(
-            f"Supporting facts — {label}: net realizable value is {nrv:,}. "
-            f"No lower-of-cost-or-NRV write-down was recorded."
-        )
+# ---------------------------------------------------------------- templates --
+def _inventory(L, c, n, rng):
+    return rng.choice([
+        f"{L}: lower-of-cost-and-net-realizable-value review at period-end — carrying amount "
+        f"{c:,}; estimated net realizable value {n:,}.",
+        f"{L}: period-end valuation memo — inventories at cost {c:,}; estimated selling prices "
+        f"less costs of completion, disposal and transportation {n:,}.",
+    ])
 
-    elif rid.startswith("R14"):
-        orig = int(meta["original_value"])
-        err = int(meta["erroneous_value"])
-        implied = orig - max(1, abs(orig) // 10)
-        implied = _not_orig(implied, orig, err)
-        if implied >= err:
-            implied = _not_orig(err - 1, orig, err)
-        parts.append(
-            f"Supporting facts — {label}: a triggering event occurred during the period "
-            f"(the reporting unit's fair value fell below its carrying amount). "
-            f"The implied fair value of goodwill is {implied:,}. No impairment loss "
-            f"was recognised."
-        )
 
-    elif rid.startswith("R10"):
-        old = meta.get("row_concept") or ""
-        indicated = "operating" if "Operating" in old else "finance" if "Finance" in old else "operating"
-        parts.append(
-            f"Supporting facts — {label}: the contract does not transfer ownership, "
-            f"has no bargain purchase option, the term is not for the major part of "
-            f"remaining economic life, and the present value of lease payments is not "
-            f"substantially all of fair value. Classification indicated by these tests "
-            f"is {indicated}."
-        )
+def _goodwill(L, ca, fv, rng):
+    return rng.choice([
+        f"{L}: annual impairment test of the reporting unit to which this goodwill is assigned — "
+        f"carrying amount of the reporting unit including goodwill {ca:,}; fair value of the "
+        f"reporting unit {fv:,}.",
+        f"{L}: impairment test at the annual testing date — reporting unit fair value {fv:,}; "
+        f"reporting unit carrying amount {ca:,} (includes the goodwill shown).",
+    ])
 
-    elif rid.startswith("R06"):
-        val = int(meta.get("fabricated_value") or 0)
-        idx = meta.get("post_inject_row", row_idx)
-        if idx is None:
-            idx = "?"
-        if val > 0:
-            debit = max(1, val // 5)
-            credit = val + debit
-            parts.append(
-                f"[row {idx}] {label}: posting to this caption: +{credit:,} (increase); "
-                f"reclass out of this caption: −{debit:,} (decrease)"
-            )
 
-    text = "\n".join(parts)
-    if "ASC" in text or "606-" in text or "330-" in text:
+def _securities(L, ac, fv, rng):
+    return rng.choice([
+        f"{L}: debt securities classified as available-for-sale — amortized cost {ac:,}; "
+        f"fair value at period-end (quoted and observable market prices) {fv:,}.",
+        f"{L}: available-for-sale debt portfolio at period-end — fair value {fv:,}; "
+        f"amortized cost basis {ac:,}.",
+    ])
+
+
+def _lease_tests(kind, rng):
+    if kind == "operating":
+        return "no", "no", int(_pct(rng, 18, 68)), int(_pct(rng, 30, 84)), "no"
+    if rng.random() < 0.3:
+        return "yes", "no", int(_pct(rng, 40, 70)), int(_pct(rng, 60, 85)), "no"
+    if rng.random() < 0.5:
+        return "no", "no", int(_pct(rng, 78, 96)), int(_pct(rng, 60, 88)), "no"
+    return "no", "no", int(_pct(rng, 40, 70)), int(_pct(rng, 91, 99)), "no"
+
+
+def _lease(L, tests, rng):
+    own, opt, t, p, spec = tests
+    return rng.choice([
+        f"{L}: classification tests for the underlying leases — ownership transfers to the "
+        f"lessee: {own}; purchase option reasonably certain to be exercised: {opt}; lease term "
+        f"as % of remaining economic life: {t}%; present value of lease payments as % of fair "
+        f"value of the underlying assets: {p}%; asset of a specialized nature: {spec}.",
+        f"{L}: lease classification worksheet — transfer of title at end of term: {own}; "
+        f"bargain/reasonably-certain purchase option: {opt}; term / economic life: {t}%; "
+        f"PV of payments / fair value: {p}%; specialized asset: {spec}.",
+    ])
+
+
+def _revenue(L, x, z, rng):
+    return rng.choice([
+        f"{L}: cut-off review — consideration billed or received during the period for "
+        f"performance obligations not yet satisfied at period-end {x:,}; of which recorded as "
+        f"contract liabilities (deferred revenue) {z:,}.",
+        f"{L}: period-end review of unsatisfied performance obligations — amounts invoiced for "
+        f"goods and services not yet transferred to customers {x:,}; amount carried in contract "
+        f"liabilities {z:,}.",
+    ])
+
+
+def _receivable(L, g, e, a, rng):
+    return rng.choice([
+        f"{L}: credit-loss review — gross receivables {g:,}; lifetime expected credit losses "
+        f"estimated at period-end {e:,}; allowance for credit losses recorded {a:,}.",
+        f"{L}: expected-credit-loss model output — amortized cost of receivables {g:,}; "
+        f"expected credit losses {e:,}; allowance on the books {a:,}.",
+    ])
+
+
+def _ppe(L, ca, ucf, fv, rng):
+    return rng.choice([
+        f"{L}: one asset group within this line was tested after a triggering event (sustained "
+        f"operating losses) — carrying amount of the asset group {ca:,}; sum of undiscounted "
+        f"future cash flows {ucf:,}; fair value of the asset group {fv:,}. No impairment loss "
+        f"was recorded.",
+        f"{L}: long-lived asset review (asset group with a triggering event) — carrying amount "
+        f"{ca:,}; undiscounted cash flows expected from use and disposal {ucf:,}; fair value "
+        f"{fv:,}. No impairment loss was recorded.",
+    ])
+
+
+def _ifrs_goodwill(L, ca, ra, rng):
+    return rng.choice([
+        f"{L}: annual impairment test of the cash-generating unit to which this goodwill is "
+        f"allocated — carrying amount of the CGU including goodwill {ca:,}; recoverable amount "
+        f"(higher of fair value less costs of disposal and value in use) {ra:,}.",
+        f"{L}: CGU impairment test — recoverable amount {ra:,}; carrying amount including the "
+        f"goodwill shown {ca:,}.",
+    ])
+
+
+def _ifrs_ppe(L, ca, viu, fvlcd, rng):
+    return rng.choice([
+        f"{L}: one cash-generating unit within this line showed an impairment indicator — "
+        f"carrying amount {ca:,}; value in use (discounted cash flows) {viu:,}; fair value less "
+        f"costs of disposal {fvlcd:,}. No impairment loss was recorded.",
+        f"{L}: impairment review of a CGU with an indicator — carrying amount {ca:,}; fair value "
+        f"less costs of disposal {fvlcd:,}; value in use {viu:,}. No impairment loss was recorded.",
+    ])
+
+
+def _debt(L, v, status, rng):
+    return rng.choice([
+        f"{L} ({v:,}): at period-end the entity {status} Under the credit agreement a covenant "
+        f"breach entitles the lenders to demand repayment.",
+        f"{L} ({v:,}): covenant compliance review — {status} A breach makes the facility "
+        f"callable by the lenders.",
+    ])
+
+
+_DEBT_OK = [
+    "was in compliance with all financial covenants.",
+    "breached the maximum leverage covenant; before the financial statements were issued the "
+    "lenders waived the breach and their right to demand repayment for a period of more than "
+    "twelve months from the balance-sheet date.",
+]
+_DEBT_BAD = [
+    "breached the maximum leverage covenant; no waiver has been obtained and the lenders may "
+    "demand repayment at any time.",
+    "breached the minimum interest-cover covenant; the lenders waived their right to demand "
+    "repayment for six months from the balance-sheet date only.",
+]
+
+
+def _dta(L, g, a, r, rng):
+    return rng.choice([
+        f"{L}: realizability assessment — gross deferred tax assets {g:,}; valuation allowance "
+        f"recorded {a:,}; amount management concludes is more likely than not to be realized "
+        f"{r:,}.",
+        f"{L}: deferred tax asset review — gross balance {g:,}; allowance on the books {a:,}; "
+        f"portion expected (more likely than not) to be realized {r:,}.",
+    ])
+
+
+def _rnd(L, total, exp, cap, rng):
+    return rng.choice([
+        f"{L}: research and development costs incurred in the period {total:,}; expensed "
+        f"{exp:,}; capitalized to the balance sheet as development costs {cap:,}.",
+        f"{L}: R&D cost analysis — total costs incurred {total:,}; charged to expense {exp:,}; "
+        f"deferred as capitalized development costs {cap:,}.",
+    ])
+
+
+# ---------------------------------------------------------- fact builders --
+def consistent_fact(kind, row, rng, label):
+    """A fact that agrees with the line as shown (no violation)."""
+    v = int(row["value"] or 0)
+    if kind == "inventory" and v > 0:
+        return _inventory(label, v, _up(v, rng, 0.04, 0.3), rng)
+    if kind == "goodwill" and v > 0:
+        ca = _up(v, rng, 0.5, 3.0)
+        return _goodwill(label, ca, _up(ca, rng, 0.05, 0.4), rng)
+    if kind == "securities" and v > 0:
+        ac = v + rng.choice([-1, 1]) * max(1, int(round(v * _pct(rng, 0.005, 0.06))))
+        return _securities(label, max(1, ac), v, rng)
+    if kind == "lease" and v:
+        cls = "finance" if "Finance" in (row.get("concept") or "") else "operating"
+        return _lease(label, _lease_tests(cls, rng), rng)
+    if kind == "revenue" and v > 0:
+        x = max(1, int(round(v * _pct(rng, 0.005, 0.04))))
+        return _revenue(label, x, x, rng)
+    if kind == "receivable" and v > 0:
+        e = max(1, int(round(v * _pct(rng, 0.005, 0.05))))
+        return _receivable(label, v + e, e, e, rng)
+    if kind == "ppe" and v > 0:
+        ca = max(2, int(round(v * _pct(rng, 0.05, 0.25))))
+        if rng.random() < 0.5:   # recoverable on undiscounted flows; fair value lower (no loss)
+            return _ppe(label, ca, _up(ca, rng, 0.05, 0.4), ca - max(1, int(round(ca * _pct(rng, 0.05, 0.3)))), rng)
+        return _ppe(label, ca, _up(ca, rng, 0.1, 0.6), _up(ca, rng, 0.02, 0.3), rng)
+    if kind == "debt" and v > 0:
+        return _debt(label, v, rng.choice(_DEBT_OK), rng)
+    if kind == "dta" and v > 0:
+        g = _up(v, rng, 0.05, 0.6)
+        return _dta(label, g, g - v, v, rng)
+    if kind == "rnd" and v < 0:
+        return _rnd(label, abs(v), abs(v), 0, rng)
+    if kind == "ifrs_goodwill" and v > 0:
+        ca = _up(v, rng, 0.5, 3.0)
+        return _ifrs_goodwill(label, ca, _up(ca, rng, 0.05, 0.4), rng)
+    if kind == "ifrs_ppe" and v > 0:
+        ca = max(2, int(round(v * _pct(rng, 0.05, 0.25))))
+        hi = _up(ca, rng, 0.02, 0.4)                  # recoverable amount above carrying amount
+        lo = ca - max(1, int(round(ca * _pct(rng, 0.05, 0.3))))
+        viu, fv = (hi, lo) if rng.random() < 0.5 else (lo, hi)
+        return _ifrs_ppe(label, ca, viu, fv, rng)
+    return None
+
+
+def violating_fact(kind, meta, row, rng, label):
+    """The fact for the injected record. Same template, contradicting numbers."""
+    orig, err = meta.get("original_value"), meta.get("erroneous_value")
+    if kind == "inventory":
+        return _inventory(label, err, orig, rng)
+    if kind == "goodwill":
+        d = err - orig
+        ca = _up(err, rng, 0.5, 3.0)
+        return _goodwill(label, ca, ca - d, rng)
+    if kind == "securities":
+        return _securities(label, err, orig, rng)
+    if kind == "lease":
+        cls = "finance" if "Finance" in (meta.get("row_concept") or "") else "operating"
+        return _lease(label, _lease_tests(cls, rng), rng)
+    if kind == "revenue":
+        d = err - orig
+        extra = max(1, int(round(orig * _pct(rng, 0.002, 0.02))))
+        return _revenue(label, d + extra, extra, rng)
+    if kind == "receivable":
+        d = err - orig
+        e = max(d + 1, int(round(orig * _pct(rng, 0.01, 0.05))))
+        return _receivable(label, orig + e, e, e - d, rng)
+    if kind == "ppe":
+        d = err - orig
+        ca = max(2 * d, int(round(err * _pct(rng, 0.05, 0.25))))
+        ucf = ca - max(1, int(round(ca * _pct(rng, 0.05, 0.3))))
+        return _ppe(label, ca, ucf, ca - d, rng)
+    if kind == "debt":
+        return _debt(label, int(row["value"]), rng.choice(_DEBT_BAD), rng)
+    if kind == "dta":
+        g = _up(err, rng, 0.05, 0.6)
+        return _dta(label, g, g - err, orig, rng)
+    if kind == "rnd":
+        return _rnd(label, abs(orig), abs(err), abs(orig) - abs(err), rng)
+    if kind == "ifrs_goodwill":
+        d = err - orig
+        ca = _up(err, rng, 0.5, 3.0)
+        return _ifrs_goodwill(label, ca, ca - d, rng)
+    if kind == "ifrs_ppe":
+        d = err - orig
+        ca = max(2 * d, int(round(err * _pct(rng, 0.05, 0.25))))
+        ra = ca - d                                   # recoverable amount = higher of the two
+        other = ra - max(1, int(round(ra * _pct(rng, 0.02, 0.2))))
+        viu, fv = (ra, other) if rng.random() < 0.5 else (other, ra)
+        return _ifrs_ppe(label, ca, viu, fv, rng)
+    return None
+
+
+def supporting_facts(shown, rng, labels, violation=None, no_decoy=()):
+    """Fact lines for the statement as shown on the exam.
+
+    labels     : {idx: caption as printed}
+    violation  : (row_idx, kind, meta) for the injected record, or None
+    no_decoy   : row idx values that must not get a consistent fact (the row a
+                 non-fact rule changed: a consistent fact there would contradict
+                 the changed number and look like a measurement fault)
+    """
+    # multi-error items pass several violations: {row_idx: (kind, meta)}
+    viol = violation if isinstance(violation, dict) else (
+        {violation[0]: (violation[1], violation[2])} if violation else {})
+    lines, spare = [], []
+    for r in shown["rows"]:
+        if r.get("kind") != "line":
+            continue
+        kind = KIND_BY_CONCEPT.get(r.get("concept"))
+        if r["idx"] in viol:
+            t = violating_fact(viol[r["idx"]][0], viol[r["idx"]][1], r, rng, labels.get(r["idx"], r["label"]))
+        elif kind and r["idx"] not in no_decoy and rng.random() < P_DECOY:
+            t = consistent_fact(kind, r, rng, labels.get(r["idx"], r["label"]))
+        else:
+            t = None
+            if kind and r["idx"] not in no_decoy:
+                spare.append((kind, r))
+        if t:
+            lines.append((r["idx"], "- " + t))
+    # A record with a violation always has a fact. So that "has facts" is not
+    # a signal, every statement with a fact-bearing line shows at least one.
+    if not lines and spare:
+        kind, r = rng.choice(spare)
+        t = consistent_fact(kind, r, rng, labels.get(r["idx"], r["label"]))
+        if t:
+            lines.append((r["idx"], "- " + t))
+    lines = [t for _, t in sorted(lines)]
+    text = "\n".join(lines)
+    if "ASC" in text or "IAS " in text or "IFRS " in text:
         raise RuntimeError("supporting facts must not name a citation")
     return text

@@ -1,0 +1,557 @@
+{
+  "company": "VALE\u00a0S.A.",
+  "ticker": "VALE",
+  "cik": "0000917851",
+  "statement_type": "BalanceSheet",
+  "fiscal_year": 2018,
+  "period": "2018-12-31",
+  "unit": "USD millions",
+  "currency": "USD",
+  "framework": "ifrs",
+  "source": "SEC EDGAR companyfacts + filing calculation linkbase (real 20-F)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Current assets:",
+      "section": "CurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Noncurrent assets or disposal groups classified as held for sale",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:NoncurrentAssetsOrDisposalGroupsClassifiedAsHeldForSale",
+      "value": 3587,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Cash and cash equivalents",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CashAndCashEquivalents",
+      "value": 5784,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 3,
+      "label": "Current trade receivables",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentTradeReceivables",
+      "value": 2648,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 4,
+      "label": "Other financial assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:OtherCurrentFinancialAssets",
+      "value": 435,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 5,
+      "label": "Inventories",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:Inventories",
+      "value": 4443,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 6,
+      "label": "Current tax assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentTaxAssetsCurrent",
+      "value": 543,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 7,
+      "label": "Other assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:OtherCurrentAssets",
+      "value": 556,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 8,
+      "label": "Other current assets, net",
+      "section": "CurrentAssets",
+      "concept": null,
+      "value": 883,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 9,
+      "label": "Current assets other than assets or disposal groups classified as held for sale or as held for distribution to owners",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentAssetsOtherThanAssetsOrDisposalGroupsClassifiedAsHeldForSaleOrAsHeldForDistributionToOwners",
+      "value": 15292,
+      "kind": "subtotal",
+      "sums": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "idx": 10,
+      "label": "Other current assets, net",
+      "section": "CurrentAssets",
+      "concept": null,
+      "value": -3587,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 11,
+      "label": "Total current assets",
+      "section": "CurrentAssets",
+      "concept": "ifrs-full:CurrentAssets",
+      "value": 15292,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        9,
+        10
+      ]
+    },
+    {
+      "idx": 12,
+      "label": "Non-current assets:",
+      "section": "NoncurrentAssets",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 13,
+      "label": "Intangible assets and goodwill",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:IntangibleAssetsAndGoodwill",
+      "value": 7962,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 14,
+      "label": "Investments in subsidiaries joint ventures and associates",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:InvestmentsInSubsidiariesJointVenturesAndAssociates",
+      "value": 3225,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 15,
+      "label": "Property, plant and equipment",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:PropertyPlantAndEquipment",
+      "value": 48385,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 16,
+      "label": "Other financial assets",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:OtherNoncurrentFinancialAssets",
+      "value": 3144,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 17,
+      "label": "Non-current tax assets",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:CurrentTaxAssetsNoncurrent",
+      "value": 544,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 18,
+      "label": "Deferred tax assets",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:DeferredTaxAssets",
+      "value": 6908,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 19,
+      "label": "Other assets",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:OtherNoncurrentAssets",
+      "value": 263,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 20,
+      "label": "Other non-current assets, net",
+      "section": "NoncurrentAssets",
+      "concept": null,
+      "value": 13326,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 21,
+      "label": "Total non-current assets",
+      "section": "NoncurrentAssets",
+      "concept": "ifrs-full:NoncurrentAssets",
+      "value": 72898,
+      "kind": "subtotal",
+      "sums": [
+        13,
+        14,
+        15,
+        20
+      ]
+    },
+    {
+      "idx": 22,
+      "label": "Total assets",
+      "section": "Assets",
+      "concept": "ifrs-full:Assets",
+      "value": 88190,
+      "kind": "total",
+      "sums": [
+        11,
+        21
+      ]
+    },
+    {
+      "idx": 23,
+      "label": "Current liabilities:",
+      "section": "CurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 24,
+      "label": "Liabilities included in disposal groups classified as held for sale",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:LiabilitiesIncludedInDisposalGroupsClassifiedAsHeldForSale",
+      "value": 1179,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 25,
+      "label": "Trade and other payables",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:TradeAndOtherCurrentPayables",
+      "value": 3512,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 26,
+      "label": "Current borrowings and portion of borrowings",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentBorrowingsAndCurrentPortionOfNoncurrentBorrowings",
+      "value": 1003,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 27,
+      "label": "Other financial liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:OtherCurrentFinancialLiabilities",
+      "value": 1604,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 28,
+      "label": "Current payables on social security and taxes other than income tax",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentPayablesOnSocialSecurityAndTaxesOtherThanIncomeTax",
+      "value": 650,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 29,
+      "label": "Current tax liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentTaxLiabilitiesCurrent",
+      "value": 210,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 30,
+      "label": "Current provisions",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentProvisions",
+      "value": 1363,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 31,
+      "label": "Current dividend payables",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentDividendPayables",
+      "value": 1441,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 32,
+      "label": "Other liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:OtherCurrentLiabilities",
+      "value": 480,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 33,
+      "label": "Other current liabilities, net",
+      "section": "CurrentLiabilities",
+      "concept": null,
+      "value": -1152,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 34,
+      "label": "Current liabilities other than liabilities included in disposal groups classified as held for sale",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentLiabilitiesOtherThanLiabilitiesIncludedInDisposalGroupsClassifiedAsHeldForSale",
+      "value": 9111,
+      "kind": "subtotal",
+      "sums": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "idx": 35,
+      "label": "Other current liabilities, net",
+      "section": "CurrentLiabilities",
+      "concept": null,
+      "value": -1179,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 36,
+      "label": "Total current liabilities",
+      "section": "CurrentLiabilities",
+      "concept": "ifrs-full:CurrentLiabilities",
+      "value": 9111,
+      "kind": "subtotal",
+      "sums": [
+        24,
+        34,
+        35
+      ]
+    },
+    {
+      "idx": 37,
+      "label": "Non-current liabilities:",
+      "section": "NoncurrentLiabilities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 38,
+      "label": "Longterm borrowings",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:LongtermBorrowings",
+      "value": 14463,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 39,
+      "label": "Other financial liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:OtherNoncurrentFinancialLiabilities",
+      "value": 2711,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 40,
+      "label": "Noncurrent payables on social security and taxes other than income tax",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:NoncurrentPayablesOnSocialSecurityAndTaxesOtherThanIncomeTax",
+      "value": 3917,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 41,
+      "label": "Deferred tax liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:DeferredTaxLiabilities",
+      "value": 1532,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 42,
+      "label": "Noncurrent provisions",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:NoncurrentProvisions",
+      "value": 7095,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 43,
+      "label": "Deferred income classified as, non-current",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:DeferredIncomeClassifiedAsNoncurrent",
+      "value": 1603,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 44,
+      "label": "Other liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:OtherNoncurrentLiabilities",
+      "value": 2094,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 45,
+      "label": "Other non-current liabilities, net",
+      "section": "NoncurrentLiabilities",
+      "concept": null,
+      "value": 832,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 46,
+      "label": "Total non-current liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:NoncurrentLiabilities",
+      "value": 34247,
+      "kind": "subtotal",
+      "sums": [
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45
+      ]
+    },
+    {
+      "idx": 47,
+      "label": "Total liabilities",
+      "section": "NoncurrentLiabilities",
+      "concept": "ifrs-full:Liabilities",
+      "value": 43358,
+      "kind": "subtotal",
+      "sums": [
+        36,
+        46
+      ]
+    },
+    {
+      "idx": 48,
+      "label": "Stockholders' equity:",
+      "section": "Equity",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 49,
+      "label": "Equity attributable to owners of the parent",
+      "section": "Equity",
+      "concept": "ifrs-full:EquityAttributableToOwnersOfParent",
+      "value": 43985,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 50,
+      "label": "Non-controlling interests",
+      "section": "Equity",
+      "concept": "ifrs-full:NoncontrollingInterests",
+      "value": 847,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 51,
+      "label": "Total equity",
+      "section": "Equity",
+      "concept": "ifrs-full:Equity",
+      "value": 44832,
+      "kind": "subtotal",
+      "sums": [
+        49,
+        50
+      ]
+    },
+    {
+      "idx": 52,
+      "label": "Total equity and liabilities",
+      "section": "LiabilitiesAndEquity",
+      "concept": "ifrs-full:EquityAndLiabilities",
+      "value": 88190,
+      "kind": "total",
+      "sums": [
+        47,
+        51
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "ifrs-full:Assets",
+      "rhs": [
+        "ifrs-full:EquityAndLiabilities"
+      ],
+      "name": "accounting_equation"
+    }
+  ],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
+}

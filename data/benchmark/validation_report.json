@@ -1,0 +1,48 @@
+{
+  "framework": "us-gaap",
+  "config": "config.json",
+  "companies_in_config": 70,
+  "companies_targeted": 70,
+  "companies_built": 70,
+  "companies_skipped": [],
+  "clean_statements_on_disk": 1989,
+  "clean_statements_by_type": {
+    "BS": 677,
+    "CF": 691,
+    "IS": 621
+  },
+  "fiscal_years_present": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "items": 14963,
+  "clean_controls": 1989,
+  "injected": 12974,
+  "single_error_verified": 12974,
+  "single_error_violations": 0,
+  "citation_tiers": {
+    "no-error": 1989,
+    "linkbase-verified": 1363,
+    "expert-authored-UNVALIDATED": 5025,
+    "no-governing-paragraph": 6586
+  },
+  "distinct_citable_paragraphs": 15,
+  "triviality_gate": {
+    "passed": true,
+    "last_line": "GATE PASSED"
+  },
+  "identifiability": {
+    "passed": true,
+    "last_line": "  false citations on clean controls: 1/1989"
+  },
+  "llm_in_ground_truth_loop": false,
+  "accountant_review_of_citations": "not done"
+}

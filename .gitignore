@@ -5,3 +5,6 @@ src/.cache/
 data/raw/
 *.zip
 .env
+data/benchmark/records.jsonl
+data/benchmark_multi/records.jsonl
+data/ifrs/benchmark/records.jsonl

@@ -1,0 +1,102 @@
+{
+  "company": "United Airlines Holdings, Inc.",
+  "ticker": "UAL",
+  "cik": "0000100517",
+  "statement_type": "IncomeStatement",
+  "fiscal_year": 2020,
+  "period": "2020-12-31",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Revenue",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "value": 15355,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 1,
+      "label": "Other operating expenses, net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -21714,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 2,
+      "label": "Operating income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:OperatingIncomeLoss",
+      "value": -6359,
+      "kind": "subtotal",
+      "sums": [
+        0,
+        1
+      ]
+    },
+    {
+      "idx": 3,
+      "label": "Other income (expense), net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": -2463,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 4,
+      "label": "Income before income taxes",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+      "value": -8822,
+      "kind": "subtotal",
+      "sums": [
+        2,
+        3
+      ]
+    },
+    {
+      "idx": 5,
+      "label": "Income tax (expense) benefit",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:IncomeTaxExpenseBenefit",
+      "value": -1753,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 6,
+      "label": "Other items, net",
+      "section": "IncomeStatement",
+      "concept": null,
+      "value": 3506,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 7,
+      "label": "Net income (loss)",
+      "section": "IncomeStatement",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": -7069,
+      "kind": "total",
+      "sums": [
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "identities": [],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
+}

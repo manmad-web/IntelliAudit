@@ -32,7 +32,7 @@ _EVENTS = {
     "us-gaap:LongTermDebtCurrent": [
         ("reclassified from long-term debt", +1), ("current maturities repaid", -1)],
     "us-gaap:RetainedEarningsAccumulatedDeficit": [
-        ("net income for the period", +1), ("dividends declared", -1)],
+        ("balance brought forward plus net income for the period", +1), ("dividends declared", -1)],
     "us-gaap:CommonStocksIncludingAdditionalPaidInCapital": [
         ("shares issued", +1), ("share repurchases retired", -1)],
     "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax": [
@@ -69,6 +69,38 @@ _EVENTS = {
         ("purchases of available-for-sale securities", +1), ("sales / maturities of AFS securities", -1)],
     "us-gaap:MarketableSecuritiesCurrent": [
         ("purchases of marketable securities", +1), ("sales / maturities of marketable securities", -1)],
+    "us-gaap:ReceivablesNetCurrent": [
+        ("invoiced customer sales on credit", +1), ("write-off of uncollectible accounts", -1)],
+    "us-gaap:AccountsPayableTradeCurrent": [
+        ("purchases on credit", +1), ("payments to vendors", -1)],
+    "us-gaap:Revenues": [
+        ("revenue recognised on satisfied performance obligations", +1),
+        ("returns and allowances", -1)],
+    "us-gaap:IntangibleAssetsNetExcludingGoodwill": [
+        ("intangible assets acquired", +1), ("amortization expense", -1)],
+    "us-gaap:OperatingLeaseRightOfUseAsset": [
+        ("right-of-use assets for new leases", +1), ("right-of-use asset amortization", -1)],
+    "us-gaap:FinanceLeaseRightOfUseAsset": [
+        ("right-of-use assets for new leases", +1), ("right-of-use asset amortization", -1)],
+    "us-gaap:OperatingLeaseLiabilityNoncurrent": [
+        ("lease liabilities for new leases", +1), ("reclassified to current portion", -1)],
+    "us-gaap:OperatingLeaseLiabilityCurrent": [
+        ("reclassified from non-current portion", +1), ("lease payments", -1)],
+    "us-gaap:DeferredIncomeTaxAssetsNet": [
+        ("deductible temporary differences originated", +1), ("temporary differences reversed", -1)],
+    "us-gaap:TreasuryStockValue": [
+        ("treasury shares reissued", +1), ("shares reacquired", -1)],
+    "us-gaap:AccumulatedOtherComprehensiveIncomeLossNetOfTax": [
+        ("unrealized gains and translation gains in other comprehensive income", +1),
+        ("unrealized losses and translation losses in other comprehensive income", -1)],
+    "us-gaap:ContractWithCustomerLiabilityCurrent": [
+        ("cash collected in advance of transfer", +1), ("revenue recognised against deferred balances", -1)],
+    "us-gaap:MarketableSecuritiesNoncurrent": [
+        ("purchases of marketable securities", +1), ("sales / maturities of marketable securities", -1)],
+    "us-gaap:AvailableForSaleSecuritiesNoncurrent": [
+        ("purchases of available-for-sale securities", +1), ("sales / maturities of AFS securities", -1)],
+    "us-gaap:IncomeTaxExpenseBenefit": [
+        ("current and deferred tax expense", +1), ("tax credits and benefits", -1)],
     "us-gaap:DeferredRevenueCurrent": [
         ("cash collected in advance of transfer", +1), ("revenue recognised against deferred balances", -1)],
 }
@@ -113,10 +145,13 @@ def _ok(amt, total, forbidden):
     return True
 
 
-def _pair(total, d0, d1, rng, forbidden):
-    """Positive a, b such that d0*a + d1*b == total, or None."""
+def _pair(total, d0, d1, rng, forbidden, contra=(0.15, 0.55)):
+    """Positive a, b such that d0*a + d1*b == total, or None.
+
+    contra bounds the smaller (offsetting) piece as a share of |total|.
+    """
     total = int(total)
-    bumps = [int(round(abs(total) * rng.uniform(0.15, 0.55))) or 1 for _ in range(40)]
+    bumps = [int(round(abs(total) * rng.uniform(*contra))) or 1 for _ in range(40)]
     bumps.extend(range(3, 60))
 
     if d0 == d1:
@@ -153,7 +188,7 @@ def _pair(total, d0, d1, rng, forbidden):
     return None
 
 
-def _amounts(total, events, rng, forbidden):
+def _amounts(total, events, rng, forbidden, contra=(0.15, 0.55)):
     """Positive integer amounts, one per event, with sum(dir * amt) == total.
 
     No printed amount is 0, equals |total|, or equals another line total.
@@ -162,7 +197,32 @@ def _amounts(total, events, rng, forbidden):
     if len(events) != 2:
         return None
     d0, d1 = events[0][1], events[1][1]
-    return _pair(int(total), d0, d1, rng, forbidden)
+    return _pair(int(total), d0, d1, rng, forbidden, contra)
+
+
+def _oriented(concept, value, events):
+    """Expenses and cash outflows are presented as negative amounts.
+
+    Their events are written for the magnitude ("cost of goods sold",
+    "purchases of productive assets"). v0.3 applied them to the signed value,
+    so a -214,137 cost of revenue became "+108,831 cost; -322,968 overhead
+    credit". For a negative line the main event lowers the line and the
+    contra event raises it.
+    """
+    if value < 0 and concept in _MAGNITUDE and events[0][1] > 0:
+        return [(d, -s) for d, s in events]
+    return events
+
+
+# Concepts whose events describe the magnitude of an expense or outflow. Only
+# these flip. Balances that are simply negative (AOCI, treasury stock, a net
+# loss) keep their event directions.
+_MAGNITUDE = {
+    "us-gaap:CostOfGoodsAndServicesSold", "us-gaap:CostOfRevenue",
+    "us-gaap:ResearchAndDevelopmentExpense", "us-gaap:SellingGeneralAndAdministrativeExpense",
+    "us-gaap:IncomeTaxExpenseBenefit", "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+    "us-gaap:PaymentsOfDividendsCommonStock", "us-gaap:PaymentsForRepurchaseOfCommonStock",
+}
 
 
 def _fmt(direction, amt):
@@ -183,10 +243,20 @@ def parse_signed_parts(line):
     return out
 
 
-def generate_for_statement(stmt, seed=0):
-    """Component-level evidence. Never prints the line total (no answer leak)."""
+def generate_for_statement(stmt, seed=0, labels=None, skip=(), extra_forbidden=()):
+    """Component-level evidence. Never prints the line total (no answer leak).
+
+    Lines are keyed by account caption, not by row number. v0.3 printed
+    "[row i]" from the clean statement, so after a row was moved, deleted or
+    inserted the evidence row numbers stopped matching the exam statement,
+    which located the injected row for 606/631 structural cases.
+
+    labels : optional {idx: caption} (e.g. qualified captions for duplicates)
+    skip   : row idx values to leave out
+    extra_forbidden : further amounts no component may equal
+    """
     rng = random.Random(seed)
-    forbidden = _forbidden(stmt)
+    forbidden = _forbidden(stmt) | {abs(int(x)) for x in extra_forbidden if x is not None}
     eligible = [
         r for r in stmt["rows"]
         if r.get("kind") == "line" and r.get("value") not in (None, 0)
@@ -204,13 +274,16 @@ def generate_for_statement(stmt, seed=0):
     out = [
         f"Transaction evidence — {stmt['company']} FY{stmt['fiscal_year']} "
         f"({stmt['statement_type']}). Amounts are component movements; they are "
-        f"NOT the reported line totals."
+        f"NOT the reported line totals. Signs are relative to the line as presented "
+        f"(expenses and cash outflows are presented as negative amounts)."
     ]
     for r in stmt["rows"]:
-        if id(r) not in covered:
+        if id(r) not in covered or r["idx"] in skip:
             continue
-        events = _expand(_EVENTS.get(r.get("concept"), _DEFAULT), rng)
-        amts = _amounts(r["value"], events, rng, forbidden)
+        known = r.get("concept") in _EVENTS
+        events = _oriented(r.get("concept"), r["value"], _expand(_EVENTS.get(r.get("concept"), _DEFAULT), rng))
+        amts = _amounts(r["value"], events, rng, forbidden,
+                        contra=(0.03, 0.25) if known else (0.15, 0.55))
         if not amts:
             continue
         parts = []
@@ -220,7 +293,8 @@ def generate_for_statement(stmt, seed=0):
             signed += direction * int(amt)
         if signed != int(r["value"]):
             continue
-        out.append(f"[row {r['idx']}] {r['label']}: " + "; ".join(parts))
+        lab = (labels or {}).get(r["idx"], r["label"])
+        out.append(f"[{lab}] " + "; ".join(parts))
     return "\n".join(out)
 
 

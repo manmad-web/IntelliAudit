@@ -26,7 +26,7 @@ def to_xbrl_json(stmt):
             facts.append({
                 "concept": r["concept"],
                 "period": {"instant": stmt["period"]},
-                "unit": "iso4217:USD",
+                "unit": f"iso4217:{stmt.get('currency', 'USD')}",
                 "value": r["value"],
                 "decimals": -6,
                 "row": r["idx"],

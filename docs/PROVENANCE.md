@@ -16,7 +16,12 @@ The **benchmark factory**. Original to this project.
 | `src/transactions.py` | synthetic transactions summing to real line values |
 | `src/render.py` | `[row n]` AuditBench text + XBRL-JSON |
 | `src/scorer.py` | hierarchical citation EM + detection EM (the grader) |
-| `scripts/build_benchmark.py` | orchestrator → `data/benchmark/records.jsonl` |
+| `scripts/build_benchmark.py` | orchestrator → `data/benchmark/records.jsonl` (`--offline`, `--config`) |
+| `src/normalize.py`, `src/labels.py` | calc-weight signs, sectioning, captions (v0.4) |
+| `src/evidence.py` | contrastive supporting facts (v0.4) |
+| `src/frameworks.py`, `rulebook_ifrs.json`, `configs/` | US-GAAP / IFRS editions, company expansion (v0.4) |
+| `scripts/check_triviality.py`, `scripts/identifiability_check.py` | regression gate; exam-only identifiability |
+| `scripts/make_predictions.py` | exam-only reference baselines (the v0.3 version read the answer key; see `results/legacy_v0.3/`) |
 
 ## OLD — the auditor pipeline (`dakshkashyap/financial-audit-capstone` @ `pipeline-stage0-1-2-evals`)
 The **auditor** (student). Team-built (daksh / irvin / man-mad). NOT modified here.

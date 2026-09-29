@@ -35,6 +35,35 @@ def extract_asc(text):
     return out
 
 
+def _is_ifrs(code):
+    return bool(re.match(r"\s*(IAS|IFRS|IFRIC|SIC)\b", str(code or ""), re.I))
+
+
+def extract_ifrs(text):
+    """All IAS/IFRS references in free text as (standard, paragraph-or-None)."""
+    from citation_resolver import _IFRS_RE
+    out = []
+    for m in _IFRS_RE.finditer(str(text)):
+        std = f"{m.group(1).upper()} {int(m.group(2))}"
+        out.append((std, f"{std}.{m.group(3).upper()}" if m.group(3) else None))
+    return out
+
+
+def score_citation_ifrs(pred_text, gt_citations):
+    """IFRS has two levels: standard (IAS 36) and paragraph (IAS 36.59).
+
+    Reported under the same keys as ASC so one scorer serves both datasets:
+    em_topic = em_subtopic = standard match, em_full = paragraph match.
+    """
+    from citation_resolver import ifrs_paragraph_of, ifrs_standard_of
+    gt = gt_citations["asc_full"]
+    g_std, g_par = ifrs_standard_of(gt), ifrs_paragraph_of(gt)
+    preds = extract_ifrs(pred_text)
+    std = int(any(p[0] == g_std for p in preds))
+    par = int(any(p[1] == g_par for p in preds))
+    return {"em_topic": std, "em_subtopic": std, "em_full": par}
+
+
 def _levels(code):
     p = code.split("-")
     return {"topic": p[0], "subtopic": "-".join(p[:2]) if len(p) >= 2 else p[0], "full": code}
@@ -55,6 +84,8 @@ def score_citation(pred_text, gt_citations, credit_linkbase_set=True):
     """
     if not citation_scored(gt_citations):
         return None
+    if _is_ifrs(gt_citations["asc_full"]):
+        return score_citation_ifrs(pred_text, gt_citations)
     preds = [_levels(c) for c in extract_asc(pred_text)]
     gt_full = gt_citations["asc_full"].replace("ASC ", "")
     gt = _levels(gt_full)

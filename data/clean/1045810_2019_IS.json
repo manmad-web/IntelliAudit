@@ -46,7 +46,7 @@
     },
     {
       "idx": 4,
-      "label": "Other operating expenses, net (residual)",
+      "label": "Other operating expenses, net",
       "section": "IncomeStatement",
       "concept": null,
       "value": 0,
@@ -102,7 +102,7 @@
     },
     {
       "idx": 9,
-      "label": "Other, net (residual)",
+      "label": "Other items, net",
       "section": "IncomeStatement",
       "concept": null,
       "value": 490,
@@ -124,5 +124,9 @@
       ]
     }
   ],
-  "identities": []
+  "identities": [],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
 }

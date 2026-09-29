@@ -1,4 +1,5 @@
 {
+  "framework": "us-gaap",
   "companies": [
     "AAPL",
     "MSFT",
@@ -7,7 +8,69 @@
     "META",
     "KO",
     "JNJ",
-    "WMT"
+    "WMT",
+    "V",
+    "UNH",
+    "PG",
+    "CL",
+    "HSY",
+    "TAP",
+    "SAM",
+    "HD",
+    "TGT",
+    "NKE",
+    "DG",
+    "LULU",
+    "CROX",
+    "TSCO",
+    "MCD",
+    "DRI",
+    "SBUX",
+    "SHAK",
+    "CAT",
+    "MMM",
+    "SNA",
+    "OC",
+    "PII",
+    "LMT",
+    "GD",
+    "BA",
+    "DAL",
+    "UAL",
+    "FDX",
+    "UNP",
+    "CCL",
+    "RCL",
+    "XOM",
+    "CVX",
+    "HAL",
+    "VLO",
+    "NUE",
+    "SHW",
+    "IP",
+    "FCX",
+    "PFE",
+    "MRK",
+    "ABBV",
+    "ABT",
+    "HCA",
+    "MCK",
+    "CSCO",
+    "ORCL",
+    "INTC",
+    "ADBE",
+    "CRM",
+    "HPQ",
+    "MU",
+    "VZ",
+    "T",
+    "NFLX",
+    "CMCSA",
+    "GM",
+    "TSLA",
+    "PTON",
+    "LCID",
+    "BYND"
   ],
   "years": [
     2015,
@@ -21,24 +84,422 @@
     2023,
     2024
   ],
-  "clean_statements_built": 220,
-  "company_years_skipped": 5,
-  "records": 1202,
+  "companies_targeted": 70,
+  "companies_built": 70,
+  "company_status": [
+    {
+      "ticker": "AAPL",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "MSFT",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "NVDA",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "GOOGL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "META",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "KO",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "JNJ",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "WMT",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "V",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "UNH",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "PG",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "CL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "HSY",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "TAP",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "SAM",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "HD",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "TGT",
+      "status": "built",
+      "statements": 24
+    },
+    {
+      "ticker": "NKE",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "DG",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "LULU",
+      "status": "built",
+      "statements": 27
+    },
+    {
+      "ticker": "CROX",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "TSCO",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "MCD",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "DRI",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "SBUX",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "SHAK",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "CAT",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "MMM",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "SNA",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "OC",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "PII",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "LMT",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "GD",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "BA",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "DAL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "UAL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "FDX",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "UNP",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "CCL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "RCL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "XOM",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "CVX",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "HAL",
+      "status": "built",
+      "statements": 20
+    },
+    {
+      "ticker": "VLO",
+      "status": "built",
+      "statements": 20
+    },
+    {
+      "ticker": "NUE",
+      "status": "built",
+      "statements": 26
+    },
+    {
+      "ticker": "SHW",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "IP",
+      "status": "built",
+      "statements": 27
+    },
+    {
+      "ticker": "FCX",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "PFE",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "MRK",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "ABBV",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "ABT",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "HCA",
+      "status": "built",
+      "statements": 23
+    },
+    {
+      "ticker": "MCK",
+      "status": "built",
+      "statements": 28
+    },
+    {
+      "ticker": "CSCO",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "ORCL",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "INTC",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "ADBE",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "CRM",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "HPQ",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "MU",
+      "status": "built",
+      "statements": 29
+    },
+    {
+      "ticker": "VZ",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "T",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "NFLX",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "CMCSA",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "GM",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "TSLA",
+      "status": "built",
+      "statements": 30
+    },
+    {
+      "ticker": "PTON",
+      "status": "built",
+      "statements": 20
+    },
+    {
+      "ticker": "LCID",
+      "status": "built",
+      "statements": 17
+    },
+    {
+      "ticker": "BYND",
+      "status": "built",
+      "statements": 23
+    }
+  ],
+  "clean_statements_built": 1989,
+  "company_years_skipped": 100,
+  "records": 14963,
+  "controls": 1989,
   "statement_type_breakdown": {
-    "BalanceSheet": 690,
-    "CashFlow": 230,
-    "IncomeStatement": 282
+    "BalanceSheet": 8395,
+    "CashFlow": 3168,
+    "IncomeStatement": 3400
   },
   "error_type_breakdown": {
-    "Misclassification": 271,
-    "Missing Row": 220,
-    "Numerical Error": 571,
-    "Redundant Row": 140
+    "None (control)": 1989,
+    "Misclassification": 3191,
+    "Missing Row": 1989,
+    "Numerical Error": 6496,
+    "Redundant Row": 1298
   },
+  "rule_breakdown": {
+    "CONTROL": 1989,
+    "R01": 655,
+    "R02": 560,
+    "R03": 325,
+    "R04": 1989,
+    "R05": 1976,
+    "R06": 1298,
+    "R07": 666,
+    "R08": 482,
+    "R09": 621,
+    "R10": 228,
+    "R11": 435,
+    "R12": 657,
+    "R14": 486,
+    "R15": 164,
+    "R16": 613,
+    "R17": 556,
+    "R18": 464,
+    "R19": 328,
+    "R20": 174,
+    "R21": 297
+  },
+  "distinct_citable_paragraphs": [
+    "ASC 210-10-45-1",
+    "ASC 210-10-45-12",
+    "ASC 210-10-45-8",
+    "ASC 230-10-45-13",
+    "ASC 230-10-45-15",
+    "ASC 320-10-35-1",
+    "ASC 326-20-30-1",
+    "ASC 330-10-35-1B",
+    "ASC 350-20-35-1",
+    "ASC 360-10-35-17",
+    "ASC 470-10-45-11",
+    "ASC 606-10-25-23",
+    "ASC 730-10-25-1",
+    "ASC 740-10-30-5",
+    "ASC 842-10-25-2"
+  ],
   "citation_tier_breakdown": {
-    "linkbase-verified": 83,
-    "expert-authored-UNVALIDATED": 409,
-    "no-governing-paragraph": 710
+    "no-error": 1989,
+    "linkbase-verified": 1363,
+    "expert-authored-UNVALIDATED": 5025,
+    "no-governing-paragraph": 6586
   },
-  "verifiable_error_pct": 65.0
+  "injected_breaking_footing_pct": 50.8,
+  "citable_breaking_footing_pct": 0.0
 }

@@ -1,0 +1,264 @@
+{
+  "framework": "ifrs",
+  "companies": [
+    "SAP",
+    "NVS",
+    "AZN",
+    "GSK",
+    "SNY",
+    "NVO",
+    "UL",
+    "DEO",
+    "BUD",
+    "ABEV",
+    "BP",
+    "SHEL",
+    "TTE",
+    "EQNR",
+    "PBR",
+    "BHP",
+    "RIO",
+    "VALE",
+    "MT",
+    "STLA",
+    "TM",
+    "SONY",
+    "RYAAY",
+    "INFY",
+    "WIT",
+    "TSM",
+    "NOK",
+    "ERIC",
+    "PHG",
+    "CNQ",
+    "BCE",
+    "SU",
+    "VOD"
+  ],
+  "years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "companies_targeted": 33,
+  "companies_built": 31,
+  "company_status": [
+    {
+      "ticker": "SAP",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "NVS",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "AZN",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "GSK",
+      "status": "built",
+      "statements": 3
+    },
+    {
+      "ticker": "SNY",
+      "status": "built",
+      "statements": 1
+    },
+    {
+      "ticker": "NVO",
+      "status": "built",
+      "statements": 5
+    },
+    {
+      "ticker": "UL",
+      "status": "built",
+      "statements": 5
+    },
+    {
+      "ticker": "DEO",
+      "status": "built",
+      "statements": 6
+    },
+    {
+      "ticker": "BUD",
+      "status": "built",
+      "statements": 1
+    },
+    {
+      "ticker": "ABEV",
+      "status": "built",
+      "statements": 3
+    },
+    {
+      "ticker": "BP",
+      "status": "built",
+      "statements": 5
+    },
+    {
+      "ticker": "SHEL",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "TTE",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "EQNR",
+      "status": "built",
+      "statements": 6
+    },
+    {
+      "ticker": "PBR",
+      "status": "built",
+      "statements": 6
+    },
+    {
+      "ticker": "BHP",
+      "status": "built",
+      "statements": 2
+    },
+    {
+      "ticker": "RIO",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "VALE",
+      "status": "built",
+      "statements": 6
+    },
+    {
+      "ticker": "MT",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "STLA",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "TM",
+      "status": "skipped",
+      "statements": 0,
+      "reason": "no statement could be built"
+    },
+    {
+      "ticker": "SONY",
+      "status": "skipped",
+      "statements": 0,
+      "reason": "no statement could be built"
+    },
+    {
+      "ticker": "RYAAY",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "INFY",
+      "status": "built",
+      "statements": 6
+    },
+    {
+      "ticker": "WIT",
+      "status": "built",
+      "statements": 3
+    },
+    {
+      "ticker": "TSM",
+      "status": "built",
+      "statements": 1
+    },
+    {
+      "ticker": "NOK",
+      "status": "built",
+      "statements": 5
+    },
+    {
+      "ticker": "ERIC",
+      "status": "built",
+      "statements": 3
+    },
+    {
+      "ticker": "PHG",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "CNQ",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "BCE",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "SU",
+      "status": "built",
+      "statements": 7
+    },
+    {
+      "ticker": "VOD",
+      "status": "built",
+      "statements": 3
+    }
+  ],
+  "clean_statements_built": 161,
+  "company_years_skipped": 28,
+  "records": 1382,
+  "controls": 161,
+  "statement_type_breakdown": {
+    "BalanceSheet": 1382
+  },
+  "error_type_breakdown": {
+    "None (control)": 161,
+    "Misclassification": 357,
+    "Missing Row": 161,
+    "Numerical Error": 542,
+    "Redundant Row": 161
+  },
+  "rule_breakdown": {
+    "CONTROL": 161,
+    "I01": 149,
+    "I02": 93,
+    "I03": 115,
+    "I04": 161,
+    "I05": 159,
+    "I06": 161,
+    "I07": 92,
+    "I11": 79,
+    "I14": 49,
+    "I15": 1,
+    "I17": 84,
+    "I18": 78
+  },
+  "distinct_citable_paragraphs": [
+    "IAS 1.66",
+    "IAS 1.69",
+    "IAS 1.70",
+    "IAS 2.9",
+    "IAS 36.59",
+    "IAS 36.90",
+    "IFRS 9.4.1.2A",
+    "IFRS 9.5.5.15"
+  ],
+  "citation_tier_breakdown": {
+    "no-error": 161,
+    "expert-authored-UNVALIDATED": 648,
+    "no-governing-paragraph": 573
+  },
+  "injected_breaking_footing_pct": 46.9,
+  "citable_breaking_footing_pct": 0.0
+}

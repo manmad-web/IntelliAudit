@@ -12,21 +12,39 @@ financial-statement violation — a task AuditBench scored with broken labels an
 FinAuditing/AuditFlow do not score at all.
 
 ## 2. Composition
-1,202 records over 220 real statements (8 companies × 10 fiscal years × {balance
-sheet, income statement, cash flow}). Each record = one clean statement + one
-injected error + synthetic transactions + labels (see `record_schema` in
-`intelliaudit_dataset_showcase.json`). See `data/benchmark/summary.json` for the
-current authoritative counts — this file is regenerated on every rebuild.
+US GAAP: 14,963 exam items over 1,989 real statements (70 companies × FY2015–2024 ×
+{balance sheet, income statement, cash flow}): 12,974 injected faults (one per applicable
+rule per statement) and 1,989 clean controls; 6,388 citable (15 governing paragraphs),
+6,586 detection-only. IFRS (separate): 1,382 items over 161 real balance sheets from 31
+SEC 20-F/40-F filers, FY2018–2024. `validation_report.json` in each output folder is
+authoritative.
 
-## 3. Collection & construction process (fully deterministic)
-1. **Real values** — `src/edgar_ingest.py` fetches `https://data.sec.gov/api/xbrl/companyfacts/CIK<10-digit>.json`; each line value is the company's actual reported 10-K fact (`fy`, `fp=FY`, `form=10-K`).
-2. **Canonical statement** — `src/statement_builder.py` places facts into an ordered us-gaap template; uses the company's **real reported subtotals/totals** as anchors and inserts transparent **residual "Other, net" lines** so every subtotal foots and Assets = Liabilities + Equity, with every number traceable to real data.
-3. **Rule-first error injection** — `src/injector.py` applies one recipe from `rulebook.json`. The rule fixes the **governing ASC citation BEFORE** the error is injected (so the label is not a post-hoc guess).
-4. **Citation cross-check** — `src/citation_resolver.py` downloads the official **US-GAAP 2023 reference linkbase** (`https://xbrl.fasb.org/us-gaap/2023/us-gaap-2023.zip`, sha256 `b48fbb7b…`, 17,800 concepts) and checks whether the rule's ASC is among the concept's real references → tags `linkbase-verified` vs `expert-authored`.
-5. **Transactions** — `src/transactions.py` generates synthetic transactions that sum to each real line value (template-based, deterministic by default).
+## 3. Collection & construction process (deterministic)
+1. **Real values** — `src/edgar_ingest.py` reads SEC companyfacts (10-K, `fp=FY`).
+2. **Statements** — balance sheets from each filing's own calculation linkbase
+   (`src/filing_structure.py`); income and cash-flow statements from a fixed template
+   with labelled residual lines (still ~23% filler on cash flows — open).
+3. **Normalization** — `src/normalize.py`: calculation-weight signs (treasury stock),
+   section fixes, ordinary captions. Values unchanged except the sign fix.
+4. **Rule-first injection** — `src/injector.py` applies one `rulebook.json` rule.
+   Citable faults keep the statement footing; detection-only faults break it.
+5. **Citation cross-check** — `src/citation_resolver.py`: strict paragraph match
+   against the FASB US-GAAP 2023 reference linkbase (`linkbase-verified`), else
+   `expert-authored-UNVALIDATED` per `docs/CITATION_POLICY.md`. Offline rebuilds use
+   `data/reference/us-gaap-2023_ref_cache.json`.
+6. **Evidence** — `src/transactions.py` (ledger movements keyed by caption; the
+   company's books for measurement faults, the true ledger otherwise) and
+   `src/evidence.py` (contrastive supporting facts on every statement).
+7. **Split** — `scripts/split_dataset.py`: opaque exam ids, 17 forms, withheld key.
 
-**No LLM is used anywhere in the current build.** There are therefore no generation
-prompts to disclose — the generator *is* the disclosure.
+**No LLM is used anywhere in the build**, neither for data nor for ground truth. The
+generator is the disclosure. Counts quoted anywhere should come from
+`data/benchmark/validation_report.json` (`scripts/make_validation_report.py`), which
+recomputes them from the files and records the gate result.
+
+**IFRS edition.** Separate dataset, not yet built from real filings; runbook in
+`docs/IFRS_BUILD.md`. Once built, only citations tagged `linkbase-verified` have been
+checked against the IFRS Taxonomy reference linkbase; the rest await an accountant.
 
 ## 4. Preprocessing / normalization
 Values scaled to $millions; residual lines absorb template gaps (labelled, not
@@ -41,23 +59,23 @@ Only two places an LLM would enter — documented here so the artifact is comple
 
 **(b) Cross-check judge** (`scripts/cross_check_llm.py`) — the blind auditor prompt is embedded in that script (System + User), reproduced in the paper appendix.
 
-## 6. Validation protocol — ⚠️ DESCRIBED BUT **NOT PERFORMED**
+## 6. Validation — what has and has not been done
 
-> **Correction (Sept 2026).** An external audit found that this section described a
-> validation protocol as though it had been carried out. **It had not.** Neither the
-> LLM cross-check nor the human expert review below was ever run. The harness
-> (`scripts/cross_check_llm.py`) exists; it has never been executed. Treat the
-> protocol below as *planned*, not *performed*. See `KNOWN_ISSUES.md`.
-- **Tier 1 — `linkbase-verified` (13 records):** deterministic; the ASC holds at paragraph level in the concept's official linkbase reference set. No human/LLM needed.
-- **Tier 2 — `expert-authored-UNVALIDATED` (479 records):** the governing standard the linkbase does not tag on the line (e.g. recognition ASC 606-10-25). *Planned* validation (still not run): (i) **independent LLM judge** (`cross_check_llm.py`, a *different* model) predicts the citation blind; agreement raises confidence, disagreement flags the record; (ii) **human expert review** of the flagged set — the same 50%-manual-review discipline FinAuditing used.
-- **`no-governing-paragraph` (710 records):** detection-only — no single ASC paragraph governs the error type (e.g. an arbitrary numeric perturbation), so these are excluded from citation scoring. See `KNOWN_ISSUES.md`.
-- **Leakage:** verified 0/1202 records contain any ASC code in model-visible fields.
+Done (automated): `scripts/check_triviality.py` (15 checks, 8 exam-only);
+`scripts/identifiability_check.py` (every citable item derivable from the exam;
+0 false alarms on controls); 36 unit tests; byte-identical rebuilds.
+
+**Not done:** accountant review of the 15 governing paragraphs and of a sample of
+items; the independent-LLM cross-check (`scripts/cross_check_llm.py`) on v0.4; the
+blind LLM baselines on v0.4. Until the first is done, every
+`expert-authored-UNVALIDATED` citation is a policy decision, not validated ground truth.
 
 ## 7. Uses & limitations
-For citation-attribution and error-detection evaluation. Limitations: compact
-single statements (not multi-document long-context like FinMR); injected (not
-naturally occurring) errors; DQC ids `verified:false` pending official-ruleset
-cross-check; template ordering, not presentation-linkbase-faithful.
+For citation-attribution and error-detection evaluation. Limitations: single
+statements (not multi-document like FinAuditing); injected, not naturally occurring,
+errors; 15 governing paragraphs (a hand-written rule system solves the citation task);
+70 US / 31 IFRS companies (no banks, insurers, REITs, utilities); cash-flow statements templated; row order from calculation, not
+presentation, linkbases; DQC ids not used as labels.
 
 ## 8. Distribution & maintenance
 Repo `manmad-web/IntelliAudit`; regenerate with `scripts/build_benchmark.py`.

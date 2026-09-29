@@ -1,0 +1,148 @@
+{
+  "company": "VERIZON COMMUNICATIONS INC",
+  "ticker": "VZ",
+  "cik": "0000732712",
+  "statement_type": "CashFlow",
+  "fiscal_year": 2022,
+  "period": "2022-12-31",
+  "unit": "USD millions",
+  "source": "SEC EDGAR companyfacts (real 10-K)",
+  "rows": [
+    {
+      "idx": 0,
+      "label": "Operating activities:",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 1,
+      "label": "Net income",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetIncomeLoss",
+      "value": 21256,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 2,
+      "label": "Other operating activities, net",
+      "section": "OperatingActivities",
+      "concept": null,
+      "value": 15885,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 3,
+      "label": "Net cash from operating activities",
+      "section": "OperatingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+      "value": 37141,
+      "kind": "subtotal",
+      "sums": [
+        1,
+        2
+      ]
+    },
+    {
+      "idx": 4,
+      "label": "Investing activities:",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 5,
+      "label": "Other investing activities, net",
+      "section": "InvestingActivities",
+      "concept": null,
+      "value": -28662,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 6,
+      "label": "Net cash from investing activities",
+      "section": "InvestingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+      "value": -28662,
+      "kind": "subtotal",
+      "sums": [
+        5
+      ]
+    },
+    {
+      "idx": 7,
+      "label": "Financing activities:",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": null,
+      "kind": "header"
+    },
+    {
+      "idx": 8,
+      "label": "Dividends paid",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:PaymentsOfDividendsCommonStock",
+      "value": -10805,
+      "kind": "line",
+      "injectable": true
+    },
+    {
+      "idx": 9,
+      "label": "Other financing activities, net",
+      "section": "FinancingActivities",
+      "concept": null,
+      "value": 2276,
+      "kind": "line",
+      "injectable": false,
+      "residual": true
+    },
+    {
+      "idx": 10,
+      "label": "Net cash from financing activities",
+      "section": "FinancingActivities",
+      "concept": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+      "value": -8529,
+      "kind": "subtotal",
+      "sums": [
+        8,
+        9
+      ]
+    },
+    {
+      "idx": 11,
+      "label": "Net increase (decrease) in cash",
+      "section": "NetChange",
+      "concept": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "value": -50,
+      "kind": "total",
+      "sums": [
+        3,
+        6,
+        10
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "lhs": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+      "rhs": [
+        "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+        "us-gaap:NetCashProvidedByUsedInFinancingActivities"
+      ],
+      "name": "cash_rollforward",
+      "tolerant": true
+    }
+  ],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
+}

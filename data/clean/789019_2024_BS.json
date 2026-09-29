@@ -131,7 +131,7 @@
     },
     {
       "idx": 13,
-      "label": "Other non-current assets, net (residual)",
+      "label": "Other non-current assets, net",
       "section": "NoncurrentAssets",
       "concept": null,
       "value": 27597,
@@ -186,7 +186,7 @@
     },
     {
       "idx": 18,
-      "label": "Deferred revenue, current",
+      "label": "Deferred revenue",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:ContractWithCustomerLiabilityCurrent",
       "value": 57582,
@@ -204,7 +204,7 @@
     },
     {
       "idx": 20,
-      "label": "Employee-related liabilities",
+      "label": "Accrued compensation",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:EmployeeRelatedLiabilitiesCurrent",
       "value": 12564,
@@ -222,7 +222,7 @@
     },
     {
       "idx": 22,
-      "label": "Long-term debt, current",
+      "label": "Current portion of long-term debt",
       "section": "CurrentLiabilities",
       "concept": "us-gaap:LongTermDebtCurrent",
       "value": 2249,
@@ -231,7 +231,7 @@
     },
     {
       "idx": 23,
-      "label": "Other current liabilities, net (residual)",
+      "label": "Other current liabilities, net",
       "section": "CurrentLiabilities",
       "concept": null,
       "value": 5017,
@@ -266,7 +266,7 @@
     },
     {
       "idx": 26,
-      "label": "Long-term debt, non-current",
+      "label": "Long-term debt",
       "section": "NoncurrentLiabilities",
       "concept": "us-gaap:LongTermDebtNoncurrent",
       "value": 42688,
@@ -275,7 +275,7 @@
     },
     {
       "idx": 27,
-      "label": "Operating lease liabilities, non-current",
+      "label": "Operating lease liabilities",
       "section": "NoncurrentLiabilities",
       "concept": "us-gaap:OperatingLeaseLiabilityNoncurrent",
       "value": 15497,
@@ -284,7 +284,7 @@
     },
     {
       "idx": 28,
-      "label": "Deferred income tax liabilities",
+      "label": "Deferred income taxes",
       "section": "NoncurrentLiabilities",
       "concept": "us-gaap:DeferredIncomeTaxLiabilitiesNet",
       "value": 2618,
@@ -302,7 +302,7 @@
     },
     {
       "idx": 30,
-      "label": "Other non-current liabilities, net (residual)",
+      "label": "Other non-current liabilities, net",
       "section": "NoncurrentLiabilities",
       "concept": null,
       "value": 30533,
@@ -406,5 +406,9 @@
       ],
       "name": "accounting_equation"
     }
-  ]
+  ],
+  "normalization": {
+    "version": 2,
+    "notes": []
+  }
 }

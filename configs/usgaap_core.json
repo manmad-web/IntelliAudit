@@ -1,0 +1,16 @@
+{
+  "companies": [
+    {"name": "Apple Inc.", "ticker": "AAPL", "cik": "320193"},
+    {"name": "Microsoft Corp.", "ticker": "MSFT", "cik": "789019"},
+    {"name": "NVIDIA Corp.", "ticker": "NVDA", "cik": "1045810"},
+    {"name": "Alphabet Inc.", "ticker": "GOOGL", "cik": "1652044"},
+    {"name": "Meta Platforms Inc.", "ticker": "META", "cik": "1326801"},
+    {"name": "Coca-Cola Co.", "ticker": "KO", "cik": "21344"},
+    {"name": "Johnson & Johnson", "ticker": "JNJ", "cik": "200406"},
+    {"name": "Walmart Inc.", "ticker": "WMT", "cik": "104169"}
+  ],
+  "fiscal_years": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+  "n_per_rule_per_statement": 1,
+  "seed": 13,
+  "notes": "Real 10-K balance sheets from SEC EDGAR companyfacts; transactions synthetic (see transactions.py); errors injected rule-first; citations cross-checked vs official US-GAAP linkbase."
+}

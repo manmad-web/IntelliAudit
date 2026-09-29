@@ -56,17 +56,16 @@ class TransactionsTest(unittest.TestCase):
             self.assertNotRegex(tx, r"\+\-")
             totals = {21120, 16849, 92284}
             for line in tx.splitlines():
-                if not line.startswith("[row"):
+                if not line.startswith("["):
                     continue
                 parts = parse_signed_parts(line)
                 self.assertGreaterEqual(len(parts), 2, line)
                 for p in parts:
                     self.assertNotIn(abs(p), totals, f"component {p} equals a line total in {line}")
-                m = re.match(r"\[row (\d+)\]", line)
-                idx = int(m.group(1))
-                want = next(r["value"] for r in stmt["rows"] if r["idx"] == idx)
+                label = re.match(r"\[(.*?)\]", line).group(1)
+                want = next(r["value"] for r in stmt["rows"] if r["label"] == label)
                 self.assertEqual(sum(parts), want, line)
-                if "Retained earnings" in line or idx == 2:
+                if label == "RE":
                     seen_re = True
                     self.assertIn("dividends declared", line)
                     self.assertIn("decrease", line)
@@ -79,8 +78,8 @@ class TransactionsTest(unittest.TestCase):
              "concept": None, "value": -400, "section": "Equity", "residual": True},
         ])
         tx = generate_for_statement(stmt, seed=1)
-        self.assertIn("[row 0]", tx)
-        line = [ln for ln in tx.splitlines() if ln.startswith("[row 0]")][0]
+        self.assertIn("[Other equity, net (residual)]", tx)
+        line = [ln for ln in tx.splitlines() if ln.startswith("[Other equity")][0]
         self.assertEqual(sum(parse_signed_parts(line)), -400)
         self.assertIn("decrease", line)
         self.assertNotIn("+-", line)
@@ -94,7 +93,7 @@ class TransactionsTest(unittest.TestCase):
              "value": 50, "section": "CurrentAssets"},
         ])
         tx = generate_for_statement(stmt, seed=0)
-        self.assertNotIn("[row 0]", tx)
+        self.assertNotIn("[Empty]", tx)
 
     def test_apple_re_block_is_bookkeeping(self):
         stmt = _apple_bs()
@@ -116,7 +115,7 @@ class TransactionsTest(unittest.TestCase):
         forbidden = _forbidden(stmt)
         tx = generate_for_statement(stmt, seed=stmt["fiscal_year"])
         for line in tx.splitlines():
-            if not line.startswith("[row"):
+            if not line.startswith("["):
                 continue
             for p in parse_signed_parts(line):
                 self.assertNotIn(abs(p), forbidden)
@@ -148,6 +147,37 @@ class TransactionsTest(unittest.TestCase):
     def test_header_states_amounts_are_not_totals(self):
         tx = generate_for_statement(_apple_bs(), seed=2015)
         self.assertIn("NOT the reported line totals", tx)
+
+    def test_expense_lines_are_mostly_the_expense(self):
+        """A -214,137 cost of revenue is a large cost and a small credit, not the reverse."""
+        stmt = _stmt([{"idx": 0, "label": "Cost of revenue", "kind": "line",
+                       "concept": "us-gaap:CostOfGoodsAndServicesSold", "value": -214137,
+                       "section": "IncomeStatement"}], statement_type="IncomeStatement")
+        for seed in range(20):
+            tx = generate_for_statement(stmt, seed=seed)
+            lines = [ln for ln in tx.splitlines() if ln.startswith("[Cost of revenue]")]
+            if not lines:
+                continue
+            parts = parse_signed_parts(lines[0])
+            self.assertEqual(sum(parts), -214137)
+            cost = [p for p in parts if p < 0][0]
+            credit = [p for p in parts if p > 0][0]
+            self.assertGreater(abs(cost), 3 * credit, lines[0])
+
+    def test_negative_balances_keep_their_event_direction(self):
+        """Treasury stock is reacquisitions, not negative reissues."""
+        stmt = _stmt([{"idx": 0, "label": "Treasury stock", "kind": "line",
+                       "concept": "us-gaap:TreasuryStockValue", "value": -75662, "section": "Equity"}])
+        for seed in range(20):
+            tx = generate_for_statement(stmt, seed=seed)
+            lines = [ln for ln in tx.splitlines() if ln.startswith("[Treasury stock]")]
+            if lines:
+                self.assertRegex(lines[0], r"shares reacquired: −[\d,]+ \(decrease\)")
+                self.assertRegex(lines[0], r"treasury shares reissued: \+[\d,]+ \(increase\)")
+
+    def test_evidence_has_no_row_numbers(self):
+        tx = generate_for_statement(_apple_bs(), seed=2015)
+        self.assertNotRegex(tx, r"\[row \d+\]")
 
     def test_pair_never_returns_the_total(self):
         rng = random.Random(0)

@@ -1,20 +1,123 @@
 ######################################################################
-IA-AAPL-2015-BS-R07_balance_sheet_identity_break-00
-  Apple Inc. FY2015 | BalanceSheet
-  error: Numerical Error on us-gaap:RetainedEarningsAccumulatedDeficit
-  CITATION GT: ASC 210-10-45-1  [linkbase-verified]  linkbase set: ['ASC 852-10-55-10', 'ASC 944-40-65-2((g)(2)(i))', 'ASC 944-40-65-2((h)(2))']
-  transactions (1st line): [contributing to row 1] Cash and cash equivalents | 21,120 [SEP] cash collected from customers: +12,476 (inflo
-
+EX-2be4dc96a623  (CONTROL, Apple Inc. FY2015 BalanceSheet)
+  judgement: Correct   error: None   citation: None  [no-error]
+  supporting facts:- Available-for-sale securities (current asset): debt securities classified as available-for-sale — amortized cost 19,308; fair value at period-end (quoted and observable market prices) 20,481.
+    - Inventories: period-end valuation memo — inventories at cost 2,349; estimated selling prices less costs of completion, disposal and transportation 2,877.
+    - Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 4,211; undiscounted cash flows expected from use and disposal 5,403; fair value 4,724. No impairment loss was recorded.
+    - Goodwill: 
 ######################################################################
-IA-AAPL-2017-IS-R09_revenue_recognition_timing-00
-  Apple Inc. FY2017 | IncomeStatement
-  error: Numerical Error on us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax
-  CITATION GT: ASC 606-10-25-1  [linkbase-verified]  linkbase set: ['ASC 924-10-S99-1((SAB Topic 11.L))', 'ASC 606-10-50-5', 'ASC 280-10-50-30((a))']
-  transactions (1st line): [contributing to row 0] Revenue | 229,234 [SEP] business activity contributing to the balance: +229,234 (inflo
-
+EX-b1146ce01aab  (R01, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Misclassification   citation: ASC 210-10-45-1  [linkbase-verified]
+  supporting facts:- Inventories: lower-of-cost-and-net-realizable-value review at period-end — carrying amount 2,349; estimated net realizable value 2,800.
+    - Long-term debt (53,463): at period-end the entity was in compliance with all financial covenants. Under the credit agreement a covenant breach entitles the lenders to demand repayment.
 ######################################################################
-IA-AAPL-2015-CF-R08_cashflow_section_misclass-00
-  Apple Inc. FY2015 | CashFlow
-  error: Misclassification on us-gaap:PaymentsToAcquirePropertyPlantAndEquipment
-  CITATION GT: ASC 230-10-45  [linkbase-verified]  linkbase set: ['ASC 230-10-45-13((c))']
-  transactions (1st line): [contributing to row 1] Net income | 53,394 [SEP] business activity contributing to the balance: +53,394 (infl
+EX-ab968666d852  (R02, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Misclassification   citation: ASC 210-10-45-8  [expert-authored-UNVALIDATED]
+  supporting facts:- Available-for-sale securities (current asset): debt securities classified as available-for-sale — amortized cost 20,766; fair value at period-end (quoted and observable market prices) 20,481.
+    - Accounts receivable, net: credit-loss review — gross receivables 17,329; lifetime expected credit losses estimated at period-end 480; allowance for credit losses recorded 480.
+    - Inventories: lower-of-cost-and-net-realizable-value review at period-end — carrying amount 2,349; estimated net realizable value 2,903.
+    - Available-for-sale securities (non-current asset): debt securities classified as availab
+######################################################################
+EX-a97f5655aa18  (R03, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Misclassification   citation: ASC 210-10-45-12  [expert-authored-UNVALIDATED]
+  supporting facts:- Available-for-sale securities (non-current asset): available-for-sale debt portfolio at period-end — fair value 164,065; amortized cost basis 171,388.
+    - Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 4,307; undiscounted cash flows expected from use and disposal 4,951; fair value 5,372. No impairment loss was recorded.
+    - Long-term debt (53,463): at period-end the entity breached the maximum leverage covenant; before the financial statements were issued the lenders waived the breach and their right to demand repayment for a p
+######################################################################
+EX-3072041f4196  (R04, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Missing Row   citation: None  [no-governing-paragraph]
+  supporting facts:- Available-for-sale securities (current asset): available-for-sale debt portfolio at period-end — fair value 20,481; amortized cost basis 20,796.
+    - Accounts receivable, net: expected-credit-loss model output — amortized cost of receivables 17,393; expected credit losses 544; allowance on the books 544.
+    - Inventories: lower-of-cost-and-net-realizable-value review at period-end — carrying amount 2,349; estimated net realizable value 2,836.
+    - Available-for-sale securities (non-current asset): debt securities classified as available-for-sale — amortized cost 167,266; fair value at period-end (quo
+######################################################################
+EX-80122a948372  (R05, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: None  [no-governing-paragraph]
+  supporting facts:- Available-for-sale securities (current asset): debt securities classified as available-for-sale — amortized cost 21,539; fair value at period-end (quoted and observable market prices) 20,481.
+    - Accounts receivable, net: credit-loss review — gross receivables 17,503; lifetime expected credit losses estimated at period-end 654; allowance for credit losses recorded 654.
+    - Inventories: lower-of-cost-and-net-realizable-value review at period-end — carrying amount 2,349; estimated net realizable value 2,971.
+    - Property, plant and equipment, net: long-lived asset review (asset group with a triggeri
+######################################################################
+EX-24910ecebe38  (R06, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Redundant Row   citation: None  [no-governing-paragraph]
+  supporting facts:- Available-for-sale securities (current asset): available-for-sale debt portfolio at period-end — fair value 20,481; amortized cost basis 21,572.
+    - Accounts receivable, net: credit-loss review — gross receivables 17,569; lifetime expected credit losses estimated at period-end 720; allowance for credit losses recorded 720.
+    - Inventories: period-end valuation memo — inventories at cost 2,349; estimated selling prices less costs of completion, disposal and transportation 2,566.
+######################################################################
+EX-8c0915da4d4a  (R07, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: None  [no-governing-paragraph]
+  supporting facts:- Available-for-sale securities (current asset): available-for-sale debt portfolio at period-end — fair value 20,481; amortized cost basis 19,697.
+    - Goodwill: annual impairment test of the reporting unit to which this goodwill is assigned — carrying amount of the reporting unit including goodwill 9,584; fair value of the reporting unit 12,500.
+    - Long-term debt (53,463): at period-end the entity was in compliance with all financial covenants. Under the credit agreement a covenant breach entitles the lenders to demand repayment.
+######################################################################
+EX-f6977a8b9159  (R08, Apple Inc. FY2015 CashFlow)
+  judgement: Incorrect   error: Misclassification   citation: ASC 230-10-45-13  [linkbase-verified]
+######################################################################
+EX-ed64eea390bf  (R09, Apple Inc. FY2016 IncomeStatement)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 606-10-25-23  [expert-authored-UNVALIDATED]
+  supporting facts:- Revenue: cut-off review — consideration billed or received during the period for performance obligations not yet satisfied at period-end 41,994; of which recorded as contract liabilities (deferred revenue) 2,054.
+######################################################################
+EX-2fe52c838f13  (R10, ADOBE INC. FY2020 BalanceSheet)
+  judgement: Incorrect   error: Misclassification   citation: ASC 842-10-25-2  [expert-authored-UNVALIDATED]
+  supporting facts:- Property, plant and equipment, net: one asset group within this line was tested after a triggering event (sustained operating losses) — carrying amount of the asset group 362; sum of undiscounted future cash flows 481; fair value of the asset group 298. No impairment loss was recorded.
+    - Finance lease right-of-use assets: classification tests for the underlying leases — ownership transfers to the lessee: no; purchase option reasonably certain to be exercised: no; lease term as % of remaining economic life: 54%; present value of lease payments as % of fair value of the underlying assets: 47%;
+######################################################################
+EX-9e0e53e96088  (R11, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 330-10-35-1B  [expert-authored-UNVALIDATED]
+  supporting facts:- Available-for-sale securities (current asset): debt securities classified as available-for-sale — amortized cost 21,622; fair value at period-end (quoted and observable market prices) 20,481.
+    - Accounts receivable, net: expected-credit-loss model output — amortized cost of receivables 17,503; expected credit losses 654; allowance on the books 654.
+    - Inventories: lower-of-cost-and-net-realizable-value review at period-end — carrying amount 2,993; estimated net realizable value 2,349.
+    - Long-term debt (53,463): covenant compliance review — breached the maximum leverage covenant; before the fin
+######################################################################
+EX-fd70c8e9013d  (R12, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: None  [no-governing-paragraph]
+  supporting facts:- Available-for-sale securities (current asset): debt securities classified as available-for-sale — amortized cost 19,271; fair value at period-end (quoted and observable market prices) 20,481.
+    - Available-for-sale securities (non-current asset): available-for-sale debt portfolio at period-end — fair value 164,065; amortized cost basis 160,349.
+    - Long-term debt (53,463): at period-end the entity was in compliance with all financial covenants. Under the credit agreement a covenant breach entitles the lenders to demand repayment.
+######################################################################
+EX-71e5ae7dbbb3  (R14, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 350-20-35-1  [expert-authored-UNVALIDATED]
+  supporting facts:- Available-for-sale securities (current asset): available-for-sale debt portfolio at period-end — fair value 20,481; amortized cost basis 20,673.
+    - Accounts receivable, net: credit-loss review — gross receivables 16,946; lifetime expected credit losses estimated at period-end 97; allowance for credit losses recorded 97.
+    - Available-for-sale securities (non-current asset): debt securities classified as available-for-sale — amortized cost 155,193; fair value at period-end (quoted and observable market prices) 164,065.
+    - Property, plant and equipment, net: long-lived asset review (asset group wi
+######################################################################
+EX-1723dce64167  (R15, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 320-10-35-1  [expert-authored-UNVALIDATED]
+  supporting facts:- Available-for-sale securities (current asset): available-for-sale debt portfolio at period-end — fair value 20,481; amortized cost basis 22,191.
+    - Inventories: period-end valuation memo — inventories at cost 2,349; estimated selling prices less costs of completion, disposal and transportation 2,444.
+    - Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 4,396; undiscounted cash flows expected from use and disposal 5,108; fair value 3,311. No impairment loss was recorded.
+######################################################################
+EX-c083b8f4abcc  (R16, Apple Inc. FY2015 CashFlow)
+  judgement: Incorrect   error: Misclassification   citation: ASC 230-10-45-15  [linkbase-verified]
+######################################################################
+EX-4dfd1514e122  (R17, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 326-20-30-1  [expert-authored-UNVALIDATED]
+  supporting facts:- Available-for-sale securities (current asset): debt securities classified as available-for-sale — amortized cost 19,346; fair value at period-end (quoted and observable market prices) 20,481.
+    - Accounts receivable, net: credit-loss review — gross receivables 18,046; lifetime expected credit losses estimated at period-end 1,197; allowance for credit losses recorded 1.
+    - Inventories: period-end valuation memo — inventories at cost 2,349; estimated selling prices less costs of completion, disposal and transportation 2,623.
+    - Property, plant and equipment, net: long-lived asset review (asset gro
+######################################################################
+EX-7cf496038adf  (R18, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 360-10-35-17  [expert-authored-UNVALIDATED]
+  supporting facts:- Accounts receivable, net: expected-credit-loss model output — amortized cost of receivables 17,235; expected credit losses 386; allowance on the books 386.
+    - Inventories: period-end valuation memo — inventories at cost 2,349; estimated selling prices less costs of completion, disposal and transportation 2,638.
+    - Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 3,397; undiscounted cash flows expected from use and disposal 3,090; fair value 2,140. No impairment loss was recorded.
+    - Goodwill: annual impairment test of the report
+######################################################################
+EX-9b869ce3076b  (R19, Apple Inc. FY2015 BalanceSheet)
+  judgement: Incorrect   error: Misclassification   citation: ASC 470-10-45-11  [expert-authored-UNVALIDATED]
+  supporting facts:- Available-for-sale securities (current asset): available-for-sale debt portfolio at period-end — fair value 20,481; amortized cost basis 21,562.
+    - Available-for-sale securities (non-current asset): debt securities classified as available-for-sale — amortized cost 166,492; fair value at period-end (quoted and observable market prices) 164,065.
+    - Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 1,368; undiscounted cash flows expected from use and disposal 1,795; fair value 1,234. No impairment loss was recorded.
+    - Goodwill: ann
+######################################################################
+EX-37caae39e967  (R20, ADOBE INC. FY2020 BalanceSheet)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 740-10-30-5  [expert-authored-UNVALIDATED]
+  supporting facts:- Property, plant and equipment, net: long-lived asset review (asset group with a triggering event) — carrying amount 328; undiscounted cash flows expected from use and disposal 388; fair value 242. No impairment loss was recorded.
+    - Operating lease right-of-use assets: classification tests for the underlying leases — ownership transfers to the lessee: no; purchase option reasonably certain to be exercised: no; lease term as % of remaining economic life: 55%; present value of lease payments as % of fair value of the underlying assets: 33%; asset of a specialized nature: no.
+    - Deferred income t
+######################################################################
+EX-9263e14bbe98  (R21, Apple Inc. FY2016 IncomeStatement)
+  judgement: Incorrect   error: Numerical Error   citation: ASC 730-10-25-1  [expert-authored-UNVALIDATED]
+  supporting facts:- Research and development: research and development costs incurred in the period 10,045; expensed 8,454; capitalized to the balance sheet as development costs 1,591.
