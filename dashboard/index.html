@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#162d38">
+  <title>Accountant Review · IntelliAudit</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23162d38'/%3E%3Cpath d='m8 17 5 5 11-13' fill='none' stroke='%235cd4b2' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="IntelliAudit home"><span class="brand-mark">i<span>✓</span></span><span>IntelliAudit<small>BENCHMARK WORKSPACE</small></span></a>
+    <div class="workspace-label">WORKSPACE</div>
+    <button class="nav-item active" data-queue="all"><span class="nav-icon">▦</span> Accountant review <span class="nav-dot"></span></button>
+    <button class="nav-item" data-queue="pending"><span class="nav-icon">◷</span> To review <span id="nav-pending" class="nav-count">—</span></button>
+    <button class="nav-item" data-queue="flagged"><span class="nav-icon">⚑</span> Flagged cases <span id="nav-flagged" class="nav-count">—</span></button>
+    <button class="nav-item" data-queue="approved"><span class="nav-icon">✓</span> Approved <span id="nav-approved" class="nav-count">—</span></button>
+    <button class="nav-item" data-queue="rejected"><span class="nav-icon">×</span> Rejected answers <span id="nav-rejected" class="nav-count">—</span></button>
+    <div class="sidebar-bottom"><div class="local-indicator"><span></span> Local review workspace</div><p>Based on real SEC filings.<br>Built for expert judgement.</p><div class="reviewer-avatar">AR</div><div class="reviewer">Accountant review<small>Notes saved in this browser</small></div></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong>Accountant review</strong></div><div class="topbar-right"><span class="version">BENCHMARK v0.5</span><button id="help-button" class="icon-button" aria-label="Review guide">?</button><span class="avatar">AR</span></div></header>
+    <main class="workspace">
+      <section class="page-heading"><div><div class="eyebrow">EXPERT VALIDATION</div><h1>Accountant review</h1><p>Inspect the evidence. Validate the citation. Make the call.</p></div><div class="heading-actions"><button id="import-button" class="button secondary"><span aria-hidden="true">↥</span> Import reviews</button><button id="export-button" class="button primary"><span aria-hidden="true">↧</span> Export reviews</button><input id="import-file" type="file" accept="application/json,.json" hidden></div></section>
+      <section class="summary-grid" aria-label="Review summary">
+        <div class="stat-card"><div class="stat-label">Total cases <span class="stat-icon">▤</span></div><strong id="stat-total">—</strong><small id="stat-scope">Loading benchmark…</small></div>
+        <div class="stat-card"><div class="stat-label">Awaiting review <span class="stat-icon amber">◷</span></div><strong id="stat-pending">—</strong><small>Ready for your assessment</small></div>
+        <div class="stat-card"><div class="stat-label">Approved <span class="stat-icon green">✓</span></div><strong id="stat-approved">—</strong><small id="stat-approved-detail">Validated by you</small></div>
+        <div class="stat-card"><div class="stat-label">Flagged <span class="stat-icon red">⚑</span></div><strong id="stat-flagged">—</strong><small>Needs a second look</small></div>
+      </section>
+      <section class="review-toolbar" aria-label="Case filters">
+        <div class="filter-top"><label class="search-field"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search cases, line items, amounts…" aria-label="Search cases, line items, amounts"></label><label class="dataset-field">DATASET<select id="dataset"><option value="us-gaap">US GAAP · Single-error</option><option value="multi">US GAAP · Multi-error</option><option value="ifrs">IFRS · Single-error</option></select></label><button id="more-filters" class="button secondary" aria-expanded="false" aria-controls="advanced-filters">More filters <span id="filter-count"></span> ☷</button></div>
+        <div class="filter-row"><label>Company<select id="filter-company"><option value="">All companies</option></select></label><label>Fiscal year<select id="filter-fiscal_year"><option value="">All years</option></select></label><label>Statement<select id="filter-statement_type"><option value="">All statements</option></select></label><label>Citation tier<select id="filter-tiers"><option value="">All tiers</option></select></label><button id="reset-filters" class="text-button">Reset filters</button></div>
+        <div id="advanced-filters" class="filter-row" hidden><label>Rule<select id="filter-rules"><option value="">All rules</option></select></label><label>Error type<select id="filter-error_types"><option value="">All error types</option></select></label><label>Governing paragraph<select id="filter-citations"><option value="">All paragraphs</option></select></label><label>Exam form<select id="filter-form"><option value="">All forms</option></select></label><label>Case type<select id="filter-kind"><option value="">All types</option></select></label></div>
+      </section>
+      <section class="review-panel">
+        <div class="panel-header"><div class="queue-tabs" role="group" aria-label="Review queue"><button data-queue="all" class="selected">All cases <span id="tab-total">—</span></button><button data-queue="pending">To review</button><button data-queue="flagged">Flagged</button><button data-queue="approved">Approved</button><button data-queue="rejected">Rejected</button></div><div class="progress"><span id="progress-text">0% reviewed</span><progress id="review-progress" max="100" value="0"></progress></div></div>
+        <div class="review-layout">
+          <aside class="case-queue" aria-label="Case list"><div class="queue-heading"><span id="result-count" aria-live="polite">Loading cases…</span><select id="sort" aria-label="Sort cases"><option value="company">Company A–Z</option><option value="year">Newest first</option><option value="tier">Unvalidated first</option></select></div><div id="case-list" class="case-list"></div><div class="pagination"><button id="page-prev" class="icon-button" aria-label="Previous page">←</button><span id="page-info">—</span><button id="page-next" class="icon-button" aria-label="Next page">→</button></div></aside>
+          <div id="case-detail" class="case-detail"><div class="empty-state"><div class="empty-icon">▤</div><h2>Loading your workspace</h2><p>Reading the benchmark and answer key…</p></div></div>
+        </div>
+      </section>
+      <footer class="workspace-footer"><span><span class="footer-dot"></span> Real filing values · Synthetic transaction evidence</span><span>Review decisions are separate from benchmark labels</span></footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <dialog id="guide"><div class="dialog-heading"><h2>A workspace for expert review</h2><button id="close-guide" class="icon-button" aria-label="Close review guide">×</button></div><p>Filter a dataset, select a case, and compare its statement and transaction evidence with the proposed answer key.</p><ol><li><strong>Inspect the statement.</strong> Switch to the corrected version to check the proposed change. Highlighting uses each version’s own row numbers; missing rows are described in the answer key.</li><li><strong>Validate the answer.</strong> Check the judgement, affected line, governing paragraph, and rationale. “Expert authored · unvalidated” is a dataset label, not accountant approval.</li><li><strong>Record your decision.</strong> Approve the proposed answer, flag it for follow-up, or reject it and document your alternative.</li></ol><p>Notes and decisions are stored in this browser for this dataset version. Export them to back up or share your work; import an export to continue in another browser. Export includes only saved reviews, across all filters in the current dataset.</p><p>Amounts use the currency and scale shown on each case. This reviewer intentionally exposes benchmark labels and is separate from blind model evaluation.</p></dialog>
+</body>
+</html>

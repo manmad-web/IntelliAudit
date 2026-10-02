@@ -49,6 +49,44 @@ check_triviality.py ─► 15-check gate, 8 of them exam-only
 
 ## Run
 
+### Accountant review dashboard
+
+```bash
+python dashboard/server.py                   # open http://127.0.0.1:8080
+python dashboard/server.py --port 8090       # optional port
+```
+
+The local dashboard reads the committed exam and answer-key files directly,
+with US GAAP, multi-error US GAAP, and IFRS dataset selection. Search statement
+values and evidence; filter by company, year, statement, rule, error type,
+paragraph, citation tier, case type, or exam form. Compare given and corrected
+statements, inspect transaction evidence, and approve, flag, or reject the
+proposed answer with your notes and alternative judgement/citation.
+
+Each dashboard dataset is limited to **eight companies** for manageable review.
+US GAAP and multi-error use Apple, Microsoft, NVIDIA, Alphabet, Meta, Coca-Cola,
+Johnson & Johnson, and Walmart. IFRS uses SAP, Novartis, AstraZeneca, GSK, Sanofi,
+Novo Nordisk, Unilever, and Diageo. All fiscal years and available case types for
+those companies remain reviewable. This scope applies to case lists, searches,
+filters, counts, and direct case links; the committed benchmark files stay intact.
+
+Reviews save automatically in the current browser, separately for each dataset
+and data version. **Export reviews** downloads a JSON backup of all saved reviews
+in the current eight-company subset (including notes-only drafts), regardless of filters.
+**Import reviews** restores a matching export and keeps newer local reviews.
+Use exports to share reviews or move between browsers. Clearing browser storage,
+changing browser/profile/port, or rebuilding the dataset can change which saved
+reviews appear. The dashboard does not modify benchmark data or citation labels.
+
+This is an answer-key review workspace, separate from blind model evaluation.
+“Linkbase verified” and “Expert authored · unvalidated” remain dataset provenance
+labels; accountant decisions are recorded separately. Statement amounts retain
+their source values and use the case's declared currency and scale. No additional
+dependencies or external services are required. Stop the server with Ctrl+C.
+Restart the server after rebuilding or replacing the dataset files.
+
+### Benchmark pipeline
+
 ```bash
 python3 --version                                   # 3.9+; standard library only
 
