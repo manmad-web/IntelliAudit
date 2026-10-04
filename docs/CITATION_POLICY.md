@@ -1,3 +1,5 @@
+> **Current status (3 October 2026):** Historical construction/policy notes below do not establish expert-reviewed gold. The benchmark-first workflow in [TEAM_HANDOFF](TEAM_HANDOFF.md) and its annotation/release gates control new research. Paid evaluation is paused pending the review pilot. Linkbase membership is association, not accounting applicability.
+
 # Citation policy — which paragraph governs
 
 This is the rule the answer key follows. It is a choice. An accountant can reject it; the disagreements worth having are listed at the end. A string typed into `rulebook.json` is not ground truth until this rule selects it.

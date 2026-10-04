@@ -1,3 +1,5 @@
+> **Current status (3 October 2026):** Historical construction/policy notes below do not establish expert-reviewed gold. The benchmark-first workflow in [TEAM_HANDOFF](TEAM_HANDOFF.md) and its annotation/release gates control new research. Paid evaluation is paused pending the review pilot. Linkbase membership is association, not accounting applicability.
+
 # Evaluation protocol (v0.4)
 
 ## 1. Give a system the exam, never the key

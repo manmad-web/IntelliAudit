@@ -1,170 +1,125 @@
-# IntelliAudit-Bench
+# IntelliAudit: evidence and accounting review
 
-A **standards-citation benchmark** for LLM financial auditing. Real 10-K statements
-(SEC EDGAR); each exam item is either a clean control or carries one injected fault,
-with ledger evidence and period-end supporting facts. For a citable fault, the
-answer is the **one FASB ASC paragraph that governs the violation**
-(`ASC 330-10-35-1B`, `ASC 470-10-45-11`, …), selected by a written policy and
-cross-checked against the FASB reference linkbase.
+This branch (`codex/accountant-review-dashboard`) owns dataset construction,
+provenance, and accountant review. The companion
+[capstone branch](https://github.com/dakshkashyap/financial-audit-capstone/tree/research/evidence-audit-2026)
+owns model methods, frozen evaluation, costs, results, and the paper.
 
-> **Status (v0.5, Sept 2026).** Built from SEC EDGAR: **US GAAP** 70 companies, 1,989 real statements (FY2015–2024); **IFRS** 31 SEC 20-F/40-F filers, 161 real balance sheets (FY2018–2024), a separate dataset. Mohsen's detection, guessability and leakage findings are fixed; the US gate passes. Still open: cash-flow statements templated (33% filler), no accountant review of the paragraphs, IFRS covers balance sheets only and fails the gate's 12-paragraph breadth check (8). Read [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) before quoting a number.
+**Current status: development, expert review pending.** The new 20-case pilot
+covers five companies and one narrow revenue-cutoff family. No completed
+accountant reviews or validated gold-standard results are claimed. Existing
+US-GAAP/IFRS labels remain provisional. Automated checks and reference-linkbase
+membership do not establish accounting correctness.
 
-## What an item looks like
+Start with [TEAM_HANDOFF](docs/TEAM_HANDOFF.md),
+[research plan](docs/RESEARCH_PLAN.md), [annotation protocol](docs/ANNOTATION_PROTOCOL.md),
+and [release gates](docs/RELEASE_GATES.md).
 
-```
-[row 1]: Inventories | $13,565 [SEP]             <- statement as shown (foots; arithmetic finds nothing)
-...
-Transaction evidence — Johnson & Johnson FY2023 (BalanceSheet) ...
-[Accounts payable] purchases on credit: +11,128 (increase); payments to vendors: −1,496 (decrease)
-...
-Supporting facts (period-end reviews):
-- Inventories: period-end valuation memo — inventories at cost 13,565; estimated selling
-  prices less costs of completion, disposal and transportation 11,181.
-- Goodwill: impairment test ... reporting unit fair value 145,960; carrying amount 122,184.
-- Long-term debt (25,881): covenant compliance review — was in compliance ...
-```
-Answer key: `Incorrect`, Numerical Error, row 1, **ASC 330-10-35-1B**. The goodwill and
-debt facts are consistent decoys; clean controls carry the same kinds of facts.
+## Start the blind review
 
-## How the dataset is built
-
-```
-config.json (companies × fiscal years)             configs/usgaap_expansion.json, configs/ifrs.json
-      │
-edgar_ingest.py ─► real 10-K facts (SEC companyfacts)
-statement_builder.py ─► BS from each filing's own calculation linkbase (IS/CF: template)
-normalize.py ─► calc-weight signs, sectioning, real captions (values unchanged)
-      │
-injector.py + rulebook.json ─► one fault per item (or a clean control)
-      │   citable faults keep the statement footing:
-      │     moves recompute subtotals; measurement faults post the other side of the entry
-      ├─► citation_resolver.py: paragraph-level check vs the FASB reference linkbase
-      │                         (offline: data/reference/us-gaap-2023_ref_cache.json)
-      ├─► transactions.py: ledger movements keyed by caption
-      └─► evidence.py: contrastive supporting facts on every statement
-      │
-split_dataset.py ─► exam.jsonl (opaque ids, forms) | answer_key.jsonl | statements_clean.jsonl
-check_triviality.py ─► 15-check gate, 8 of them exam-only
-```
-
-## Run
-
-### Accountant review dashboard
+Python 3.9+; dashboard and review tools use the standard library.
 
 ```bash
-python dashboard/server.py                   # open http://127.0.0.1:8080
-python dashboard/server.py --port 8090       # optional port
+git switch codex/accountant-review-dashboard
+python dashboard/server.py
+# Open http://127.0.0.1:8080
 ```
 
-The local dashboard reads the committed exam and answer-key files directly,
-with US GAAP, multi-error US GAAP, and IFRS dataset selection. Search statement
-values and evidence; filter by company, year, statement, rule, error type,
-paragraph, citation tier, case type, or exam form. Compare given and corrected
-statements, inspect transaction evidence, and approve, flag, or reject the
-proposed answer with your notes and alternative judgement/citation.
+The default workspace presents the review pilot without proposed answers,
+rule IDs, corrected statements, or answer-based filters. Enter a stable reviewer
+identifier and qualifications. Save the initial judgment, cited evidence and
+reasoning before explicitly revealing a proposal. Reconciliation is a separate
+record; it does not overwrite the initial judgment. Export backups regularly.
+The local server stores review events in `reviews/reviews.sqlite3`.
 
-Each dashboard dataset is limited to **eight companies** for manageable review.
-US GAAP and multi-error use Apple, Microsoft, NVIDIA, Alphabet, Meta, Coca-Cola,
-Johnson & Johnson, and Walmart. IFRS uses SAP, Novartis, AstraZeneca, GSK, Sanofi,
-Novo Nordisk, Unilever, and Diageo. All fiscal years and available case types for
-those companies remain reviewable. This scope applies to case lists, searches,
-filters, counts, and direct case links; the committed benchmark files stay intact.
+One accountant is available. This is a single-expert workflow; it provides no
+inter-rater reliability estimate. The curator must collect **all 20 initial
+judgments and the delayed repeat subset before any answer reveal** to reduce contamination between related
+cases. The UI requires a saved initial review per case, but this whole-pilot
+embargo is an operational protocol. Keep the reviewer away from source keys,
+curator files and model outputs during the first pass.
 
-Reviews save automatically in the current browser, separately for each dataset
-and data version. **Export reviews** downloads a JSON backup of all saved reviews
-in the current eight-company subset (including notes-only drafts), regardless of filters.
-**Import reviews** restores a matching export and keeps newer local reviews.
-Use exports to share reviews or move between browsers. Clearing browser storage,
-changing browser/profile/port, or rebuilding the dataset can change which saved
-reviews appear. The dashboard does not modify benchmark data or citation labels.
+The server is a local trusted-team tool, not an authenticated hosted service.
+Reviewer IDs are attribution labels, not login accounts. HTTP blind views reduce
+accidental answer exposure; anyone with repository/filesystem access can inspect
+committed curator proposals. Distribute only the blind packet to the reviewer.
+Do not expose the server on a public interface.
 
-This is an answer-key review workspace, separate from blind model evaluation.
-“Linkbase verified” and “Expert authored · unvalidated” remain dataset provenance
-labels; accountant decisions are recorded separately. Statement amounts retain
-their source values and use the case's declared currency and scale. No additional
-dependencies or external services are required. Stop the server with Ctrl+C.
-Restart the server after rebuilding or replacing the dataset files.
-
-### Benchmark pipeline
+For legacy answer-visible dataset inspection, use a separate curator session:
 
 ```bash
-python3 --version                                   # 3.9+; standard library only
-
-python3 scripts/build_benchmark.py --offline        # rebuild from committed data/clean (no network)
-python3 scripts/build_benchmark.py                  # online: refetch SEC facts + filing linkbases
-python3 scripts/split_dataset.py
-python3 scripts/check_triviality.py                 # must print GATE PASSED
-python3 scripts/identifiability_check.py            # every citable item derivable from the exam?
-python3 scripts/make_dataset_card.py
-python3 -m unittest discover -s tests               # 36 tests
-
-python3 scripts/score_predictions.py results/<your_predictions>.jsonl [--form N]
+python dashboard/server.py --curator --port 8090
 ```
 
-Rebuilds are byte-identical.
+Legacy browser-local reviews are answer-visible verification records. They cannot
+be imported as independent blind judgments. The benchmark data files are not
+modified by dashboard review.
 
-## Numbers (v0.5 — from `data/benchmark/validation_report.json`)
+![Blind review workspace](docs/assets/blind-review-preview.png)
 
-**US GAAP** (`data/clean/`, `data/benchmark/`): 70 companies (`config.json`) × FY2015–2024;
-1,989 real statements (677 BS, 621 IS, 691 CF). 14,963 items = 12,974 injected (one fault
-each) + 1,989 clean controls. 6,388 citable over **15 governing paragraphs in 11 topics**
-(1,363 linkbase-verified, 5,025 `expert-authored-UNVALIDATED`); 6,586 detection-only.
+## Pilot and reproducibility
 
-**IFRS** (`data/ifrs/clean/`, `data/ifrs/benchmark/`): 31 of 33 phase-1 SEC filers built
-(Toyota and Sony skipped: no Liabilities total in their XBRL) × FY2018–2024; 161 real
-balance sheets in the filer's currency. 1,382 items = 1,221 injected + 161 controls; 648
-citable over 8 IAS/IFRS paragraphs (all UNVALIDATED: the IFRS Taxonomy download needs an
-ifrs.org login); 573 detection-only.
+`data/review_pilot/manifest.json` records selection rules, source commit and hashes.
+The 20 items are ten matched-source clean/fault cases plus ten versions with one
+revenue-cutoff fact withheld. Source evidence can differ beyond the manipulated
+fact; these are **not certified minimal counterfactual pairs**. Withholding a
+fact does not prove that the remaining evidence is insufficient. The accountant
+must assess that question. Company names anchor source figures, not real fraud.
 
-| Gate check | v0.3 | v0.4 |
-|---|---|---|
-| citation guessable from (error type × statement type) | 79.2% | 34.3% |
-| exam-only: fact keyword → paragraph, no number read | 92.5% | 36.4% |
-| citable faults visible to arithmetic | 100% of moves | 0.0% |
-| evidence row numbers locating the injected row | 606/631 | none printed |
-| balance-sheet unnamed filler | 4.1% | 1.0% |
-| clean controls on the exam | 0 | 220 |
+```bash
+python -m unittest discover -s tests -v
+python scripts/build_review_pilot.py --help
+python scripts/check_release_readiness.py --help
+python scripts/build_annotation_packet.py --help
+```
 
-Exam-only reference points: a statement-type prior scores **25.4%** exact paragraph;
-the authors' hand-written rule system scores **100%** (see "narrow task" in KNOWN_ISSUES).
+Use a fresh output directory when rebuilding the pilot. Record-level annotation
+validation and release readiness are separate: a structurally valid unreviewed
+template must still fail the release gate. Dashboard events also need curation
+into the full provenance/applicability schema before release; saving a review is
+not automatic gold certification.
 
-## Error taxonomy
+## Existing source datasets
 
-AuditBench's four types (Missing Row, Numerical Error, Redundant Row, Misclassification)
-split into **detection-only** faults (R04, R05, R06, R07, R12: arithmetic, existence,
-sign, identity) and **citable** faults:
+| Dataset | Companies | Items | Clean controls | Provisionally citable |
+|---|---:|---:|---:|---:|
+| US GAAP | 70 | 14,963 | 1,989 | 6,388 |
+| IFRS (balance sheets only) | 31 | 1,382 | 161 | 648 |
 
-| Clause | Rules → paragraph |
-|---|---|
-| presentation | R01 → 210-10-45-1 · R02 → 210-10-45-8 · R03 → 210-10-45-12 · R08 → 230-10-45-13 · R16 → 230-10-45-15 |
-| subject | R09 → 606-10-25-23 · R10 → 842-10-25-2 · R11 → 330-10-35-1B · R14 → 350-20-35-1 · R15 → 320-10-35-1 · R17 → 326-20-30-1 · R18 → 360-10-35-17 · R19 → 470-10-45-11 · R20 → 740-10-30-5 · R21 → 730-10-25-1 |
+Of the US-GAAP citable labels, 5,025 carry an explicit unvalidated tag; 1,363 have
+reference-linkbase associations, which are also not expert applicability review.
+All 648 IFRS labels are unvalidated. Financial figures are SEC-derived;
+transactions and supporting facts are synthetic. Source accession consistency,
+residual/template artifacts and citation validity remain open issues.
+See [datasheet](docs/DATASHEET.md) and [known issues](KNOWN_ISSUES.md).
 
-Why each paragraph wins: [`docs/CITATION_POLICY.md`](docs/CITATION_POLICY.md).
+The existing generator commands remain available for construction research:
 
-## Multi-error split
+```bash
+python scripts/build_benchmark.py --offline
+python scripts/split_dataset.py
+python scripts/check_triviality.py
+python scripts/identifiability_check.py
+python scripts/make_dataset_card.py
+```
 
-`data/benchmark_multi/` (US GAAP): 9,945 items — 1,989 clean controls and 1,725 / 3,301 /
-2,930 items with 1 / 2 / 3 faults (17,117 faults, 7,481 citable) on the same 1,989 real
-statements. See
-[`docs/MULTI_ERROR.md`](docs/MULTI_ERROR.md).
+These commands can overwrite generated artifacts: run in a separate checkout
+when reproducing historical data. A shortcut gate passing is a regression check,
+not proof that the task is realistic or difficult. Reproducibility depends on
+pinned inputs/caches; online SEC data may change.
 
-## IFRS edition (separate dataset)
+## Research and release boundary
 
-Built from SEC 20-F/40-F `ifrs-full` facts: see the Numbers section. `rulebook_ifrs.json`
-(23 rules, 8 of them framework contrasts; 15 runnable on balance sheets), `configs/ifrs.json`,
-IFRS citation grammar and resolver. Balance sheets only; runbook in
-[`docs/IFRS_BUILD.md`](docs/IFRS_BUILD.md), plan in [`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md).
+Our hypothesis is that a benchmark combining evidence sufficiency, acceptable
+proof alternatives, dated citation applicability and budgeted investigation can
+measure supported decisions better than answer matching alone. Individual
+components already occur in prior work. Novelty and model gains remain to be
+established. Paid model experiments are paused until review informs a frozen
+protocol. Use only one frontier family and cheap/open-weight comparators.
 
-## Documents
-
-[`docs/EVAL.md`](docs/EVAL.md) protocol · [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) ·
-[`docs/CITATION_POLICY.md`](docs/CITATION_POLICY.md) · [`docs/EXPANSION_PLAN.md`](docs/EXPANSION_PLAN.md) ·
-[`docs/DATASHEET.md`](docs/DATASHEET.md) · [`docs/PROVENANCE.md`](docs/PROVENANCE.md) ·
-[`data/dataset_card.json`](data/dataset_card.json)
-
-## Relation to the baseline papers
-
-- **AuditBench** (2506.17282): format and task ancestor; its GPT-4 prose citations are replaced by paragraph identifiers.
-- **FinAuditing / FinMR** (2510.08886): real XBRL filings with DQC labels; use it as the out-of-distribution test for any pipeline tuned here.
-- **AuditFlow** (2606.03031): symbolic verification, LLM search; it does not score citations.
-- **FinRule-Bench** (2603.11339): closest prior work on "which principle is violated" (closed rule set, US GAAP and IFRS). Must be cited and contrasted.
+Inherited code/data redistribution rights and standards-text permissions remain
+unresolved. Public access to company filings is not a blanket public-domain
+license. No new blanket license is granted by this documentation. The December
+target is a defensible release and submission-ready preprint, not guaranteed
+conference acceptance. See the companion paper and measured results before
+quoting performance.

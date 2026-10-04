@@ -1,82 +1,71 @@
-# Datasheet — IntelliAudit-Bench
+# Dataset datasheet: provisional source data and review pilot
 
-*How the dataset was built (the reproducibility artifact). AuditBench documented
-its construction with GPT-4 **prompts** because its data is LLM-generated. Ours is
-**deterministic code**, so the artifact is this datasheet + a re-runnable generator —
-a stronger reproducibility claim: `python3 scripts/build_benchmark.py` yields
-byte-identical records, every time.*
+Status: expert review pending. This document supersedes earlier claims that all
+external audit findings were fixed or that the answer key was accounting ground truth.
 
-## 1. Motivation
-Benchmark whether an auditor can **cite the governing FASB ASC standard** for a
-financial-statement violation — a task AuditBench scored with broken labels and
-FinAuditing/AuditFlow do not score at all.
+## Scope and composition
 
-## 2. Composition
-US GAAP: 14,963 exam items over 1,989 real statements (70 companies × FY2015–2024 ×
-{balance sheet, income statement, cash flow}): 12,974 injected faults (one per applicable
-rule per statement) and 1,989 clean controls; 6,388 citable (15 governing paragraphs),
-6,586 detection-only. IFRS (separate): 1,382 items over 161 real balance sheets from 31
-SEC 20-F/40-F filers, FY2018–2024. `validation_report.json` in each output folder is
-authoritative.
+The US-GAAP source has 14,963 items from 1,989 base statements and 70 companies:
+1,989 controls, 6,388 provisionally citable faults and 6,586 detection-only faults.
+Of the citable labels, 1,363 have a reference-linkbase association and 5,025 are
+explicitly unvalidated. The separate IFRS source has 1,382 items from 161 balance
+sheets and 31 filers, including 161 controls and 648 unvalidated citable items.
+The new review pilot has 20 items, five companies, a narrow revenue-cutoff family,
+and zero completed accountant reviews at construction. Its manifest is authoritative
+for selection, source hashes and limitations. It is not a held-out model test.
 
-## 3. Collection & construction process (deterministic)
-1. **Real values** — `src/edgar_ingest.py` reads SEC companyfacts (10-K, `fp=FY`).
-2. **Statements** — balance sheets from each filing's own calculation linkbase
-   (`src/filing_structure.py`); income and cash-flow statements from a fixed template
-   with labelled residual lines (still ~23% filler on cash flows — open).
-3. **Normalization** — `src/normalize.py`: calculation-weight signs (treasury stock),
-   section fixes, ordinary captions. Values unchanged except the sign fix.
-4. **Rule-first injection** — `src/injector.py` applies one `rulebook.json` rule.
-   Citable faults keep the statement footing; detection-only faults break it.
-5. **Citation cross-check** — `src/citation_resolver.py`: strict paragraph match
-   against the FASB US-GAAP 2023 reference linkbase (`linkbase-verified`), else
-   `expert-authored-UNVALIDATED` per `docs/CITATION_POLICY.md`. Offline rebuilds use
-   `data/reference/us-gaap-2023_ref_cache.json`.
-6. **Evidence** — `src/transactions.py` (ledger movements keyed by caption; the
-   company's books for measurement faults, the true ledger otherwise) and
-   `src/evidence.py` (contrastive supporting facts on every statement).
-7. **Split** — `scripts/split_dataset.py`: opaque exam ids, 17 forms, withheld key.
+## Construction and provenance
 
-**No LLM is used anywhere in the build**, neither for data nor for ground truth. The
-generator is the disclosure. Counts quoted anywhere should come from
-`data/benchmark/validation_report.json` (`scripts/make_validation_report.py`), which
-recomputes them from the files and records the gate result.
+SEC companyfacts and filing calculation structures anchor financial figures.
+Income/cash-flow templates, normalization, residual reconciliation, synthetic
+component movements and synthetic period-end facts transform those inputs into
+exam items. These are not verbatim complete filings or authentic company ledgers.
+Use declared currency/scale per item; do not assume all IFRS figures are USD.
+Calculation structure does not guarantee original presentation layout.
 
-**IFRS edition.** Separate dataset, not yet built from real filings; runbook in
-`docs/IFRS_BUILD.md`. Once built, only citations tagged `linkbase-verified` have been
-checked against the IFRS Taxonomy reference linkbase; the rest await an accountant.
+The capstone's source audit of eight firms found 2,929 signed numeric matches out
+of 4,092 rows, plus magnitude-only/derived/unmatched rows and two mismatches.
+Eighteen of 226 tables lacked a common accession among matched mapped cells.
+These results concern that audited subset, not the whole dataset. See the companion
+`research/results/sec_pilot_companies.json` and `sec_accession_consistency.json`.
+Original-accession, unit, period, sign and transformation checks remain required.
 
-## 4. Preprocessing / normalization
-Values scaled to $millions; residual lines absorb template gaps (labelled, not
-injectable). Known artifact: overlapping-concept residuals can be negative (e.g.
-lease liability inside "other").
+## Labels and evidence
 
-## 5. Optional LLM-in-the-loop (with prompts, AuditBench-style)
-Only two places an LLM would enter — documented here so the artifact is complete:
+Rule-first injection supplies author proposals. A reference-linkbase match proves
+association, not normative applicability, currency or sufficient supporting facts.
+The legacy tag `expert-authored-UNVALIDATED` does not demonstrate an independent
+accountant authored or reviewed a record. Some faults intentionally have no single
+governing paragraph. Accept alternatives or unresolved outcomes when justified.
 
-**(a) Richer transaction narratives** (`transactions.generate_with_llm`, off by default). If enabled, disclose this prompt:
-> *"You are a financial-data expert. Given this statement line `<label> = <value>`, generate 2–4 realistic business transactions that sum EXACTLY to `<value>`. Output each as a short event + amount, then `[Explanation: <value> = a + b − c]`."*
+The pilot removes one revenue-cutoff fact in ten versions. Residual evidence may
+still resolve a case; the proposed insufficiency is a hypothesis for review.
+Clean/fault sources can differ on other evidence lines, so paired cases are not
+certified minimal counterfactuals. Familiarity across variants can bias review.
 
-**(b) Cross-check judge** (`scripts/cross_check_llm.py`) — the blind auditor prompt is embedded in that script (System + User), reproduced in the paper appendix.
+## Validation and intended use
 
-## 6. Validation — what has and has not been done
+Automated regression checks test specified shortcuts and generator consistency.
+A generator-aware rule system can exploit a narrow ontology even when these checks
+pass. No passing gate proves realistic accounting, absence of all leakage, or
+population validity. One accountant will perform blind initial judgments followed
+by separate proposal reconciliation. Record expertise, prior exposure, missing
+facts and acceptable proof/citation alternatives. No inter-rater validation is
+possible with one expert; delayed repeats measure intra-rater consistency only.
 
-Done (automated): `scripts/check_triviality.py` (15 checks, 8 exam-only);
-`scripts/identifiability_check.py` (every citable item derivable from the exam;
-0 false alarms on controls); 36 unit tests; byte-identical rebuilds.
+Use current records for development and annotation feasibility. Do not label them
+a gold-standard release or use inspected cases as a fresh final test. Group company,
+base filing, event and variants for splits; preserve revisions and prior scores.
 
-**Not done:** accountant review of the 15 governing paragraphs and of a sample of
-items; the independent-LLM cross-check (`scripts/cross_check_llm.py`) on v0.4; the
-blind LLM baselines on v0.4. Until the first is done, every
-`expert-authored-UNVALIDATED` citation is a policy decision, not validated ground truth.
+## Reproducibility, distribution and maintenance
 
-## 7. Uses & limitations
-For citation-attribution and error-detection evaluation. Limitations: single
-statements (not multi-document like FinAuditing); injected, not naturally occurring,
-errors; 15 governing paragraphs (a hand-written rule system solves the citation task);
-70 US / 31 IFRS companies (no banks, insurers, REITs, utilities); cash-flow statements templated; row order from calculation, not
-presentation, linkbases; DQC ids not used as labels.
+Pin generator commit, source/cache files, selection seed and output hashes. Online
+refetches may change; determinism applies to fixed inputs and versions, not every
+future SEC response. Use a fresh checkout/output directory for historical rebuilds.
+`docs/ANNOTATION_PROTOCOL.md` and `docs/RELEASE_GATES.md` define the release process.
 
-## 8. Distribution & maintenance
-Repo `manmad-web/IntelliAudit`; regenerate with `scripts/build_benchmark.py`.
-Cite SEC EDGAR (public domain) + FASB US-GAAP taxonomy (FASB terms).
+Inherited code/data licensing and standards-text redistribution rights remain
+unresolved. Public SEC availability is not a blanket public-domain grant for
+company-authored filings. Do not redistribute licensed ASC/IFRS text without
+permission. Keep operational review identity/backups outside Git; release only
+consented, appropriately pseudonymized annotations with explicit rights.

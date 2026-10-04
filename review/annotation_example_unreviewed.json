@@ -1,0 +1,347 @@
+{
+  "schema_version": "0.1.0",
+  "annotation_id": "annotation_fictional_cutoff",
+  "case_id": "case_fictional_cutoff",
+  "status": "draft",
+  "release_status": "development_only",
+  "scope": {
+    "framework": "us_gaap",
+    "jurisdiction": [
+      "illustrative_US"
+    ],
+    "assertion_family": "revenue_cutoff",
+    "assertion": "A fictional 31 December entry records revenue; the available packet does not establish all transfer-of-control conditions.",
+    "entity_type": "fictional_nonfinancial_issuer",
+    "reporting_period_start": "2024-01-01",
+    "reporting_period_end": "2024-12-31",
+    "investigation_cutoff": "2025-02-15",
+    "source_case_kind": "synthetic",
+    "synthetic_assumptions": [
+      "All documents and entities in this example are fictional.",
+      "A simplified customer-acceptance clause is illustrative, not a complete revenue-recognition rule."
+    ],
+    "scope_limitations": []
+  },
+  "sources": [
+    {
+      "document_id": "doc_journal",
+      "source_kind": "synthetic",
+      "accession": null,
+      "source_url": null,
+      "sha256": null,
+      "retrieved_at": null,
+      "document_date": "2024-12-31",
+      "available_at": "2025-01-08",
+      "initially_visible": true,
+      "obtainable": true,
+      "is_synthetic": true,
+      "rights_status": "unresolved",
+      "provenance_note": "Illustrative document description only; no source artifact or verified hash exists."
+    },
+    {
+      "document_id": "doc_contract",
+      "source_kind": "synthetic",
+      "accession": null,
+      "source_url": null,
+      "sha256": null,
+      "retrieved_at": null,
+      "document_date": "2024-12-31",
+      "available_at": "2025-01-08",
+      "initially_visible": false,
+      "obtainable": true,
+      "is_synthetic": true,
+      "rights_status": "unresolved",
+      "provenance_note": "Illustrative document description only; no source artifact or verified hash exists."
+    },
+    {
+      "document_id": "doc_customer_confirmation",
+      "source_kind": "synthetic",
+      "accession": null,
+      "source_url": null,
+      "sha256": null,
+      "retrieved_at": null,
+      "document_date": "2024-12-31",
+      "available_at": "2025-01-08",
+      "initially_visible": false,
+      "obtainable": true,
+      "is_synthetic": true,
+      "rights_status": "unresolved",
+      "provenance_note": "Illustrative document description only; no source artifact or verified hash exists."
+    },
+    {
+      "document_id": "doc_acceptance_register",
+      "source_kind": "synthetic",
+      "accession": null,
+      "source_url": null,
+      "sha256": null,
+      "retrieved_at": null,
+      "document_date": "2024-12-31",
+      "available_at": "2025-01-08",
+      "initially_visible": false,
+      "obtainable": true,
+      "is_synthetic": true,
+      "rights_status": "unresolved",
+      "provenance_note": "Illustrative document description only; no source artifact or verified hash exists."
+    }
+  ],
+  "cells": [],
+  "facts": [
+    {
+      "fact_id": "fact_booked",
+      "document_id": "doc_journal",
+      "locator": "illustrative entry A",
+      "proposition": "Entry A records revenue on 31 December.",
+      "origin": "synthetic",
+      "source_cell_ids": [],
+      "event_date": "2024-12-31",
+      "entity_refs": [
+        "fictional_invoice_A",
+        "fictional_customer_A"
+      ],
+      "role": "support",
+      "derivation": "",
+      "reliability_assessment": "Not reviewed."
+    },
+    {
+      "fact_id": "fact_term",
+      "document_id": "doc_contract",
+      "locator": "illustrative acceptance clause",
+      "proposition": "The simplified contract mentions customer acceptance; its legal and accounting effect remains unreviewed.",
+      "origin": "synthetic",
+      "source_cell_ids": [],
+      "event_date": null,
+      "entity_refs": [
+        "fictional_invoice_A",
+        "fictional_customer_A"
+      ],
+      "role": "support",
+      "derivation": "",
+      "reliability_assessment": "Not reviewed."
+    },
+    {
+      "fact_id": "fact_confirmation",
+      "document_id": "doc_customer_confirmation",
+      "locator": "illustrative confirmation A",
+      "proposition": "A purported customer confirmation dates acceptance to 3 January.",
+      "origin": "synthetic",
+      "source_cell_ids": [],
+      "event_date": "2025-01-03",
+      "entity_refs": [
+        "fictional_invoice_A",
+        "fictional_customer_A"
+      ],
+      "role": "support",
+      "derivation": "",
+      "reliability_assessment": "Not reviewed."
+    },
+    {
+      "fact_id": "fact_register",
+      "document_id": "doc_acceptance_register",
+      "locator": "illustrative register A",
+      "proposition": "An internal acceptance register also dates acceptance to 3 January.",
+      "origin": "synthetic",
+      "source_cell_ids": [],
+      "event_date": "2025-01-03",
+      "entity_refs": [
+        "fictional_invoice_A",
+        "fictional_customer_A"
+      ],
+      "role": "support",
+      "derivation": "",
+      "reliability_assessment": "Not reviewed."
+    }
+  ],
+  "authorities": [],
+  "proof_sets": [
+    {
+      "proof_id": "proof_candidate_confirmation",
+      "conclusion": "supported_misstatement",
+      "fact_ids": [
+        "fact_booked",
+        "fact_term",
+        "fact_confirmation"
+      ],
+      "edges": [
+        {
+          "from_fact_id": "fact_booked",
+          "to_fact_id": "fact_term",
+          "relation": "same_invoice_contract",
+          "join_basis": "Illustrative shared invoice/customer identifiers."
+        },
+        {
+          "from_fact_id": "fact_term",
+          "to_fact_id": "fact_confirmation",
+          "relation": "acceptance_event",
+          "join_basis": "Illustrative shared invoice/customer identifiers."
+        }
+      ],
+      "authority_ids": [],
+      "refutation_fact_ids": [],
+      "assumptions": [
+        "Candidate proof only: full control-transfer analysis and completeness/reliability checks are missing."
+      ],
+      "refutation_resolution": "No refutation review has occurred.",
+      "minimality": {
+        "status": "not_reviewed",
+        "reviewer_ids": [],
+        "deletion_tests": [],
+        "scope_note": "This illustrates alternatives only; neither sufficiency nor minimality is established."
+      }
+    },
+    {
+      "proof_id": "proof_candidate_register",
+      "conclusion": "supported_misstatement",
+      "fact_ids": [
+        "fact_booked",
+        "fact_term",
+        "fact_register"
+      ],
+      "edges": [
+        {
+          "from_fact_id": "fact_booked",
+          "to_fact_id": "fact_term",
+          "relation": "same_invoice_contract",
+          "join_basis": "Illustrative shared invoice/customer identifiers."
+        },
+        {
+          "from_fact_id": "fact_term",
+          "to_fact_id": "fact_register",
+          "relation": "acceptance_event",
+          "join_basis": "Illustrative shared invoice/customer identifiers."
+        }
+      ],
+      "authority_ids": [],
+      "refutation_fact_ids": [],
+      "assumptions": [
+        "Candidate proof only: full control-transfer analysis and completeness/reliability checks are missing."
+      ],
+      "refutation_resolution": "No refutation review has occurred.",
+      "minimality": {
+        "status": "not_reviewed",
+        "reviewer_ids": [],
+        "deletion_tests": [],
+        "scope_note": "This illustrates alternatives only; neither sufficiency nor minimality is established."
+      }
+    }
+  ],
+  "gold": {
+    "conclusion": "unresolved",
+    "decision_sufficiency": "unresolved",
+    "authority_disposition": "insufficient_evidence",
+    "acceptable_citation_sets": [],
+    "accepted_proof_ids": [],
+    "missing_fact_requirements": [
+      "Complete contract and transfer-of-control conditions.",
+      "Independent source reliability and authority applicability review."
+    ],
+    "rationale": "This example intentionally has no accepted proof, governing paragraph, reviewer or final accounting conclusion."
+  },
+  "reviewers": [],
+  "reviews": [],
+  "resolution": {
+    "mode": "not_started",
+    "recorder_id": null,
+    "expert_reviewer_id": null,
+    "completed_at": null,
+    "resolutions": [],
+    "remaining_dissent": [],
+    "gold_sha256": null
+  },
+  "review_plan": {
+    "model": "single_expert_review",
+    "repeat_required": false,
+    "minimum_repeat_delay_days": 7,
+    "repeat_selection_frozen_at": null,
+    "repeat_strata": [],
+    "manual_version": "0.1.0"
+  },
+  "leakage_checks": [
+    {
+      "check_id": "payload_gold_leakage",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "metadata_shortcuts",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "counterfactual_validity",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "invariant_perturbations",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "missing_evidence_ablation",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "contradiction_sensitivity",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "memorization_stress",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "cross_split_duplicates",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    }
+  ],
+  "split": {
+    "company_group_ids": [
+      "company_fictional_A"
+    ],
+    "filing_group_ids": [],
+    "event_group_ids": [
+      "event_fictional_cutoff_A"
+    ],
+    "pair_group_ids": [
+      "pair_fictional_A"
+    ],
+    "assignment": "development",
+    "freeze_id": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "initial_view_sha256": null,
+    "observable_bundle_sha256": null
+  },
+  "notes": [
+    "Fictional unreviewed schema example; not a benchmark case or accounting advice.",
+    "Both candidate proof structures remain unaccepted, and the gold conclusion stays unresolved.",
+    "There are no reviewer identities or completed human-review claims."
+  ]
+}

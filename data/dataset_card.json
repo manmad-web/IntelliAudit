@@ -1,12 +1,12 @@
 {
  "name": "IntelliAudit-Bench (US GAAP)",
  "version": "0.4-contrastive",
- "description": "Standards-citation benchmark for financial-statement auditing. Real 10-K statements (SEC EDGAR); one injected error per item or a clean control; ledger evidence plus period-end supporting facts; the governing FASB ASC paragraph as ground truth for citable faults.",
+ "description": "Standards-citation benchmark for financial-statement auditing. SEC-derived normalized statement tables; one injected error per item or a clean control; synthetic movements and period-end supporting facts; proposed FASB ASC paragraph labels remain unvalidated pending expert applicability review.",
  "repository": "https://github.com/manmad-web/IntelliAudit",
- "framework": "US GAAP (FASB ASC). An IFRS edition is planned as a separate dataset; see docs/EXPANSION_PLAN.md.",
+ "framework": "US GAAP (FASB ASC). A separate IFRS balance-sheet dataset is built; its citations are unvalidated.",
  "task": "Given a statement and its evidence, judge Correct/Incorrect; if Incorrect, locate the error, name its type, and cite the governing ASC paragraph (or null when no single paragraph governs, e.g. an arithmetic slip).",
  "license_and_terms": {
-  "financial_values": "SEC EDGAR filings (US public domain).",
+  "financial_values": "Publicly accessible SEC-derived figures; company-authored filings are not covered by a blanket public-domain grant. Redistribution rights require review.",
   "citations": "FASB ASC paragraph identifiers; linkbase cross-check uses the US-GAAP 2023 taxonomy (FASB terms).",
   "generated_content": "Injected errors, ledger evidence and supporting facts are produced by this repository's generator."
  },
@@ -416,18 +416,19 @@
   }
  ],
  "ground_truth_confidence": {
-  "linkbase-verified": "the FASB reference linkbase attaches this exact paragraph to the affected concept",
+  "linkbase-verified": "a recorded reference-linkbase association; does not establish normative applicability or expert review",
   "expert-authored-UNVALIDATED": "chosen by docs/CITATION_POLICY.md; NOT yet reviewed by an accountant",
   "no-governing-paragraph": "detection-only fault; excluded from citation scoring",
   "no-error": "clean control"
  },
  "known_limitations": [
-  "8 companies, 5 of them large-cap technology; no banks, insurers, utilities, REITs or energy.",
+  "70 source companies; the new review pilot has five. Neither sample is established as representative.",
   "15 citable paragraphs. A hand-written rule system solves every citable item (scripts/identifiability_check.py): the citation task tests whether a system knows and applies these rules, not open-ended standards knowledge.",
-  "Income-statement and cash-flow statements are still built from a fixed template; cash-flow filler is ~23% of line magnitude.",
+  "Income-statement and cash-flow statements are still built from a fixed template; cash-flow residual line mass is about 33.4% under the current audit metric.",
   "Ledger evidence is two synthetic movements per line with no opening balance.",
-  "No accountant has reviewed the expert-authored citations; the LLM cross-check has not been run on v0.4.",
+  "No completed expert review is recorded in the release artifacts; proposed labels are development-only.",
   "Every statement appears in ~17 versions; score per form or item-by-item (docs/EVAL.md)."
  ],
+ "review_status": "EXPERT_REVIEW_PENDING; see docs/ANNOTATION_PROTOCOL.md and docs/RELEASE_GATES.md",
  "evaluation": "docs/EVAL.md; scripts/score_predictions.py; regression gate scripts/check_triviality.py."
 }

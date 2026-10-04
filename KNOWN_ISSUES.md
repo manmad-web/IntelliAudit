@@ -1,3 +1,5 @@
+> **Current status (3 October 2026):** Historical construction/policy notes below do not establish expert-reviewed gold. The benchmark-first workflow in [TEAM_HANDOFF](docs/TEAM_HANDOFF.md) and its annotation/release gates control new research. Paid evaluation is paused pending the review pilot. Linkbase membership is association, not accounting applicability.
+
 # Known issues — external audit, September 2026
 
 ## v0.5 — built from SEC (Sept 2026)

@@ -1,0 +1,134 @@
+{
+  "schema_version": "0.1.0",
+  "annotation_id": "annotation_TODO",
+  "case_id": "case_TODO",
+  "status": "draft",
+  "release_status": "development_only",
+  "scope": {
+    "framework": "us_gaap",
+    "jurisdiction": [],
+    "assertion_family": "revenue_cutoff",
+    "assertion": "",
+    "entity_type": null,
+    "reporting_period_start": null,
+    "reporting_period_end": null,
+    "investigation_cutoff": null,
+    "source_case_kind": "source_grounded",
+    "synthetic_assumptions": [],
+    "scope_limitations": []
+  },
+  "sources": [],
+  "cells": [],
+  "facts": [],
+  "authorities": [],
+  "proof_sets": [],
+  "gold": {
+    "conclusion": "unresolved",
+    "decision_sufficiency": "unresolved",
+    "authority_disposition": "unresolved",
+    "acceptable_citation_sets": [],
+    "accepted_proof_ids": [],
+    "missing_fact_requirements": [],
+    "rationale": ""
+  },
+  "reviewers": [],
+  "reviews": [],
+  "resolution": {
+    "mode": "not_started",
+    "recorder_id": null,
+    "expert_reviewer_id": null,
+    "completed_at": null,
+    "resolutions": [],
+    "remaining_dissent": [],
+    "gold_sha256": null
+  },
+  "review_plan": {
+    "model": "single_expert_review",
+    "repeat_required": false,
+    "minimum_repeat_delay_days": 7,
+    "repeat_selection_frozen_at": null,
+    "repeat_strata": [],
+    "manual_version": "0.1.0"
+  },
+  "leakage_checks": [
+    {
+      "check_id": "payload_gold_leakage",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "metadata_shortcuts",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "counterfactual_validity",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "invariant_perturbations",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "missing_evidence_ablation",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "contradiction_sensitivity",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "memorization_stress",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    },
+    {
+      "check_id": "cross_split_duplicates",
+      "status": "pending",
+      "artifact_url": null,
+      "artifact_sha256": null,
+      "reviewer_id": null,
+      "rationale": ""
+    }
+  ],
+  "split": {
+    "company_group_ids": [],
+    "filing_group_ids": [],
+    "event_group_ids": [],
+    "pair_group_ids": [],
+    "assignment": "unassigned",
+    "freeze_id": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "initial_view_sha256": null,
+    "observable_bundle_sha256": null
+  },
+  "notes": [
+    "Blank template. No completed source verification or human review has occurred."
+  ]
+}

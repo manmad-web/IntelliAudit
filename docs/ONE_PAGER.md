@@ -1,51 +1,33 @@
-# IntelliAudit — One Pager
+# Team briefing: evidence-supported financial reporting verification
 
-> **Superseded in parts (v0.4, Sept 2026).** The recoverability table below describes v0.3 and a
-> citation selector that branched on `rule_id`; it is not a result. The "concept × violation"
-> finding is now shown by the data (R03 vs R19 on the same concept), but the citations are
-> still unreviewed by an accountant, and "first benchmark" must be checked against FinRule-Bench
-> (arXiv 2603.11339). Current numbers: `README.md`; status: `KNOWN_ISSUES.md`.
+**Current deliverable:** an auditable development study plus a blind single-accountant
+review workflow. **Next milestone:** reviewed, source-traceable narrow tasks that
+permit supported answers, alternatives and abstention. No gold-standard status,
+novelty or cheap-model superiority is established yet.
 
-## The question
-Can an AI auditor not just **find** an error in a financial statement, but **cite the exact accounting rule it breaks** (the FASB ASC codification section)?
+IntelliAudit owns data/provenance/review; financial-audit-capstone owns methods,
+matched model evaluation, costs and paper. Use the two designated branches and
+start at [TEAM_HANDOFF](TEAM_HANDOFF.md).
 
-## What we're solving (plain words)
-LLMs can often say *"this statement looks wrong,"* but they cannot reliably name the **rule** that governs the violation. And there was no fair way to *grade* that skill — the one prior attempt (AuditBench) used vague GPT-written citations that even a perfect retriever could only match ~26% of the time. So we (1) build **the exam** — a benchmark with a trustworthy, machine-checkable answer key — and (2) show a **rule-grounded auditor** can pass it.
+The earlier screenshot's roughly 12% pipeline citation rate is not a diagnosis.
+Strict denominators, answer leakage, provisional labels, candidate coverage,
+provider failures and authority applicability must be separated. Existing capstone
+48-case development results show Opus 11/16 strict full-citation agreement and
+Qwen3-8B 0/16; they do not establish accounting correctness. Historical topic
+recoverability and rule-ID selectors are oracle diagnostics, not blind performance.
 
-## The pipeline: two lanes that meet
+The new twenty-case review pilot covers five companies and revenue cutoff, including
+ten evidence-withheld variants. One accountant records judgments without proposed
+answers, then reconciles against them; initial records remain immutable. The
+accountant can reject labels or mark evidence insufficient. The pilot has no
+completed reviews yet and does not constitute realistic hidden multi-hop fraud.
 
-**Lane A — Benchmark factory (YOURS, `manmad-web/IntelliAudit`)** — *makes the exam*
-1. `edgar_ingest.py` — pull **real 10-K** facts from SEC EDGAR (values are real).
-2. `statement_builder.py` — assemble a canonical **BS / IS / CF** that reconciles (Assets = Liabilities + Equity).
-3. `rulebook.json` + `injector.py` — inject **one error, rule-first** (the governing ASC citation is fixed *before* the error is made).
-4. `citation_resolver.py` — **cross-check** each citation against the official **US-GAAP reference linkbase** → tag `linkbase-verified` vs `expert-authored`.
-5. `records.jsonl` + `scorer.py` — the dataset + a hierarchical citation grader.
+The research hypothesis combines sufficient-proof alternatives, incomplete evidence,
+dated standards applicability and cost-aware investigation. Existing papers cover
+many individual ingredients; establish the precise distinction in related work.
+A benchmark contribution can be valuable even when a cheap model does not win.
 
-**Lane B — Auditor pipeline (OLD / team, `financial-audit-capstone`)** — *takes the exam*
-- **Stage 0** deterministic gate (`stage0a/0b.py`) — arithmetic + accounting identities; **0% false alarms**.
-- **Stage 1** taxonomy citation (`taxonomy_graph.py`, `concept_citation.py`) — concept → ASC from the FASB linkbase; subject-matter (330/470/606) vs presentation (210/220/230) **candidate union**.
-- **Stage 2** focused LLM (`stage2_llm.py`) — only on abstains; picks a *grounded* citation, never invents one.
-- **AuditPatch** (`finmr_repair.py`) — **81.5% exact repair** on real DQC-labeled filings, deterministic, with certificates.
-
-**Where they meet — the combine (NEW glue, `integration/`)**
-- `adapter.py` — turns a benchmark record into the `item` the auditor expects, and hands over the **gold concept** (skipping the auditor's weak concept-mapper).
-- `eval_pipeline.py` — runs the auditor's citation logic on the records and grades it with the benchmark scorer.
-
-## Recoverability check (NOT the auditor's accuracy — read the caveat)
-A citation-**selector** check (Stage-1 logic only, no detection, no LLM):
-
-| Selector check | Citation topic |
-|---|---|
-| AuditBench — correct cite even *in* the candidate set (oracle) | **26.2%** |
-| IntelliAudit-Bench — concept-only heuristic pick | **50.9%** |
-| IntelliAudit-Bench — answer recoverable from taxonomy | **100% [upper bound, by construction]** |
-
-**Caveat (important):** the 100% is **true by construction** — injection is rule-first, so anything that branches on the rule identity re-derives the citation; it is an *upper bound*, **not a finding**, and must never be reported as the auditor's accuracy. The **real** results are two separate experiments still to run: (1) a **blind independent LLM** baseline on `exam.jsonl` (`scripts/cross_check_llm.py`, expect ~26%), and (2) the **actual staged pipeline** run end-to-end. Note the honest gap: Stage 0 abstains on classification/fabricated errors (~62%), so it cannot yet supply the violation signal for most citation-relevant rows.
-
-## Why it's novel
-- **First** benchmark to score the **governing ASC citation** — on **real filings**, with a **deterministic, cross-checkable** answer key.
-- AuditBench: broken GPT citation labels. FinAuditing / FinMR: real XBRL but **no citation output**. AuditFlow: deterministic verification but a **numeric verdict only**.
-- **Finding:** citation = *f*(concept × violation); the taxonomy linkbase alone under-determines it (accounts-receivable → ASC 310 not 210; revenue → 606-10-50 disclosure not 606-10-25 recognition) — which is exactly why LLMs *and* naive lookup miss.
-
-## Scale & provenance
-1,089 records · 8 companies × 10 fiscal years × 3 statements · values = SEC EDGAR (real) · citations = official US-GAAP 2023 linkbase · transactions = synthetic (sum to real lines). Reproducible: `python3 scripts/build_benchmark.py`.
+By mid-December aim for a validated narrow release, transparent comparisons and a
+submission-ready preprint. Resolve accounting review, original-source provenance,
+frozen splits, rights and independent artifact reproduction before stronger claims.
+Paid model calls remain paused during the initial review stage.

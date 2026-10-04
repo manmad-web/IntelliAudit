@@ -8,3 +8,10 @@ data/raw/
 data/benchmark/records.jsonl
 data/benchmark_multi/records.jsonl
 data/ifrs/benchmark/records.jsonl
+
+# Local reviewer records and portable backups (may contain personal information)
+reviews/
+review_exports/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal

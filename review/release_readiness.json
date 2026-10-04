@@ -1,0 +1,63 @@
+{
+  "gate_version": "0.1.0",
+  "checked_at": "2026-10-04T17:27:28.824876+00:00",
+  "release_ready": false,
+  "meaning": "Consistency of documented single-expert publication prerequisites; this does not authenticate human review or accounting correctness and does not publish anything.",
+  "permitted_review_claim": "single-expert reviewed, only after actual accountant completion; never dual-expert adjudicated gold",
+  "annotation_directory": "review/annotations",
+  "case_manifest": "data/review_pilot/manifest.json",
+  "expected_case_count": 20,
+  "annotation_record_count": 0,
+  "records_passing_release_checks": 0,
+  "status_counts": {},
+  "declared_qualified_expert_count": 0,
+  "repeat_fraction_checked": true,
+  "blocker_count": 3,
+  "blockers": [
+    {
+      "code": "no_annotations",
+      "detail": "No completed publication annotation records were found. Empty annotation sets never pass."
+    },
+    {
+      "code": "missing_case_reviews",
+      "case_ids": [
+        "RP-0fb546ac3e026b8f562cd3d4",
+        "RP-295f1da34c9711a2eef1f242",
+        "RP-3a04b7004026efb71cd9e3f5",
+        "RP-4a796a378e55f758a3c26612",
+        "RP-53c9049f57a4c305491a2105",
+        "RP-6ae0da4b1248aadac5fab2ad",
+        "RP-714cca45a4e98fdb22a7e0d5",
+        "RP-760516e01ac5a0ef035b17b7",
+        "RP-8463ed46b48001357a4df724",
+        "RP-8911d83e363da79de981041d",
+        "RP-94c1c2efc5516a9f64742171",
+        "RP-a978db124da5ff3ff7d704f0",
+        "RP-be07965d6d79468dbb30f5b5",
+        "RP-cddc78c34b456ffc9dc6521e",
+        "RP-cf81741ad54f5e793c850616",
+        "RP-de5009bf8923d8dd3e2c524b",
+        "RP-f1e82ae16113e2d9a2cc2f78",
+        "RP-f83c67d75448d3e62e3fbc50",
+        "RP-f954842fd5ae42f2237e690c",
+        "RP-fa11f8f964a52686b8e2d421"
+      ]
+    },
+    {
+      "code": "annotation_gate_failure",
+      "detail": "batch: full-corpus blind-repeat fraction must be 10–20% (observed 0/0); tiny-pilot rounding is a reported development exception"
+    }
+  ],
+  "source_hashes": {
+    "schema_sha256": "7fb479be5a6f947647fd1ede99cb442738b0eef18a0e0d489476a3406df39e04",
+    "validator_sha256": "3d4ac1873524d5c0cc960fc9468c6a0bb4ccd422bd117ea64db00a3045b2e11b",
+    "gate_sha256": "55bcc7d04bc3f6a3eef031bf80bc27b14e8446e2a02fc46434ba7aca07acb539",
+    "case_manifest_sha256": "31e8e9673025881fbb2aa2cdcdec2840464ee5a869bd0beaae56fdd2015afb7a",
+    "annotation_files": {}
+  },
+  "not_checked_by_this_gate": [
+    "The identity, credentials, independence and actual work of a human reviewer.",
+    "Normative accounting correctness, source authenticity, authority licensing and semantic equivalence of proofs.",
+    "Secure reviewer/model access boundaries, statistical power, model-comparison fairness and scientific novelty."
+  ]
+}

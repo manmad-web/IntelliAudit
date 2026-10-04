@@ -101,7 +101,7 @@ class DashboardTests(unittest.TestCase):
             Dataset(self.directory)
 
     def test_http_search_errors_and_static_allowlist(self):
-        handler = handler_for(Store(self.root))
+        handler = handler_for(Store(self.root), curator=True)
         handler.log_message = lambda *args: None
         server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
