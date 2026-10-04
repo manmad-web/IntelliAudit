@@ -1,0 +1,10 @@
+# Keep pinned JSON inputs and generated review artifacts byte-stable on every OS.
+*.json text eol=lf
+*.jsonl text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

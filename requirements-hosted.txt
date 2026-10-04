@@ -1,0 +1,2 @@
+# Hosted dashboard only. The benchmark and local dashboard remain stdlib-only.
+psycopg[binary]==3.3.6

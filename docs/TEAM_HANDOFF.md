@@ -45,7 +45,11 @@ evidence judgments; do not force a paragraph to improve an accuracy table.
 5. Curator completes source and dated authority/applicability fields, preserves
    alternatives and unresolved cases, and runs release readiness checks.
 
-The UI enforces per-case save-before-reveal, not the global twenty-case embargo.
+The server enforces the complete first pass, a seven-day delay and the frozen
+three-case repeat subset before proposal reveal. Repeat aliases and hidden prior
+answers are persisted across restarts. Hosted mode adds separate invitation
+accounts and a curator workspace; use [deployment instructions](DEPLOYMENT.md)
+before sharing the pilot URL.
 Maintain that separation in the session plan. The repository includes source keys:
 operational blinding assumes the reviewer does not inspect them. It is not a
 security boundary against a reviewer deliberately searching for answers.

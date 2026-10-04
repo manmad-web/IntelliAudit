@@ -71,7 +71,8 @@ class ReviewPilotTests(unittest.TestCase):
 
     def test_rebuild_matches_checked_in_bytes_and_manifest_hashes(self):
         for name, value in self.artifacts.items():
-            self.assertEqual((pilot.ROOT / 'data/review_pilot' / name).read_bytes(), value)
+            saved = (pilot.ROOT / 'data/review_pilot' / name).read_bytes()
+            self.assertEqual(pilot.canonical_lf_bytes(saved), value)
         for name, checksum in self.manifest['artifact_sha256'].items():
             self.assertEqual(pilot.digest(self.artifacts[name]), checksum)
 
@@ -81,6 +82,26 @@ class ReviewPilotTests(unittest.TestCase):
                 (Path(directory) / name).write_text('{}\n')
             with self.assertRaisesRegex(ValueError, 'pinned commit'):
                 pilot.build(Path(directory))
+
+    def test_crlf_checkout_rebuilds_identical_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for name in pilot.PINNED_SOURCE_SHA256:
+                canonical = pilot.canonical_lf_bytes((pilot.ROOT / 'data/benchmark' / name).read_bytes())
+                (Path(directory) / name).write_bytes(canonical.replace(b'\n', b'\r\n'))
+            self.assertEqual(pilot.build(Path(directory)), self.artifacts)
+
+    def test_content_change_is_rejected_even_with_crlf(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for name in pilot.PINNED_SOURCE_SHA256:
+                canonical = pilot.canonical_lf_bytes((pilot.ROOT / 'data/benchmark' / name).read_bytes())
+                modified = canonical.replace(b'\n', b' \n', 1)
+                (Path(directory) / name).write_bytes(modified.replace(b'\n', b'\r\n'))
+            with self.assertRaisesRegex(ValueError, 'pinned commit'):
+                pilot.build(Path(directory))
+
+    def test_line_ending_normalization_does_not_change_json_values(self):
+        value = b'{"text":"literal \\r\\n and \\n"}\r\n'
+        self.assertEqual(pilot.canonical_lf_bytes(value), b'{"text":"literal \\r\\n and \\n"}\n')
 
     def test_nonempty_destination_is_never_replaced(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -32,18 +32,23 @@ reasoning before explicitly revealing a proposal. Reconciliation is a separate
 record; it does not overwrite the initial judgment. Export backups regularly.
 The local server stores review events in `reviews/reviews.sqlite3`.
 
-One accountant is available. This is a single-expert workflow; it provides no
-inter-rater reliability estimate. The curator must collect **all 20 initial
-judgments and the delayed repeat subset before any answer reveal** to reduce contamination between related
-cases. The UI requires a saved initial review per case, but this whole-pilot
-embargo is an operational protocol. Keep the reviewer away from source keys,
-curator files and model outputs during the first pass.
+The server enforces **all 20 initial judgments before any proposal reveal**,
+followed by a frozen three-case delayed repeat subset after at least seven days.
+Repeat cases use fresh shuffled aliases; earlier assessments and reviewer exports
+are hidden during that stage. Reconciliation opens only after both blind passes.
+Keep reviewers away from source keys, curator files and model outputs throughout
+the blind phase. The public repository still contains curator proposals, so this
+is an operational research blinding boundary.
 
-The server is a local trusted-team tool, not an authenticated hosted service.
-Reviewer IDs are attribution labels, not login accounts. HTTP blind views reduce
-accidental answer exposure; anyone with repository/filesystem access can inspect
-committed curator proposals. Distribute only the blind packet to the reviewer.
-Do not expose the server on a public interface.
+Default local mode is a trusted-team tool: self-entered reviewer IDs are attribution
+labels. For remote accountants, use authenticated hosted mode as described in
+[free deployment](docs/DEPLOYMENT.md). It requires durable PostgreSQL storage,
+personal invitation accounts, revocable sessions and an exact HTTPS origin;
+it refuses public binding in local mode and temporary SQLite in hosted mode.
+The curator creates separate accountant invitations, monitors first-pass and
+repeat progress, compares preserved initial assessments, exports backups and
+records separate resolutions. Self-declared qualifications and descriptive
+agreement counts do not establish independent expert validation or publication gold.
 
 For legacy answer-visible dataset inspection, use a separate curator session:
 

@@ -7,8 +7,11 @@ Blind reviews are append-only local SQLite records. Curator mode must be explici
 import argparse
 import hashlib
 import json
+import os
+import secrets
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.cookies import SimpleCookie
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 try:
@@ -112,7 +115,7 @@ class Dataset:
                 line = stream.readline()
                 if not line:
                     return
-                digest.update(line)
+                digest.update(line.replace(b'\r\n', b'\n'))
                 if line.strip():
                     yield offset, json.loads(line)
 
@@ -148,8 +151,8 @@ class BlindDataset:
         self.exams, self.proposals = {}, {}
         if dataset_id == 'pilot':
             directory = store.root / 'data/review_pilot'
-            raw = (directory / 'public_cases.jsonl').read_bytes()
-            proposal_raw = (directory / 'curator/proposals.jsonl').read_bytes()
+            raw = (directory / 'public_cases.jsonl').read_bytes().replace(b'\r\n', b'\n')
+            proposal_raw = (directory / 'curator/proposals.jsonl').read_bytes().replace(b'\r\n', b'\n')
             self.fingerprint = hashlib.sha256(raw + b'\x00' + proposal_raw).hexdigest()
             for line in raw.splitlines():
                 exam = json.loads(line)
@@ -200,8 +203,14 @@ class BlindDataset:
         return {'answer': answer, 'errors': faults(answer), 'status': 'unvalidated_proposal'}
 
 
-def handler_for(store, curator=False, reviews=None):
+def handler_for(store, curator=False, reviews=None, auth=None, public_origin=None):
     reviews = reviews or ReviewStore(store.root / 'reviews/reviews.sqlite3')
+    if auth and curator:
+        raise ValueError('Hosted curator access uses the authenticated admin workspace')
+    if auth:
+        parsed_origin = urlsplit(public_origin or '')
+        if parsed_origin.scheme != 'https' or not parsed_origin.hostname or parsed_origin.path or parsed_origin.query or parsed_origin.fragment or parsed_origin.username:
+            raise ValueError('Hosted APP_ORIGIN must be one exact HTTPS origin')
     blind_cache = {}
     blind_lock = threading.Lock()
     def blind(dataset_id):
@@ -210,10 +219,15 @@ def handler_for(store, curator=False, reviews=None):
         with blind_lock:
             if dataset_id not in blind_cache:
                 blind_cache[dataset_id] = BlindDataset(store, dataset_id)
+                reviews.register_protocol(dataset_id, blind_cache[dataset_id].fingerprint, blind_cache[dataset_id].entries)
             return blind_cache[dataset_id]
 
     class Handler(BaseHTTPRequestHandler):
-        def send(self, status, body, content_type="application/json; charset=utf-8"):
+        def setup(self):
+            super().setup()
+            self.connection.settimeout(30)
+
+        def send(self, status, body, content_type="application/json; charset=utf-8", headers=None):
             if not isinstance(body, bytes):
                 body = json.dumps(body, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
@@ -223,19 +237,71 @@ def handler_for(store, curator=False, reviews=None):
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
             self.send_header("Content-Security-Policy", "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'")
+            if auth:
+                self.send_header('Strict-Transport-Security', 'max-age=31536000')
+            for key, value in (headers or {}).items():
+                self.send_header(key, value)
             self.end_headers()
             self.wfile.write(body)
 
         def local_request(self, mutation=False):
-            allowed = {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}
+            allowed = {parsed_origin.netloc} if auth else {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}
             host = self.headers.get('Host', '')
             if host not in allowed:
-                raise PermissionError('Use the localhost URL printed by the server')
+                raise PermissionError('Unrecognized request host')
             origin = self.headers.get('Origin')
-            if origin and origin != 'http://' + host:
+            expected_origin = public_origin if auth else 'http://' + host
+            if (origin and origin != expected_origin) or (auth and mutation and origin != expected_origin):
                 raise PermissionError('Cross-origin requests are forbidden')
             if self.headers.get('Sec-Fetch-Site') == 'cross-site':
                 raise PermissionError('Cross-site requests are forbidden')
+
+        def token(self):
+            cookies = SimpleCookie()
+            try:
+                cookies.load(self.headers.get('Cookie', ''))
+            except Exception:
+                return ''
+            value = cookies.get('__Host-intelliaudit')
+            return value.value if value else ''
+
+        def current_session(self, required=True, curator_only=False, mutation=False):
+            if not auth:
+                return None
+            session = auth.session(self.token())
+            if not session:
+                if required:
+                    raise AuthenticationError('Sign in to continue')
+                return None
+            if curator_only and session['reviewer']['role'] != 'curator':
+                raise PermissionError('Curator access required')
+            if mutation and not secrets.compare_digest(self.headers.get('X-CSRF-Token', ''), session['csrf_token']):
+                raise PermissionError('Session security token is missing or invalid')
+            return session
+
+        def reviewer_id(self, supplied, session):
+            if session:
+                identity = session['reviewer']['id']
+                if session['reviewer']['role'] != 'reviewer':
+                    raise PermissionError('Use a separate accountant account for independent review')
+                if supplied is not None and supplied != identity:
+                    raise PermissionError('You can access only your own review records')
+                return identity
+            return nonempty(supplied, 'reviewer_id', 200)
+
+        def scope(self, dataset_id, dataset, reviewer_id, case_id=None):
+            result = {'dataset': dataset_id, 'fingerprint': dataset.fingerprint, 'reviewer_id': reviewer_id}
+            if case_id is not None:
+                result['case_id'] = case_id
+            return result
+
+        def all_reviews(self, dataset_id, dataset):
+            events = []
+            for user in auth.reviewers():
+                if user['role'] == 'reviewer':
+                    scope = self.scope(dataset_id, dataset, user['id'])
+                    events.extend(reviews.history(scope, allow_during_repeat=True)['events'])
+            return events
 
         @staticmethod
         def parameters(query, allowed):
@@ -249,6 +315,8 @@ def handler_for(store, curator=False, reviews=None):
                 action()
             except PermissionError as error:
                 self.send(403, {'error': str(error)})
+            except AuthenticationError as error:
+                self.send(401, {'error': str(error)})
             except (ValueError, TypeError, AttributeError) as error:
                 self.send(400, {'error': str(error)})
             except KeyError:
@@ -256,15 +324,61 @@ def handler_for(store, curator=False, reviews=None):
             except FileNotFoundError:
                 self.send(404, {'error': 'Dataset or asset files are missing; build the pilot first.'})
             except OSError as error:
-                self.log_error('Read failed: %s', error)
-                self.send(500, {'error': 'Could not read local data'})
+                self.log_error('Storage operation failed (%s)', type(error).__name__)
+                self.send(500, {'error': 'Storage is temporarily unavailable; your submission was not confirmed. Please retry.'})
+            except Exception as error:
+                self.log_error('Operation failed (%s)', type(error).__name__)
+                self.send(500, {'error': 'The service could not complete this operation. Please retry.'})
 
         def do_GET(self):
+            if self.path == '/healthz':
+                self.send(200, {'status': 'ok'})
+                return
             self.guard(self.get)
 
         def get(self):
             url = urlsplit(self.path)
             query = parse_qs(url.query, keep_blank_values=True)
+            session = self.current_session(required=False)
+            if url.path == '/api/auth/session':
+                self.parameters(query, set())
+                self.send(200, {'hosted': bool(auth), 'authenticated': bool(session), **(session or {})})
+                return
+            login_assets = {'/login.html': ('login.html', 'text/html; charset=utf-8'), '/login.js': ('login.js', 'text/javascript; charset=utf-8'), '/login.css': ('login.css', 'text/css; charset=utf-8')}
+            if url.path in login_assets:
+                filename, mime = login_assets[url.path]
+                self.send(200, (Path(__file__).parent / filename).read_bytes(), mime)
+                return
+            if auth and not session:
+                if not url.path.startswith('/api/'):
+                    self.send(303, b'', headers={'Location': '/login.html'})
+                    return
+                raise AuthenticationError('Sign in to continue')
+            if auth and url.path in {'/admin.html', '/admin.js', '/admin.css'}:
+                self.current_session(curator_only=True)
+                filename = url.path[1:]
+                mime = 'text/html; charset=utf-8' if filename.endswith('.html') else 'text/javascript; charset=utf-8' if filename.endswith('.js') else 'text/css; charset=utf-8'
+                self.send(200, (Path(__file__).parent / filename).read_bytes(), mime)
+                return
+            if auth and url.path.startswith('/api/admin/'):
+                self.current_session(curator_only=True)
+                q = self.parameters(query, {'dataset'})
+                dataset_id = q.get('dataset', 'pilot')
+                dataset = blind(dataset_id)
+                if url.path == '/api/admin/reviewers':
+                    users = auth.reviewers()
+                    for user in users:
+                        if user['role'] == 'reviewer':
+                            user['protocol'] = reviews.protocol(self.scope(dataset_id, dataset, user['id']))
+                    self.send(200, {'reviewers': users})
+                elif url.path == '/api/admin/comparison':
+                    from .agreement import build_comparison
+                    self.send(200, build_comparison(dataset.entries, self.all_reviews(dataset_id, dataset), auth.resolutions({'dataset': dataset_id, 'fingerprint': dataset.fingerprint})))
+                elif url.path == '/api/admin/export':
+                    self.send(200, {'dataset': dataset_id, 'fingerprint': dataset.fingerprint, 'events': self.all_reviews(dataset_id, dataset), 'adjudications': auth.resolutions({'dataset': dataset_id, 'fingerprint': dataset.fingerprint}), 'status': 'operational_records_not_publication_gold'})
+                else:
+                    self.send(404, {'error': 'Not found'})
+                return
             assets = {'/': ('index.html' if curator else 'blind.html', 'text/html; charset=utf-8'),
                       '/blind.html': ('blind.html', 'text/html; charset=utf-8'),
                       '/blind.js': ('blind.js', 'text/javascript; charset=utf-8'),
@@ -280,18 +394,28 @@ def handler_for(store, curator=False, reviews=None):
                 q = self.parameters(query, {'dataset', 'id'})
                 dataset_id = q.get('dataset', 'pilot')
                 dataset = blind(dataset_id)
+                if auth:
+                    identity = self.reviewer_id(None, session)
+                    protocol = reviews.protocol(self.scope(dataset_id, dataset, identity))
+                    if protocol['phase'] == 'repeat' and url.path.endswith('/case'):
+                        raise PermissionError('Complete the shuffled repeat packet before reopening the initial cases')
                 if url.path.endswith('/index'):
                     self.send(200, {'dataset': dataset_id, 'name': 'Revenue review pilot' if dataset_id == 'pilot' else DATASETS[dataset_id][0],
-                                    'fingerprint': dataset.fingerprint, 'facets': dataset.facets, 'cases': dataset.entries})
+                                    'fingerprint': dataset.fingerprint, 'facets': dataset.facets, 'cases': protocol['repeat_cases'] if auth and protocol['phase'] == 'repeat' else dataset.entries})
                 else:
                     self.send(200, dataset.detail(q.get('id', '')))
                 return
-            if url.path in ('/api/review/history', '/api/review/export'):
-                q = self.parameters(query, {'dataset', 'case_id', 'reviewer_id'})
+            if url.path in ('/api/review/history', '/api/review/export', '/api/review/protocol', '/api/review/repeat-case'):
+                q = self.parameters(query, {'dataset', 'case_id', 'reviewer_id', 'id'})
                 dataset_id = q.get('dataset', 'pilot')
                 dataset = blind(dataset_id)
-                scope = {'dataset': dataset_id, 'fingerprint': dataset.fingerprint,
-                         'reviewer_id': nonempty(q.get('reviewer_id'), 'reviewer_id', 200)}
+                scope = self.scope(dataset_id, dataset, self.reviewer_id(q.get('reviewer_id'), session))
+                if url.path.endswith('/protocol'):
+                    self.send(200, reviews.protocol(scope))
+                    return
+                if url.path.endswith('/repeat-case'):
+                    self.send(200, reviews.repeat_detail(scope, q.get('id', ''), dataset.detail))
+                    return
                 if url.path.endswith('/history'):
                     scope['case_id'] = q.get('case_id', '')
                     dataset.detail(scope['case_id'])
@@ -318,7 +442,8 @@ def handler_for(store, curator=False, reviews=None):
         def post(self):
             self.local_request(mutation=True)
             url = urlsplit(self.path)
-            if url.query or url.path not in {'/api/review/submit', '/api/review/reveal', '/api/review/import'}:
+            paths = {'/api/review/submit', '/api/review/reveal', '/api/review/import', '/api/review/repeat-submit', '/api/auth/login', '/api/auth/logout', '/api/admin/invite', '/api/admin/revoke', '/api/admin/adjudicate'}
+            if url.query or url.path not in paths or (not auth and url.path.startswith(('/api/auth/', '/api/admin/'))):
                 self.send(404, {'error': 'Not found'})
                 return
             if self.headers.get_content_type() != 'application/json':
@@ -329,19 +454,76 @@ def handler_for(store, curator=False, reviews=None):
             body = json.loads(self.rfile.read(length))
             if not isinstance(body, dict):
                 raise ValueError('Expected JSON object')
+            if url.path == '/api/auth/login':
+                if not auth:
+                    raise ValueError('Login is available only in hosted mode')
+                if set(body) != {'invite_code'}:
+                    raise ValueError('Expected a personal access code')
+                # Render terminates TLS and sets X-Forwarded-For. The last hop is
+                # controlled by the proxy; without it use the direct peer.
+                client = self.headers.get('X-Forwarded-For', '').split(',')[-1].strip() or self.client_address[0]
+                token, result = auth.login(body['invite_code'], client)
+                self.send(200, result, headers={'Set-Cookie': f'__Host-intelliaudit={token}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=28800'})
+                return
+            session = self.current_session(mutation=True)
+            if url.path == '/api/auth/logout':
+                if not auth or body:
+                    raise ValueError('Invalid logout request')
+                auth.logout(self.token())
+                self.send(200, {'signed_out': True}, headers={'Set-Cookie': '__Host-intelliaudit=; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=0'})
+                return
+            if url.path.startswith('/api/admin/'):
+                self.current_session(curator_only=True, mutation=True)
+                if url.path.endswith('/invite'):
+                    if set(body) != {'name', 'qualification'}:
+                        raise ValueError('Expected name and qualification')
+                    self.send(200, auth.invite(body['name'], body['qualification']))
+                elif url.path.endswith('/revoke'):
+                    if set(body) != {'reviewer_id'}:
+                        raise ValueError('Expected reviewer_id')
+                    auth.revoke(nonempty(body['reviewer_id'], 'reviewer_id', 200))
+                    self.send(200, {'revoked': True})
+                else:
+                    if set(body) != {'dataset', 'case_id', 'annotation', 'reason'}:
+                        raise ValueError('Invalid curator resolution fields')
+                    dataset_id = body['dataset']
+                    dataset = blind(dataset_id)
+                    detail = dataset.detail(body['case_id'])
+                    annotation = validate_annotation(body['annotation'], detail, 'blind')
+                    all_events = self.all_reviews(dataset_id, dataset)
+                    events = [event for event in all_events if event['stage'] == 'blind' and event['case_id'] == body['case_id']]
+                    for reviewer_id in {event['reviewer_id'] for event in all_events if event['stage'] == 'blind'}:
+                        if reviews.protocol(self.scope(dataset_id, dataset, reviewer_id))['phase'] != 'reconciliation':
+                            raise PermissionError('Curator resolution opens after the contributing reviewers complete blind and delayed-repeat review')
+                    scope = {'dataset': dataset_id, 'fingerprint': dataset.fingerprint, 'case_id': body['case_id']}
+                    self.send(200, {'record': auth.resolve(scope, session['reviewer']['id'], annotation, body['reason'], [event['event_id'] for event in events])})
+                return
             if url.path.endswith('/import'):
+                if auth:
+                    raise PermissionError('Hosted reviewer imports are disabled to preserve server-recorded identity and timestamps')
                 dataset_id = body.get('scope', {}).get('dataset', '')
                 dataset = blind(dataset_id)
                 self.send(200, reviews.import_events(body, dataset, dataset.detail))
                 return
             allowed = {'dataset', 'case_id', 'reviewer_id'}
-            if url.path.endswith('/submit'):
+            if url.path.endswith('/submit') or url.path.endswith('/repeat-submit'):
                 allowed |= {'reviewer_name', 'qualification', 'stage', 'annotation'}
             if set(body) - allowed:
                 raise ValueError('Unknown request field')
             dataset_id = body.get('dataset', 'pilot')
             dataset = blind(dataset_id)
-            scope = reviews.identity(dataset_id, dataset.fingerprint, body.get('case_id'), body.get('reviewer_id'))
+            identity = self.reviewer_id(body.get('reviewer_id'), session)
+            scope = reviews.identity(dataset_id, dataset.fingerprint, body.get('case_id'), identity)
+            if session:
+                for field, expected in (('reviewer_name', session['reviewer']['name']), ('qualification', session['reviewer']['qualification'])):
+                    if field in body and body[field] != expected:
+                        raise PermissionError('Reviewer details are controlled by your invitation account')
+                    body[field] = expected
+            if url.path.endswith('/repeat-submit'):
+                name = nonempty(body.get('reviewer_name'), 'reviewer_name', 300)
+                qualification = nonempty(body.get('qualification'), 'qualification', 2000)
+                self.send(200, {'record': reviews.append_repeat(scope, scope['case_id'], name, qualification, body.get('annotation'), dataset.detail)})
+                return
             detail = dataset.detail(scope['case_id'])
             if url.path.endswith('/reveal'):
                 record = reviews.append(scope, 'reveal')
@@ -358,14 +540,36 @@ def handler_for(store, curator=False, reviews=None):
     return Handler
 
 
+class AuthenticationError(Exception):
+    """A valid session is required; distinct from authenticated authorization."""
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=8080)
+    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--hosted', action='store_true', help='Require invitation authentication and durable PostgreSQL storage')
     parser.add_argument('--curator', action='store_true', help='Expose proposal keys and the legacy verification dashboard (never use for blind review)')
     args = parser.parse_args()
-    with ThreadingHTTPServer(('127.0.0.1', args.port), handler_for(Store(), curator=args.curator)) as server:
-        print(f"IntelliAudit {'CURATOR (answers visible)' if args.curator else 'BLIND review'}: http://127.0.0.1:{args.port}", flush=True)
-        print('Local workspace only; reviewer IDs are not authentication. Reviews persist in reviews/reviews.sqlite3.', flush=True)
+    auth = None
+    public_origin = None
+    if args.hosted:
+        from .auth_store import AuthStore
+        from .postgres_store import PostgresReviewStore
+        database_url = os.environ.get('DATABASE_URL', '')
+        public_origin = os.environ.get('APP_ORIGIN') or os.environ.get('RENDER_EXTERNAL_URL')
+        if not database_url:
+            parser.error('Hosted mode requires DATABASE_URL; ephemeral SQLite is not permitted')
+        reviews = PostgresReviewStore(database_url)
+        auth = AuthStore(reviews.connect, os.environ.get('ADMIN_ACCESS_CODE', ''))
+    else:
+        if args.host not in {'127.0.0.1', 'localhost', '::1'}:
+            parser.error('Public interfaces require --hosted and authentication')
+        reviews = ReviewStore(os.environ.get('REVIEW_DB_PATH', str(ROOT / 'reviews/reviews.sqlite3')))
+    with ThreadingHTTPServer((args.host, args.port), handler_for(Store(), curator=args.curator, reviews=reviews, auth=auth, public_origin=public_origin)) as server:
+        server.timeout = 30
+        print(f"IntelliAudit {'CURATOR (answers visible)' if args.curator else 'BLIND review'}: {public_origin if auth else f'http://127.0.0.1:{args.port}'}", flush=True)
+        print('Hosted access: invitation accounts and durable PostgreSQL.' if auth else 'Local workspace only; reviewer IDs are not authentication. Reviews persist in the configured SQLite file.', flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:

@@ -29,6 +29,16 @@ def digest(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def canonical_lf_bytes(value: bytes) -> bytes:
+    """Undo Git's CRLF checkout conversion without changing JSON content.
+
+    The pinned hashes describe the LF Git blobs, not platform-specific working
+    tree line endings. Do not parse/reserialize JSON, trim whitespace, or replace
+    escaped newlines inside values: any content change must still fail the pin.
+    """
+    return value.replace(b'\r\n', b'\n')
+
+
 def rank(namespace: str, value: str) -> str:
     return digest(f'{SEED}|{namespace}|{value}'.encode())
 
@@ -53,7 +63,7 @@ def remove_cutoff(text: str) -> tuple[str, list[str]]:
 
 def build(source: Path = ROOT / 'data/benchmark') -> dict[str, bytes]:
     paths = {name: source / name for name in ('exam.jsonl', 'answer_key.jsonl')}
-    raw = {name: path.read_bytes() for name, path in paths.items()}
+    raw = {name: canonical_lf_bytes(path.read_bytes()) for name, path in paths.items()}
     hashes = {name: digest(value) for name, value in raw.items()}
     if hashes != PINNED_SOURCE_SHA256:
         raise ValueError('Source bytes differ from the pinned commit inputs; revise and document a new pilot version')
@@ -160,7 +170,7 @@ def main() -> None:
     args = parser.parse_args()
     artifacts = build(args.source)
     if args.check:
-        mismatches = [name for name, value in artifacts.items() if not (args.output / name).is_file() or (args.output / name).read_bytes() != value]
+        mismatches = [name for name, value in artifacts.items() if not (args.output / name).is_file() or canonical_lf_bytes((args.output / name).read_bytes()) != value]
         if mismatches:
             raise SystemExit('Rebuild differs: ' + ', '.join(mismatches))
         print('Verified deterministic 20-case, 5-company review pilot; all labels remain unreviewed.')

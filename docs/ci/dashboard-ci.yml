@@ -1,0 +1,88 @@
+name: Accountant dashboard checks
+
+on:
+  push:
+    branches: [codex/accountant-review-dashboard]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Python checks (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Check deterministic pilot reconstruction
+        run: python scripts/build_review_pilot.py --check
+      - name: Verify empty review records keep publication blocked
+        shell: python
+        run: |
+          import json
+          import subprocess
+          import sys
+          import tempfile
+          with tempfile.TemporaryDirectory() as empty_annotations:
+              result = subprocess.run(
+                  [sys.executable, "scripts/check_release_readiness.py", "--annotations", empty_annotations],
+                  capture_output=True, text=True, check=False,
+              )
+          assert result.returncode == 1, result.stderr or result.stdout
+          report = json.loads(result.stdout)
+          assert report["release_ready"] is False
+          assert report["expected_case_count"] == 20
+          assert report["annotation_record_count"] == 0
+          assert {"no_annotations", "missing_case_reviews"} <= {item["code"] for item in report["blockers"]}
+          print("Confirmed: hosting an unreviewed pilot does not establish publication readiness.")
+      - name: Check whitespace
+        run: git diff --check
+
+  postgres:
+    name: Durable PostgreSQL checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:test-only@127.0.0.1:55432/intelliaudit_qa?sslmode=require
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-hosted.txt
+      - name: Start isolated TLS database
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/intelliaudit-pg"
+          openssl req -x509 -newkey rsa:2048 -keyout "$RUNNER_TEMP/intelliaudit-pg/server.key" -out "$RUNNER_TEMP/intelliaudit-pg/server.crt" -days 1 -nodes -subj '/CN=localhost' 2>/dev/null
+          cat > "$RUNNER_TEMP/intelliaudit-pg/start.sh" <<'SCRIPT'
+          cp /qa/server.key /tmp/server.key
+          cp /qa/server.crt /tmp/server.crt
+          chown postgres:postgres /tmp/server.key /tmp/server.crt
+          chmod 600 /tmp/server.key
+          exec /usr/local/bin/docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/tmp/server.crt -c ssl_key_file=/tmp/server.key
+          SCRIPT
+          docker run --detach --name intelliaudit-ci-postgres --publish 127.0.0.1:55432:5432 --env POSTGRES_PASSWORD=test-only --env POSTGRES_DB=intelliaudit_qa --mount "type=bind,source=$RUNNER_TEMP/intelliaudit-pg,target=/qa,readonly" --entrypoint /bin/sh postgres:17-alpine /qa/start.sh
+          for attempt in $(seq 1 30); do
+            if docker exec intelliaudit-ci-postgres pg_isready -U postgres -d intelliaudit_qa; then break; fi
+            sleep 1
+          done
+      - name: Check database transitions, account persistence and immutable records
+        run: python -m unittest discover -s tests -p test_postgres_store.py -v

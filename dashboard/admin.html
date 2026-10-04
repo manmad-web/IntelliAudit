@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#162d38">
+  <title>Curator workspace · IntelliAudit</title>
+  <link rel="stylesheet" href="/admin.css">
+  <script src="/admin.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#comparison">Skip to comparisons</a>
+  <header class="top">
+    <a class="brand" href="/admin.html">i✓ <span>IntelliAudit<small>CURATOR WORKSPACE</small></span></a>
+    <div class="account"><span id="account-name">Checking access…</span><button id="backup-button">Export study backup</button><button id="logout">Sign out</button></div>
+  </header>
+  <main>
+    <section class="heading"><div><p class="eyebrow">INDEPENDENT REVIEWS, PRESERVED</p><h1>Coordinate the accountant pilot.</h1><p>Invite reviewers, compare their first assessments, and record curator resolutions.</p></div><button id="refresh">Refresh records</button></section>
+    <p id="status" role="status" aria-live="polite">Loading the curator workspace…</p>
+    <section class="overview" aria-label="Pilot progress">
+      <article class="metric"><span>Companies / cases</span><strong>5 / <span id="case-count">—</span></strong><small>Focused revenue and cutoff pilot</small></article>
+      <article class="metric"><span>Reviewers with initial records</span><strong id="reviewer-count">—</strong><small>Qualifications require human verification</small></article>
+      <article class="metric"><span>Cases needing comparison</span><strong id="dispute-count">—</strong><small>Initial field differences or incomplete records</small></article>
+      <article class="metric"><span>Curator resolutions</span><strong id="resolved-count">—</strong><small>Separate from publication approval</small></article>
+    </section>
+    <section class="people card" aria-labelledby="people-title">
+      <div class="section-heading"><div><h2 id="people-title">Accountant access</h2><p>Individual invitations keep submissions tied to each account.</p></div></div>
+      <form id="invite-form" class="invite-form">
+        <label>Accountant name<input name="name" autocomplete="off" maxlength="300" required></label>
+        <label>Declared qualification<input name="qualification" placeholder="CPA; financial reporting experience" maxlength="2000" required></label>
+        <button class="primary" type="submit">Create invitation</button>
+      </form>
+      <div id="invite-result" class="notice" hidden><strong>Invitation created. Copy this code now.</strong><p>Share it privately with the intended accountant. This code is displayed only once.</p><div class="copy-row"><code id="invite-code"></code><button id="copy-invite" type="button">Copy code</button></div></div>
+      <div id="reviewers" class="reviewer-list"></div>
+    </section>
+    <section class="card agreement" aria-labelledby="agreement-title">
+      <h2 id="agreement-title">First-assessment agreement</h2><p>Raw reviewer-pair counts. Different accepted proofs or paragraph choices can still need curator interpretation.</p>
+      <div id="agreement-metrics" class="agreement-metrics"></div>
+      <details><summary>How to interpret these counts</summary><ul id="caveats"></ul></details>
+    </section>
+    <section id="comparison" class="layout" aria-label="Case comparisons">
+      <aside class="card queue">
+        <h2>Case comparison queue</h2>
+        <label>Find a case<input id="search" type="search" placeholder="Company, year or case ID"></label>
+        <label>Case status<select id="status-filter"><option value="all">All cases</option><option value="disputed">Initial disagreements</option><option value="pending">Waiting for another reviewer</option><option value="incomplete">Incomplete records</option><option value="resolved">Curator resolution recorded</option><option value="agreed">Initial fields agree</option></select></label>
+        <div id="case-list"></div>
+      </aside>
+      <article id="case-detail" class="card detail" tabindex="-1"><p>Select a case to compare independent assessments.</p></article>
+    </section>
+    <footer>Hosting a review workspace does not establish a validated benchmark. Preserve independent answers, verify expert qualifications and authority, and run the publication gates separately.</footer>
+  </main>
+</body>
+</html>
