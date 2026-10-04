@@ -59,10 +59,10 @@ escaped newlines inside JSON values. All pinned hashes, company selection, case
 IDs and canonical generated artifact bytes remain unchanged; actual content
 changes still fail the source pin.
 
-The prepared `docs/ci/dashboard-ci.yml` runs the standard-library test suite and
+`.github/workflows/dashboard-ci.yml` runs the standard-library test suite and
 deterministic pilot reconstruction on Linux and Windows with Python 3.12. It also
 asserts that an empty annotation directory leaves publication blocked for all
 20 cases. A successful software/deployment check does not make proposed labels
 reviewed accounting results.
 
-The CI template is kept outside the executable workflow directory because the current GitHub OAuth credential lacks `workflow` scope. After authorizing that scope, move it to `.github/workflows/dashboard-ci.yml` and push to enable CI. Manual Windows and real PostgreSQL checks described above have passed.
+GitHub workflow authorization is now available and the CI configuration is enabled. Windows and an isolated Linux Python 3.12 container both passed all 115 tests against the TLS PostgreSQL test database. The saved pilot also passed deterministic reconstruction on both platforms.
