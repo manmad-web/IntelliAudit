@@ -2,8 +2,6 @@
 import json
 import copy
 import math
-import random
-import secrets
 import sqlite3
 import threading
 import uuid
@@ -12,6 +10,10 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 SCHEMA = 1
+EXPORT_SCHEMA = 2
+IMMEDIATE_PROTOCOL = 'immediate_reconciliation_v2'
+LEGACY_PROTOCOL = 'delayed_repeat_v1'
+IMMEDIATE_ROUNDING = 'No delayed repeats; reconciliation follows the complete initial pass'
 
 def nonempty(value, name, limit=20000):
     if not isinstance(value, str) or not value.strip() or len(value) > limit:
@@ -22,7 +24,9 @@ def nonempty(value, name, limit=20000):
 def validate_annotation(annotation, detail, stage):
     required = {'judgement', 'error_type', 'rows', 'evidence_sufficiency', 'authority_disposition',
                 'citations', 'authority_currency', 'authority_source', 'proof_sets', 'reasoning', 'confidence'}
-    optional = {'evidence_quotes'} | ({'disposition'} if stage == 'verification' else set())
+    optional = {'evidence_quotes', 'supporting_evidence', 'missing_information',
+                'case_quality_flags', 'case_quality_notes', 'alternative_treatments',
+                'contradictions'} | ({'disposition'} if stage == 'verification' else set())
     if not isinstance(annotation, dict) or not required <= annotation.keys() or annotation.keys() - required - optional:
         raise ValueError('Annotation fields are missing or unknown')
     choices = {
@@ -60,6 +64,22 @@ def validate_annotation(annotation, detail, stage):
         raise ValueError('Verified authority requires source and effective-date rationale')
     nonempty(annotation['reasoning'], 'reasoning')
     units = {u['id']: u['text'] for u in detail['evidence_units']}
+    supporting = annotation.get('supporting_evidence', [])
+    if (not isinstance(supporting, list) or len(supporting) > 100
+            or any(not isinstance(unit, str) or unit not in units for unit in supporting)
+            or len(set(supporting)) != len(supporting)):
+        raise ValueError('Supporting evidence must reference distinct supplied evidence units')
+    for field in ('missing_information', 'case_quality_notes', 'alternative_treatments', 'contradictions'):
+        value = annotation.get(field, '')
+        if not isinstance(value, str) or len(value) > 10000:
+            raise ValueError(f'Invalid {field}')
+    quality_choices = {'statement_unclear', 'evidence_unclear', 'evidence_insufficient',
+                       'evidence_contradictory', 'scenario_unrealistic', 'source_unclear', 'other'}
+    quality_flags = annotation.get('case_quality_flags', [])
+    if (not isinstance(quality_flags, list) or len(quality_flags) > len(quality_choices)
+            or any(not isinstance(flag, str) or flag not in quality_choices for flag in quality_flags)
+            or len(set(quality_flags)) != len(quality_flags)):
+        raise ValueError('Invalid case quality flags')
     proofs = annotation['proof_sets']
     if not isinstance(proofs, list) or len(proofs) > 50:
         raise ValueError('Invalid proof_sets')
@@ -127,31 +147,47 @@ class ReviewStore:
         row = con.execute('SELECT payload FROM protocol_plans WHERE dataset=? AND fingerprint=? AND reviewer_id=?', key).fetchone()
         if row:
             plan = json.loads(row[0])
-            if set(plan['case_ids']) != set(cases):
-                raise ValueError('Frozen protocol corpus mismatch')
+            self._validate_plan(plan, cases)
             return plan
-        # Round 15% to the nearest case (half up). A twenty-case pilot repeats three.
-        # Tiny development fixtures may round to zero; this is disclosed in status.
-        count = math.floor(len(cases) * .15 + .5)
-        rng = random.SystemRandom()
-        strata = {}
-        for case_id, meta in cases.items():
-            strata.setdefault(meta.get('company', ''), []).append(case_id)
-        groups = list(strata.values())
-        rng.shuffle(groups)
-        for group in groups:
-            rng.shuffle(group)
-        chosen = []
-        while len(chosen) < count:
-            for group in groups:
-                if group and len(chosen) < count:
-                    chosen.append(group.pop())
-        rng.shuffle(chosen)
-        plan = {'version': 1, 'case_ids': sorted(cases), 'delay_days': 7,
-                'rounding': '15% rounded to nearest integer, half up; public company strata',
-                'repeats': [{'alias': 'repeat_' + secrets.token_hex(12), 'case_id': case_id} for case_id in chosen]}
+        # Plans are frozen per participant. Existing version-one plans keep their
+        # original aliases and delay; only newly enrolled participants use v2.
+        plan = {'version': 2, 'protocol_id': IMMEDIATE_PROTOCOL, 'case_ids': sorted(cases),
+                'delay_days': 0, 'rounding': IMMEDIATE_ROUNDING, 'repeats': [],
+                'reliability_status': 'reliability_not_measured'}
         con.execute('INSERT INTO protocol_plans VALUES (?,?,?,?)', (*key, json.dumps(plan, sort_keys=True)))
         return plan
+
+    @staticmethod
+    def _validate_plan(plan, cases):
+        """Accept both frozen protocols without silently interpreting a new one."""
+        common = {'version', 'case_ids', 'delay_days', 'rounding', 'repeats'}
+        if not isinstance(plan, dict) or type(plan.get('version')) is not int or plan['version'] not in {1, 2}:
+            raise ValueError('Unsupported frozen protocol version')
+        expected = common if plan['version'] == 1 else common | {'protocol_id', 'reliability_status'}
+        case_ids = plan.get('case_ids')
+        if (not cases or set(plan) != expected or not isinstance(case_ids, list)
+                or any(not isinstance(case_id, str) for case_id in case_ids)
+                or len(case_ids) != len(cases) or set(case_ids) != set(cases)
+                or type(plan.get('delay_days')) is not int
+                or not isinstance(plan.get('rounding'), str) or not plan['rounding'].strip()
+                or not isinstance(plan.get('repeats'), list)):
+            raise ValueError('Invalid frozen protocol plan or corpus mismatch')
+        if plan['version'] == 2:
+            if (plan['protocol_id'] != IMMEDIATE_PROTOCOL or plan['delay_days'] != 0
+                    or plan['repeats'] or plan['rounding'] != IMMEDIATE_ROUNDING
+                    or plan['reliability_status'] != 'reliability_not_measured'):
+                raise ValueError('Invalid immediate reconciliation protocol')
+            return
+        repeats = plan['repeats']
+        import re
+        if (plan['delay_days'] != 7 or len(repeats) != math.floor(len(cases) * .15 + .5)
+                or any(not isinstance(repeat, dict) or set(repeat) != {'alias', 'case_id'}
+                       or not isinstance(repeat['case_id'], str) or repeat['case_id'] not in cases
+                       or not isinstance(repeat['alias'], str)
+                       or not re.fullmatch(r'repeat_[0-9a-f]{24}', repeat['alias']) for repeat in repeats)
+                or len({repeat['alias'] for repeat in repeats}) != len(repeats)
+                or len({repeat['case_id'] for repeat in repeats}) != len(repeats)):
+            raise ValueError('Invalid legacy delayed repeat subset')
 
     def _protocol(self, con, scope):
         plan = self._plan(con, scope)
@@ -167,10 +203,16 @@ class ReviewStore:
         phase = ('initial' if not complete else 'waiting' if pending and self.clock() < eligible
                  else 'repeat' if pending else 'reconciliation')
         cases = self.protocol_cases[(scope['dataset'], scope['fingerprint'])]
-        return {'phase': phase, 'initial_completed': len(initial), 'initial_total': len(plan['case_ids']),
+        reliability = ('reliability_not_measured' if plan['version'] == 2 else
+                       'repeat_assessments_collected' if not pending and complete else 'delayed_repeat_pending')
+        return {'phase': phase, 'plan_version': plan['version'],
+                'protocol_id': plan.get('protocol_id', LEGACY_PROTOCOL), 'reliability_status': reliability,
+                'initial_completed': len(initial), 'initial_total': len(plan['case_ids']),
                 'repeat_required': len(plan['repeats']), 'repeat_completed': len(plan['repeats']) - len(pending),
                 'repeat_ready_at': eligible.isoformat() if eligible else None, 'delay_days': plan['delay_days'],
                 'repeat_fraction': len(plan['repeats']) / len(plan['case_ids']), 'rounding': plan['rounding'],
+                'completed_case_ids': sorted(initial) if phase != 'repeat' else [],
+                'verification_completed_case_ids': sorted({event['case_id'] for event in events if event['stage'] == 'verification'}) if phase != 'repeat' else [],
                 'repeat_cases': [{'id': repeat['alias'], **cases[repeat['case_id']]} for repeat in pending] if phase == 'repeat' else []}
 
     def protocol(self, scope):
@@ -213,9 +255,11 @@ class ReviewStore:
             if protocol['phase'] == 'repeat' and not allow_during_repeat:
                 raise PermissionError('Prior assessments are hidden while delayed repeat review is open')
             rows = con.execute('SELECT payload FROM events WHERE dataset=? AND fingerprint=? AND reviewer_id=?' + (' AND case_id=?' if 'case_id' in scope else '') + ' ORDER BY rowid', tuple(scope[k] for k in ('dataset', 'fingerprint', 'reviewer_id')) + ((scope['case_id'],) if 'case_id' in scope else ())).fetchall()
-            envelope = {'schema_version': SCHEMA, 'scope': scope, 'events': [json.loads(r[0]) for r in rows]}
-            if 'case_id' not in scope and protocol['phase'] == 'reconciliation':
-                envelope['protocol_plan'] = self._plan(con, scope)
+            plan = self._plan(con, scope)
+            envelope = {'schema_version': EXPORT_SCHEMA, 'protocol_version': plan['version'],
+                        'scope': scope, 'events': [json.loads(r[0]) for r in rows]}
+            if 'case_id' not in scope and (plan['version'] == 2 or protocol['phase'] == 'reconciliation' or allow_during_repeat):
+                envelope['protocol_plan'] = plan
         return envelope
 
     def _insert(self, con, event):
@@ -242,7 +286,8 @@ class ReviewStore:
             if datetime.fromisoformat(event['created_at']) < ready_at:
                 raise ValueError('Repeat timestamp predates the seven-day delay')
         if event['stage'] in {'reveal', 'verification'} and self._protocol(con, event)['phase'] != 'reconciliation':
-            raise ValueError('Complete every initial review and the delayed repeat subset before revealing proposals')
+            requirement = ' and the frozen delayed repeat subset' if plan['version'] == 1 else ''
+            raise ValueError(f'Complete every initial review{requirement} before revealing proposals')
         if event['stage'] == 'reveal' and 'blind' not in stages:
             raise ValueError('Submit a blind review before revealing the proposal')
         if event['stage'] == 'verification' and 'reveal' not in stages:
@@ -260,12 +305,25 @@ class ReviewStore:
             raise ValueError('Unknown review stage')
         event = self._event(scope, stage, reviewer_name, qualification, annotation)
         with self.lock, self.connect() as con:
+            if stage == 'reveal':
+                if self._protocol(con, event)['phase'] != 'reconciliation':
+                    raise ValueError('Complete every initial review and any repeats required by your frozen protocol before revealing proposals')
+                ident = tuple(event[key] for key in ('fingerprint', 'dataset', 'case_id', 'reviewer_id'))
+                prior = con.execute("SELECT payload FROM events WHERE fingerprint=? AND dataset=? AND case_id=? AND reviewer_id=? AND stage='reveal'", ident).fetchone()
+                if prior:
+                    return json.loads(prior[0])
             self._insert(con, event)
         return event
 
     def import_events(self, envelope, dataset, detail_fn):
-        if not isinstance(envelope, dict) or not {'schema_version', 'scope', 'events'} <= set(envelope) or set(envelope) - {'schema_version', 'scope', 'events', 'protocol_plan'} or type(envelope['schema_version']) is not int or envelope['schema_version'] != SCHEMA:
+        if not isinstance(envelope, dict) or type(envelope.get('schema_version')) is not int or envelope['schema_version'] not in {1, EXPORT_SCHEMA}:
             raise ValueError('Unsupported or stale export schema')
+        required = {'schema_version', 'scope', 'events'} | ({'protocol_version'} if envelope['schema_version'] == EXPORT_SCHEMA else set())
+        if not required <= set(envelope) or set(envelope) - required - {'protocol_plan'}:
+            raise ValueError('Unsupported or stale export schema')
+        protocol_version = envelope.get('protocol_version', 1)
+        if type(protocol_version) is not int or protocol_version not in {1, 2}:
+            raise ValueError('Unsupported export protocol version')
         scope = envelope['scope']
         if not isinstance(scope, dict) or set(scope) != {'dataset', 'fingerprint', 'reviewer_id'} or scope['fingerprint'] != dataset.fingerprint:
             raise ValueError('Dataset fingerprint or export scope mismatch')
@@ -276,19 +334,22 @@ class ReviewStore:
         fields = {'dataset', 'fingerprint', 'case_id', 'reviewer_id', 'event_id', 'schema_version', 'created_at', 'stage', 'reviewer_name', 'qualification', 'annotation'}
         count = 0
         with self.lock, self.connect() as con:
+            row = con.execute('SELECT payload FROM protocol_plans WHERE dataset=? AND fingerprint=? AND reviewer_id=?', self._key(scope)).fetchone()
+            existing_plan = json.loads(row[0]) if row else None
             if 'protocol_plan' in envelope:
                 plan = envelope['protocol_plan']
                 cases = self.protocol_cases.get((scope['dataset'], scope['fingerprint']), {})
-                if not isinstance(plan, dict) or set(plan) != {'version', 'case_ids', 'delay_days', 'rounding', 'repeats'} or plan['version'] != 1 or plan['delay_days'] != 7 or set(plan['case_ids']) != set(cases) or len(plan['case_ids']) != len(cases):
-                    raise ValueError('Invalid frozen protocol plan')
-                repeats = plan['repeats']
-                if not isinstance(repeats, list) or len(repeats) != math.floor(len(cases) * .15 + .5) or any(not isinstance(r, dict) or set(r) != {'alias', 'case_id'} or r['case_id'] not in cases or not isinstance(r['alias'], str) or not r['alias'].startswith('repeat_') or len(r['alias']) != 31 for r in repeats) or len({r['alias'] for r in repeats}) != len(repeats) or len({r['case_id'] for r in repeats}) != len(repeats):
-                    raise ValueError('Invalid repeat subset')
-                row = con.execute('SELECT payload FROM protocol_plans WHERE dataset=? AND fingerprint=? AND reviewer_id=?', self._key(scope)).fetchone()
-                if row and json.loads(row[0]) != plan:
-                    raise ValueError('Imported protocol conflicts with the already frozen repeat subset')
+                self._validate_plan(plan, cases)
+                if plan['version'] != protocol_version:
+                    raise ValueError('Export and frozen protocol versions disagree')
+                if existing_plan is not None and existing_plan != plan:
+                    raise ValueError('Imported protocol conflicts with the already frozen review plan')
                 if not row:
                     con.execute('INSERT INTO protocol_plans VALUES (?,?,?,?)', (*self._key(scope), json.dumps(plan, sort_keys=True)))
+            elif existing_plan is None or existing_plan.get('version') != protocol_version:
+                # Earlier exports could omit the hidden repeat plan. Recreating
+                # it would change the participant's random subset and aliases.
+                raise ValueError('A complete frozen protocol plan is required to restore this export into a new store')
             for event in events:
                 expected = fields | ({'repeat_alias'} if isinstance(event, dict) and event.get('stage') == 'repeat' else set())
                 if not isinstance(event, dict) or set(event) != expected or type(event['schema_version']) is not int or event['schema_version'] != SCHEMA or any(event[k] != scope[k] for k in scope):

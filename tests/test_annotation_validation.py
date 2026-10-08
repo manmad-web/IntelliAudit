@@ -65,6 +65,14 @@ def add_repeat(item, when="2026-10-11T12:00:00Z"):
     item["review_plan"]["repeat_required"] = True
 
 
+def immediate_fixture():
+    item = fixture()
+    item["review_plan"].update(protocol_id="immediate_reconciliation_v2", reliability_status="reliability_not_measured",
+                               repeat_required=False, minimum_repeat_delay_days=0,
+                               repeat_selection_frozen_at=None, repeat_strata=[])
+    return item
+
+
 def add_mock_authority(item):
     item["authorities"] = [{"authority_id": "authority_test", "canonical_code": "ASC 606-10-25-23", "source_kind": "canonical_standard",
                             "framework": "us_gaap", "assertion_family": "revenue_cutoff", "source_url": "urn:unit-test:authority", "snapshot_sha256": "f" * 64,
@@ -162,6 +170,88 @@ class AnnotationValidationTests(unittest.TestCase):
         self.assertTrue(any("repeat fraction" in x for x in validate_batch(records, complete_dataset=True)))
         add_repeat(records[0])
         self.assertEqual(validate_batch(records, release=True, complete_dataset=True), [])
+
+    def test_immediate_protocol_passes_without_claiming_repeat_reliability(self):
+        records = []
+        for index in range(20):
+            record = immediate_fixture()
+            record.update(case_id=f"case_{index}", annotation_id=f"annotation_{index}")
+            records.append(record)
+        self.assertEqual(validate_batch(records, release=True, complete_dataset=True), [])
+        self.assertTrue(all(record["review_plan"]["reliability_status"] == "reliability_not_measured" for record in records))
+
+    def test_immediate_protocol_requires_explicit_disclosure_and_no_delayed_subset(self):
+        changes = [{"reliability_status": "repeat_assessments_collected"}, {"minimum_repeat_delay_days": 7},
+                   {"repeat_required": True}, {"repeat_selection_frozen_at": "2026-10-03T18:00:00Z"},
+                   {"repeat_strata": ["test_stratum"]}]
+        for change in changes:
+            record = immediate_fixture()
+            record["review_plan"].update(change)
+            with self.subTest(change=change):
+                self.assertTrue(validate_record(record, release=True))
+        record = immediate_fixture()
+        del record["review_plan"]["reliability_status"]
+        self.assertTrue(any("reliability_status" in error for error in validate_record(record)))
+
+    def test_legacy_implicit_and_explicit_protocols_keep_seven_day_and_selection_gates(self):
+        for explicit in (False, True):
+            record = fixture()
+            if explicit:
+                record["review_plan"]["protocol_id"] = "delayed_repeat_v1"
+            self.assertEqual(validate_record(record, release=True), [])
+            record["review_plan"]["minimum_repeat_delay_days"] = 0
+            self.assertTrue(any("below minimum 7" in error for error in validate_record(record, release=True)))
+            record["review_plan"]["minimum_repeat_delay_days"] = 7
+            record["review_plan"]["repeat_selection_frozen_at"] = None
+            self.assertTrue(any("selection not frozen" in error for error in validate_record(record, release=True)))
+
+    def test_immediate_post_proposal_review_is_reconciliation_never_blind_repeat(self):
+        record = immediate_fixture()
+        later = deepcopy(record["reviews"][0])
+        later.update(review_id="review_reconciliation", phase="expert_reconciliation", submitted_at="2026-10-03T14:00:00Z",
+                     saw_own_prior_annotation=True, saw_reference_key=True)
+        later["submission_sha256"] = review_digest(later)
+        record["reviews"].append(later)
+        self.assertEqual(validate_record(record, release=True), [])
+        later["phase"] = "expert_repeat"
+        later["submission_sha256"] = review_digest(later)
+        self.assertTrue(any("no independent delayed expert_repeat" in error for error in validate_record(record, release=True)))
+
+    def test_reconciliation_preserves_chronology_and_reasons_for_changed_decisions(self):
+        record = immediate_fixture()
+        later = deepcopy(record["reviews"][0])
+        later.update(review_id="review_reconciliation", phase="expert_reconciliation", submitted_at="2026-10-03T11:00:00Z",
+                     saw_own_prior_annotation=True, saw_reference_key=True)
+        later["submission_sha256"] = review_digest(later)
+        record["reviews"].append(later)
+        self.assertTrue(any("reconciliation precedes" in error for error in validate_record(record, release=True)))
+        later.update(submitted_at="2026-10-03T14:00:00Z", conclusion="insufficient_evidence",
+                     accepted_proof_ids=[], missing_fact_requirements=["Mock missing evidence."])
+        later["submission_sha256"] = review_digest(later)
+        self.assertTrue(any("recorded resolution" in error for error in validate_record(record, release=True)))
+        record["resolution"]["resolutions"] = [{"issue": "Mock changed decision.", "resolution": "Retain original after review.", "rationale": "Software test only."}]
+        self.assertEqual(validate_record(record, release=True), [])
+
+    def test_complete_dataset_rejects_mixed_protocols_and_bad_protocol_values(self):
+        first, second = immediate_fixture(), fixture()
+        first.update(case_id="case_first", annotation_id="annotation_first")
+        second.update(case_id="case_second", annotation_id="annotation_second")
+        self.assertTrue(any("cannot mix" in error for error in validate_batch([first, second], release=True, complete_dataset=True)))
+        for value in ("unknown_protocol", {"protocol": "immediate_reconciliation_v2"}):
+            record = immediate_fixture()
+            record["review_plan"]["protocol_id"] = value
+            with self.subTest(value=value):
+                self.assertTrue(validate_batch([record], release=True, complete_dataset=True))
+
+    def test_immediate_protocol_still_requires_qualification_proof_and_source_gates(self):
+        record = immediate_fixture()
+        record["reviewers"][0]["qualification_verified"] = False
+        record["proof_sets"][0]["minimality"]["deletion_tests"][0]["still_sufficient"] = True
+        record["sources"][0]["rights_status"] = "unresolved"
+        record["resolution"]["gold_sha256"] = gold_digest(record)
+        errors = validate_record(record, release=True)
+        for expected in ("qualification not verified", "minimality", "rights unresolved"):
+            self.assertTrue(any(expected in error for error in errors), errors)
 
     def test_accepted_proof_cannot_use_inaccessible_late_evidence(self):
         record = fixture()
@@ -268,6 +358,30 @@ class AnnotationValidationTests(unittest.TestCase):
             self.assertTrue(assess_release(annotations, manifest, complete_dataset=False)["release_ready"])
             manifest.write_text(json.dumps({"case_ids": ["case_test", "case_missing"]}))
             self.assertFalse(assess_release(annotations, manifest, complete_dataset=False)["release_ready"])
+
+    def test_release_gate_reports_new_protocol_and_blocks_manifest_relabeling(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            annotations = root / "annotations"
+            annotations.mkdir()
+            manifest = root / "manifest.json"
+            manifest.write_text(json.dumps({"case_ids": ["case_test"], "review_protocol": "immediate_reconciliation_v2"}))
+            (annotations / "case.json").write_text(json.dumps(immediate_fixture()))
+            report = assess_release(annotations, manifest)
+            self.assertTrue(report["release_ready"], report["blockers"])
+            self.assertEqual(report["reliability_status"], "reliability_not_measured")
+            self.assertFalse(report["repeat_fraction_checked"])
+            self.assertTrue(report["complete_dataset_protocol_checked"])
+            (annotations / "case.json").write_text(json.dumps(fixture()))
+            report = assess_release(annotations, manifest, complete_dataset=False)
+            self.assertFalse(report["release_ready"])
+            self.assertTrue(any(blocker["code"] == "manifest_review_protocol_mismatch" for blocker in report["blockers"]))
+            (annotations / "case.json").write_text(json.dumps(immediate_fixture()))
+            manifest.write_text(json.dumps({"case_ids": ["case_test"], "schema_version": "review-pilot-v1"}))
+            report = assess_release(annotations, manifest, complete_dataset=False)
+            self.assertFalse(report["release_ready"])
+            self.assertEqual(report["manifest_review_protocol"], "delayed_repeat_v1")
+            self.assertTrue(any(blocker["code"] == "manifest_review_protocol_mismatch" for blocker in report["blockers"]))
 
     def test_operational_workflow_is_not_publication_gold(self):
         with tempfile.TemporaryDirectory() as directory:

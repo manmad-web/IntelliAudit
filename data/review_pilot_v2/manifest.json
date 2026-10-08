@@ -1,0 +1,73 @@
+{
+  "accountant_reviews_completed": 0,
+  "artifact_sha256": {
+    "curator/proposals.jsonl": "14ddffb174097f208f9647971158bf968b5703ed0c5a640a3d3b50f9ac70f55b",
+    "public_cases.jsonl": "14494d984cdb764c5d3fdca6d0d7a44ae10ec4b26f56372cf22e61858c8b5e40"
+  },
+  "case_ids": [
+    "RP2-019e6deb6b2bfcf0e8674c1c",
+    "RP2-b4b46e9744766b58c3919bd0",
+    "RP2-edea889851135693108ab1e9",
+    "RP2-8ad8c5ed9bf830bef4bd9fe9",
+    "RP2-59f5f0a6f840a7a53d4e64f7",
+    "RP2-f05220ac09fa348497481b99",
+    "RP2-d6c84c7bf81347325164063f",
+    "RP2-b4865cb5913e5af8f8bb2d9d",
+    "RP2-1cb71744ba36dc9f8c8d76ed",
+    "RP2-d6ced74bec290a3e2f7a7724",
+    "RP2-b83e2ca1d8708eee085cea19",
+    "RP2-076945933bddaf712a99a200",
+    "RP2-296e1cfe11be887ee4e41f9e",
+    "RP2-9d20199bafc6f87d2aaa298c",
+    "RP2-6eafb8ebcfd220dc5af5e65a",
+    "RP2-0423d7705029ae622683ce36",
+    "RP2-4402eef79d52be1c4431bce5",
+    "RP2-a328f0efa2f01272366baf28",
+    "RP2-dc6119dd1884a94acb4432db",
+    "RP2-e5ab9e5bd34061e407f2214e"
+  ],
+  "company_labels": [
+    "Company A",
+    "Company B",
+    "Company C",
+    "Company D",
+    "Company E"
+  ],
+  "curator_access": "Original company/CIK, old/new case mapping, source IDs, proposed answers, removed facts, pair groups, and construction notes are curator material. Keep them out of blind API responses. Repository access can expose construction keys and must be controlled in any future blinded study.",
+  "date_policy": "Fiscal year and statement period end retain the source values. Original reporting/publication date is unknown and represented as null; no date is invented.",
+  "evidence": "Reconstructed SEC-derived illustrations with computed residual rows and synthetic component movements, period-end facts, and simulated edits. Statements are not verbatim filings; supporting narratives are not authentic invoices, contracts, or ledgers. No allegation concerns a named company.",
+  "licensing": "No new redistribution license is asserted for inherited source content.",
+  "n_cases": 20,
+  "n_companies": 5,
+  "neutral_wording_policy": "Replace the inherited revenue-component phrase asserting satisfied performance obligations with a neutral revenue-account credit description. Preserve every number, sign, statement row, and substantive period-end fact.",
+  "pairing_limitations": "Related full/withheld and reconstructed/simulated variants may cue judgments through repeated amounts and wording. Pseudonyms reduce name lookup cues but cannot establish blinding, minimal counterfactual validity, or genuinely undecidable evidence.",
+  "publication_gate": "Original filing accession/period/unit reconciliation, qualified human accounting and authority review, ambiguity disposition, leakage assessment, and research release gates remain pending.",
+  "purpose": "Blind annotation and usability development pilot; automated checks do not establish accounting validity or a scientific reliability result.",
+  "qualification_policy": "Reviewer qualification is self-declared and must be independently checked for the intended claim. An accounting student, exam-level candidate, or teammate is not automatically a licensed CPA or a qualified US-GAAP expert.",
+  "review_policy": "Record the complete initial pass before any proposed-answer reveal. Reconciliation follows immediately; this version does not request a delayed repeat or claim intra-rater reliability. Preserve initial and reconciliation records separately.",
+  "review_protocol": "immediate_reconciliation_v2",
+  "schema_version": "review-pilot-v2",
+  "seed": "accountant-review-pilot-v2-neutral-pseudonyms",
+  "selection": "Preserve the frozen v1 inventory of 20 related cases across five source companies, assign new opaque IDs and consistent Company A–E labels, and shuffle with the v2 seed.",
+  "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+  "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+  "source_paths": [
+    "data/benchmark/exam.jsonl",
+    "data/benchmark/answer_key.jsonl"
+  ],
+  "source_pilot_sha256": {
+    "curator/proposals.jsonl": "dd39766d90a3ccc6a6daff7a1c7501b09185ea1e04fdd5da2d38a8ca99042414",
+    "manifest.json": "31e8e9673025881fbb2aa2cdcdec2840464ee5a869bd0beaae56fdd2015afb7a",
+    "public_cases.jsonl": "df1481e18267d0d008d7d68a124f62ea3f2e73fec1508d12e745aae3a549ff6f"
+  },
+  "source_pilot_version": "review-pilot-v1",
+  "source_repository": "https://github.com/manmad-web/IntelliAudit",
+  "source_sha256": {
+    "answer_key.jsonl": "a00a4057184bda6a5c80d6091453b5ff586a956dec9b52871c3a91eafe9a3c23",
+    "exam.jsonl": "83f44363450ffa4b53ca7744e6728cd0d75bacb25a7032869b27f4011f2658ce"
+  },
+  "status": "EXPERT_REVIEW_PENDING",
+  "unit_policy": "All statement values and supplied synthetic component/fact amounts are in USD millions; parentheses denote negative values.",
+  "version_policy": "Frozen v1 artifacts and any historical review scope remain unchanged. v2 requires a separate dataset fingerprint and review scope; no automatic migration or relabeling of submitted work.",
+  "withheld_variant_policy": "Remove only the single revenue cutoff supporting-fact line. Keep all other text, including component movements. Insufficient-evidence proposals require independent review."
+}

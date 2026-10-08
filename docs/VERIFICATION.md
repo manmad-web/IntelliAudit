@@ -1,4 +1,35 @@
-# Verification record — 4 October 2026
+# Verification record — 7 October 2026
+
+## Expert-facing pilot v2
+
+- Windows regression run: **151 test cases, 146 passed and five live PostgreSQL
+  integration cases skipped locally**. The branch CI runs those external checks
+  separately against an isolated TLS PostgreSQL service, as well as Linux and
+  Windows regression jobs.
+- Both frozen v1 and new v2 packets rebuild deterministically. The v2 quality
+  inventory checks all 20 cases/five aliases for format, units, source projection,
+  component totals, statement arithmetic and hidden construction identifiers.
+  These mechanical checks do not establish original filing or accounting validity.
+- Actual browser verification used two clearly synthetic localhost accounts.
+  Practice saved zero study events; instructions, tables, evidence categories,
+  exact accessible form labels, optional standards questions, case-quality flags
+  and draft restoration were checked. A proposal was denied at 19/20 and appeared
+  automatically after the twentieth response. Revising proposal feedback preserved
+  the original assessment. Cross-account history requests were denied.
+- Proposal exposure is idempotent: reopening an available case reuses its first
+  exposure record. Initial decisions and resolutions remain immutable. Earlier
+  frozen v1 plans retain their aliases, delay, and backup restoration behavior.
+- JavaScript syntax and whitespace checks pass. Browser QA accounts are software
+  testers, not independently qualified accounting experts or human usability participants.
+- Original accessions/per-fact periods, reviewer qualifications, and domain/authority
+  validity remain explicitly pending in the private curator inventory. Empty
+  annotations continue to fail the publication release gate.
+
+Screenshots of the actual local test workspace are saved in `docs/assets/`.
+The current deployment continues to use the existing Render Free and Supabase Free
+services; follow `DEPLOYMENT.md` to verify a newly deployed commit before sharing.
+
+## Previous verification — 4 October 2026
 
 ## Hosted pilot update
 
@@ -21,7 +52,8 @@
 - Browser checks cover curator login, invitation creation, logout, accountant
   login with locked identity fields, case loading, blind submission and disabled
   proposal reveal; no JavaScript errors were observed. Only synthetic accounts
-  and disposable local records were used. Final public deployment is pending.
+  and disposable local records were used. The public service subsequently deployed
+  successfully on 4 October using Render Free and Supabase Free.
 
 ## Previous local pilot verification
 

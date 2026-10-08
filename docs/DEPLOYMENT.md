@@ -34,9 +34,11 @@ Keep passwords, administrator codes, invitation codes, session tokens, reviewer 
 
 ## Verify and share
 
-Before distributing the URL, create two test reviewer invitations and verify that each account sees only its own history. Confirm unauthenticated review requests are denied, proposals remain unavailable before the complete blind round and delayed repeats, and a redeploy retains the accounts and submissions. Use disposable test accounts; keep test events separate from actual accountant annotations.
+Before distributing the URL, verify two independent test accounts in a disposable study database. Confirm unauthenticated review requests are denied, proposals remain unavailable before all 20 initial submissions, and a redeploy retains accounts, frozen plans and submissions. Keep software test events outside the actual accountant study.
 
-The study keeps each first assessment immutable, requires every initial case to be submitted, waits seven days before a shuffled 15% repeat subset, hides earlier answers during the repeat, and then opens reconciliation. For a 20-case pilot, the repeat subset is three cases. Share the HTTPS URL plus a separate invitation code with each accountant. Keep the administrator code private. Invitations are credentials, so share them directly with their intended accountant.
+The current `pilot-v2` study keeps each first assessment immutable and opens generated proposals immediately after all 20 initial cases are submitted. Agreement, revision or unresolved feedback is a separate record. It does not measure independent delayed repeat reliability. Earlier frozen v1 plans preserve their seven-day, three-case repeat requirement; the curator version selector can inspect that historical packet. Share the HTTPS URL plus a separate invitation code with each accountant. Keep the administrator code private. Invitations are credentials, so share them directly with their intended accountant.
+
+The reviewer sees income-statement tables, explicit synthetic-source limitations, a short guide and a fictional practice case that saves no study records. Standards details can remain unresolved. The curator sees source provenance and construction checks separately; missing original filing accessions, qualifications and domain validation remain human review requirements.
 
 Export and securely back up submitted reviews after each review session. Hosting and a completed review workflow do not by themselves establish a publication-ready benchmark or adjudicated gold labels.
 

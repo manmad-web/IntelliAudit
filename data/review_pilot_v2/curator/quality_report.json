@@ -1,0 +1,1014 @@
+{
+  "checked_case_count": 20,
+  "checked_company_count": 5,
+  "construction_checks": {
+    "blinding": "passed",
+    "component_arithmetic": "passed",
+    "format": "passed",
+    "integrity": "passed",
+    "inventory": "passed",
+    "source_projection": "passed",
+    "statement_arithmetic": "passed",
+    "status": "passed",
+    "units": "passed"
+  },
+  "construction_error_count": 0,
+  "construction_errors_by_kind": {},
+  "curator_only_base_inventory": [
+    {
+      "cik": "0000051434",
+      "company": "INTERNATIONAL PAPER COMPANY",
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_filing_fidelity": "not_established",
+      "residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -3256
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 825
+        }
+      ],
+      "source_period_start": null,
+      "unit": "USD millions"
+    },
+    {
+      "cik": "0000731766",
+      "company": "UnitedHealth Group Incorporated",
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_filing_fidelity": "not_established",
+      "residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -268284
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -12216
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": -837
+        }
+      ],
+      "source_period_start": null,
+      "unit": "USD millions"
+    },
+    {
+      "cik": "0000831259",
+      "company": "Freeport-McMoRan Inc.",
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_filing_fidelity": "not_established",
+      "residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -725
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -322
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 31
+        }
+      ],
+      "source_period_start": null,
+      "unit": "USD millions"
+    },
+    {
+      "cik": "0000949870",
+      "company": "THE BOSTON BEER COMPANY, INC.",
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_filing_fidelity": "not_established",
+      "residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -613
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        }
+      ],
+      "source_period_start": null,
+      "unit": "USD millions"
+    },
+    {
+      "cik": "0001334036",
+      "company": "CROCS,\u00a0INC.",
+      "fiscal_year": 2020,
+      "original_accession": null,
+      "original_filing_fidelity": "not_established",
+      "residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 4,
+          "value": -11
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 6,
+          "value": -7
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 9,
+          "value": 212
+        }
+      ],
+      "source_period_start": null,
+      "unit": "USD millions"
+    }
+  ],
+  "curator_only_case_findings": [
+    {
+      "case_id": "RP2-019e6deb6b2bfcf0e8674c1c",
+      "component_lines_checked": 3,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -613
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000949870",
+      "original_company": "THE BOSTON BEER COMPANY, INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "dcaa5291bdcea0cf4e602671",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "a6ef473df701550e1dfc7c1e6bbe26ecf9fdbb0fc9b9367a7813b8b2c5e96f34",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-c31f051213b4",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-b4b46e9744766b58c3919bd0",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 4,
+          "value": -11
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 6,
+          "value": -7
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 9,
+          "value": 212
+        }
+      ],
+      "fiscal_year": 2020,
+      "original_accession": null,
+      "original_cik": "0001334036",
+      "original_company": "CROCS,\u00a0INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "78e6566975d915f10233cad7",
+      "period_end": "2020-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ec4add301ade8bc6b024dc06ba88f151a592c52748f3fbc164b070bb7918ce7a",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-7b4d1d5a8f10",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-edea889851135693108ab1e9",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 4,
+          "value": -11
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 6,
+          "value": -7
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 9,
+          "value": 212
+        }
+      ],
+      "fiscal_year": 2020,
+      "original_accession": null,
+      "original_cik": "0001334036",
+      "original_company": "CROCS,\u00a0INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "78e6566975d915f10233cad7",
+      "period_end": "2020-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ec4add301ade8bc6b024dc06ba88f151a592c52748f3fbc164b070bb7918ce7a",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-c671044df3af",
+      "units": "USD millions",
+      "variant": "source_control_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-8ad8c5ed9bf830bef4bd9fe9",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -725
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -322
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 31
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000831259",
+      "original_company": "Freeport-McMoRan Inc.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "ae1cb76af527b1ca91e1c21e",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "16f1b10db748d350e1bf4a9a11a7aa8a66e66011b54c4798186dc138176675d1",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-ba2e4da7a85e",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-59f5f0a6f840a7a53d4e64f7",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -268284
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -12216
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": -837
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000731766",
+      "original_company": "UnitedHealth Group Incorporated",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "59ce965dc51793c0e9828775",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "9894aa5c0d4df8279666b84ab801ae72f7b7bf03575d53282e6ae44d788f35da",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-e5c6423d6fd0",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-f05220ac09fa348497481b99",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -725
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -322
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 31
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000831259",
+      "original_company": "Freeport-McMoRan Inc.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "ae1cb76af527b1ca91e1c21e",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "16f1b10db748d350e1bf4a9a11a7aa8a66e66011b54c4798186dc138176675d1",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-3d59fdd361b7",
+      "units": "USD millions",
+      "variant": "source_control_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-d6c84c7bf81347325164063f",
+      "component_lines_checked": 4,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -3256
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 825
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000051434",
+      "original_company": "INTERNATIONAL PAPER COMPANY",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "207f35fbdea43a068c35370a",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ef2398b3db0ee35f01bd8ee88ccd02b9918061f1151b85b7ebe2cb52b227d30b",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-a53fafa6ad26",
+      "units": "USD millions",
+      "variant": "source_control_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-b4865cb5913e5af8f8bb2d9d",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -268284
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -12216
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": -837
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000731766",
+      "original_company": "UnitedHealth Group Incorporated",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "59ce965dc51793c0e9828775",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "9894aa5c0d4df8279666b84ab801ae72f7b7bf03575d53282e6ae44d788f35da",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-e587abeb0c81",
+      "units": "USD millions",
+      "variant": "source_control_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-1cb71744ba36dc9f8c8d76ed",
+      "component_lines_checked": 3,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -613
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000949870",
+      "original_company": "THE BOSTON BEER COMPANY, INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "dcaa5291bdcea0cf4e602671",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "a6ef473df701550e1dfc7c1e6bbe26ecf9fdbb0fc9b9367a7813b8b2c5e96f34",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-0e4144a145f3",
+      "units": "USD millions",
+      "variant": "source_control_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-d6ced74bec290a3e2f7a7724",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -268284
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -12216
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": -837
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000731766",
+      "original_company": "UnitedHealth Group Incorporated",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "59ce965dc51793c0e9828775",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "9894aa5c0d4df8279666b84ab801ae72f7b7bf03575d53282e6ae44d788f35da",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-e587abeb0c81",
+      "units": "USD millions",
+      "variant": "source_control_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-b83e2ca1d8708eee085cea19",
+      "component_lines_checked": 4,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -3256
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 825
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000051434",
+      "original_company": "INTERNATIONAL PAPER COMPANY",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "207f35fbdea43a068c35370a",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ef2398b3db0ee35f01bd8ee88ccd02b9918061f1151b85b7ebe2cb52b227d30b",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-6fa3e026d200",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-076945933bddaf712a99a200",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -725
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -322
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 31
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000831259",
+      "original_company": "Freeport-McMoRan Inc.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "ae1cb76af527b1ca91e1c21e",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "16f1b10db748d350e1bf4a9a11a7aa8a66e66011b54c4798186dc138176675d1",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-3d59fdd361b7",
+      "units": "USD millions",
+      "variant": "source_control_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-296e1cfe11be887ee4e41f9e",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -268284
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -12216
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": -837
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000731766",
+      "original_company": "UnitedHealth Group Incorporated",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "59ce965dc51793c0e9828775",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "9894aa5c0d4df8279666b84ab801ae72f7b7bf03575d53282e6ae44d788f35da",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-e5c6423d6fd0",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-9d20199bafc6f87d2aaa298c",
+      "component_lines_checked": 4,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -3256
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 825
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000051434",
+      "original_company": "INTERNATIONAL PAPER COMPANY",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "207f35fbdea43a068c35370a",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ef2398b3db0ee35f01bd8ee88ccd02b9918061f1151b85b7ebe2cb52b227d30b",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-6fa3e026d200",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-6eafb8ebcfd220dc5af5e65a",
+      "component_lines_checked": 3,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -613
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000949870",
+      "original_company": "THE BOSTON BEER COMPANY, INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "dcaa5291bdcea0cf4e602671",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "a6ef473df701550e1dfc7c1e6bbe26ecf9fdbb0fc9b9367a7813b8b2c5e96f34",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-c31f051213b4",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-0423d7705029ae622683ce36",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -725
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": -322
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 31
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000831259",
+      "original_company": "Freeport-McMoRan Inc.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "ae1cb76af527b1ca91e1c21e",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "16f1b10db748d350e1bf4a9a11a7aa8a66e66011b54c4798186dc138176675d1",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-ba2e4da7a85e",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-4402eef79d52be1c4431bce5",
+      "component_lines_checked": 4,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -3256
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 8,
+          "value": 825
+        }
+      ],
+      "fiscal_year": 2024,
+      "original_accession": null,
+      "original_cik": "0000051434",
+      "original_company": "INTERNATIONAL PAPER COMPANY",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "207f35fbdea43a068c35370a",
+      "period_end": "2024-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ef2398b3db0ee35f01bd8ee88ccd02b9918061f1151b85b7ebe2cb52b227d30b",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-a53fafa6ad26",
+      "units": "USD millions",
+      "variant": "source_control_cutoff_withheld",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-a328f0efa2f01272366baf28",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 4,
+          "value": -11
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 6,
+          "value": -7
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 9,
+          "value": 212
+        }
+      ],
+      "fiscal_year": 2020,
+      "original_accession": null,
+      "original_cik": "0001334036",
+      "original_company": "CROCS,\u00a0INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "78e6566975d915f10233cad7",
+      "period_end": "2020-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ec4add301ade8bc6b024dc06ba88f151a592c52748f3fbc164b070bb7918ce7a",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-7b4d1d5a8f10",
+      "units": "USD millions",
+      "variant": "source_revenue_fault_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-dc6119dd1884a94acb4432db",
+      "component_lines_checked": 5,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 4,
+          "value": -11
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 6,
+          "value": -7
+        },
+        {
+          "label": "Other items, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 9,
+          "value": 212
+        }
+      ],
+      "fiscal_year": 2020,
+      "original_accession": null,
+      "original_cik": "0001334036",
+      "original_company": "CROCS,\u00a0INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "78e6566975d915f10233cad7",
+      "period_end": "2020-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "ec4add301ade8bc6b024dc06ba88f151a592c52748f3fbc164b070bb7918ce7a",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-c671044df3af",
+      "units": "USD millions",
+      "variant": "source_control_full",
+      "withholding_establishes_undecidability": false
+    },
+    {
+      "case_id": "RP2-e5ab9e5bd34061e407f2214e",
+      "component_lines_checked": 3,
+      "derived_residual_rows": [
+        {
+          "label": "Other operating expenses, net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 3,
+          "value": -613
+        },
+        {
+          "label": "Other income (expense), net",
+          "origin": "derived_residual_not_individually_reported_fact",
+          "row": 5,
+          "value": 0
+        }
+      ],
+      "fiscal_year": 2022,
+      "original_accession": null,
+      "original_cik": "0000949870",
+      "original_company": "THE BOSTON BEER COMPANY, INC.",
+      "original_reporting_date": null,
+      "original_source_fidelity": "not_established",
+      "pair_group": "dcaa5291bdcea0cf4e602671",
+      "period_end": "2022-12-31",
+      "recognition_conclusion_cue_present": false,
+      "remaining_evidence_requires_accounting_review": true,
+      "source_bundle_sha256": "f7f897dd59c853a5517b09aeb94a810b01c2d04d0cf78fbcea770c0e8e065949",
+      "source_clean_sha256": "a6ef473df701550e1dfc7c1e6bbe26ecf9fdbb0fc9b9367a7813b8b2c5e96f34",
+      "source_commit": "72da89a9e6400bfd1da9041a742f9cdeb00470bc",
+      "source_exam_id": "EX-0e4144a145f3",
+      "units": "USD millions",
+      "variant": "source_control_full",
+      "withholding_establishes_undecidability": false
+    }
+  ],
+  "curator_only_pair_groups": {
+    "207f35fbdea43a068c35370a": [
+      "RP2-d6c84c7bf81347325164063f",
+      "RP2-b83e2ca1d8708eee085cea19",
+      "RP2-9d20199bafc6f87d2aaa298c",
+      "RP2-4402eef79d52be1c4431bce5"
+    ],
+    "59ce965dc51793c0e9828775": [
+      "RP2-59f5f0a6f840a7a53d4e64f7",
+      "RP2-b4865cb5913e5af8f8bb2d9d",
+      "RP2-d6ced74bec290a3e2f7a7724",
+      "RP2-296e1cfe11be887ee4e41f9e"
+    ],
+    "78e6566975d915f10233cad7": [
+      "RP2-b4b46e9744766b58c3919bd0",
+      "RP2-edea889851135693108ab1e9",
+      "RP2-a328f0efa2f01272366baf28",
+      "RP2-dc6119dd1884a94acb4432db"
+    ],
+    "ae1cb76af527b1ca91e1c21e": [
+      "RP2-8ad8c5ed9bf830bef4bd9fe9",
+      "RP2-f05220ac09fa348497481b99",
+      "RP2-076945933bddaf712a99a200",
+      "RP2-0423d7705029ae622683ce36"
+    ],
+    "dcaa5291bdcea0cf4e602671": [
+      "RP2-019e6deb6b2bfcf0e8674c1c",
+      "RP2-1cb71744ba36dc9f8c8d76ed",
+      "RP2-6eafb8ebcfd220dc5af5e65a",
+      "RP2-e5ab9e5bd34061e407f2214e"
+    ]
+  },
+  "curator_only_variant_counts": {
+    "source_control_cutoff_withheld": 5,
+    "source_control_full": 5,
+    "source_revenue_fault_cutoff_withheld": 5,
+    "source_revenue_fault_full": 5
+  },
+  "errors": [],
+  "expert_validated": false,
+  "human_review_requirements": [
+    "Reconcile each SEC-derived value to original accession, period, unit, and filing locator before source-grounded release.",
+    "Review constructed residuals and synthetic narratives; packet is not an unmodified annual report or authentic ledger.",
+    "Decide sufficiency of remaining evidence independently; withholding alone does not establish ambiguity or undecidability.",
+    "Check applicable authority, scope, effective dates, exceptions, citations, and alternative proofs using permitted sources.",
+    "Assess recognition cues, repeated variants, prior exposure, and company dependence before interpreting review agreement."
+  ],
+  "interpretation": "Zero construction errors verifies only the declared local transformation, formatting, units, and arithmetic. Missing original filing provenance and human accounting judgments remain unresolved.",
+  "pilot_schema_version": "review-pilot-v2",
+  "publication_blockers": [
+    "missing_original_filing_accessions_and_per_fact_periods",
+    "reviewer_qualification_not_independently_verified",
+    "domain_validity_and_authority_applicability_require_human_review"
+  ],
+  "publication_ready": false,
+  "schema_version": "pilot-quality-check-v1",
+  "source_accession_fidelity": "missing_original_accessions_and_per_fact_periods",
+  "structural_ready": true
+}

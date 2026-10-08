@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import os
+import copy
 import secrets
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,10 +17,14 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 try:
     from .review_store import ReviewStore, nonempty, validate_annotation
+    from .presentation import build_presentation
 except ImportError:
     from review_store import ReviewStore, nonempty, validate_annotation
+    from presentation import build_presentation
 
 ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_REVIEW_DATASET = 'pilot-v2'
+PILOT_DIRECTORIES = {'pilot': 'data/review_pilot', 'pilot-v2': 'data/review_pilot_v2'}
 DATASETS = {
     "us-gaap": ("US GAAP", "data/benchmark"),
     "multi": ("US GAAP · Multi-error", "data/benchmark_multi"),
@@ -149,8 +154,9 @@ class BlindDataset:
     def __init__(self, store, dataset_id):
         self.dataset_id = dataset_id
         self.exams, self.proposals = {}, {}
-        if dataset_id == 'pilot':
-            directory = store.root / 'data/review_pilot'
+        if dataset_id in PILOT_DIRECTORIES:
+            directory = store.root / PILOT_DIRECTORIES[dataset_id]
+            self.directory = directory
             raw = (directory / 'public_cases.jsonl').read_bytes().replace(b'\r\n', b'\n')
             proposal_raw = (directory / 'curator/proposals.jsonl').read_bytes().replace(b'\r\n', b'\n')
             self.fingerprint = hashlib.sha256(raw + b'\x00' + proposal_raw).hexdigest()
@@ -181,7 +187,7 @@ class BlindDataset:
 
     @staticmethod
     def metadata(exam):
-        return {field: exam.get('metadata', {}).get(field) for field in ('company', 'fiscal_year', 'statement_type', 'period', 'unit', 'currency', 'reporting_date') if field in exam.get('metadata', {})}
+        return {field: exam.get('metadata', {}).get(field) for field in ('company', 'fiscal_year', 'statement_type', 'period', 'unit', 'currency', 'reporting_date', 'derived_rows') if field in exam.get('metadata', {})}
 
     def detail(self, case_id):
         exam = self.exams[case_id]
@@ -192,7 +198,27 @@ class BlindDataset:
             for number, line in enumerate(public[field].splitlines(), 1):
                 if line.strip():
                     units.append({'id': f'{source}:L{number:04d}', 'source': source, 'text': line})
-        return {'exam': public, 'evidence_units': units}
+        return {'exam': public, 'evidence_units': units,
+                'presentation': build_presentation(public, units, self.dataset_id)}
+
+    def quality(self):
+        path = getattr(self, 'directory', ROOT / 'not-a-pilot') / 'curator/quality_report.json'
+        if path.is_file():
+            return json.loads(path.read_text(encoding='utf-8'))
+        return {'construction_error_count': None, 'publication_blockers': ['Legacy packet: no expert-ready quality report is supplied.'],
+                'curator_only_case_findings': [], 'status': 'not_expert_validated'}
+
+    def curator_detail(self, case_id):
+        if self.legacy:
+            context = self.legacy.detail(self.proposals[case_id])
+        else:
+            context = copy.deepcopy(self.proposals[case_id])
+        findings = self.quality().get('curator_only_case_findings', [])
+        if isinstance(findings, dict):
+            quality = findings.get(case_id, {})
+        else:
+            quality = next((finding for finding in findings if finding.get('case_id', finding.get('exam_id')) == case_id), {})
+        return {'detail': self.detail(case_id), 'source_context': context, 'quality': quality}
 
     def reveal(self, case_id):
         if self.legacy:
@@ -214,7 +240,7 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
     blind_cache = {}
     blind_lock = threading.Lock()
     def blind(dataset_id):
-        if dataset_id not in DATASETS and dataset_id != 'pilot':
+        if dataset_id not in DATASETS and dataset_id not in PILOT_DIRECTORIES:
             raise ValueError('Unknown dataset')
         with blind_lock:
             if dataset_id not in blind_cache:
@@ -303,6 +329,10 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
                     events.extend(reviews.history(scope, allow_during_repeat=True)['events'])
             return events
 
+        def reviewer_exports(self, dataset_id, dataset):
+            return [reviews.history(self.scope(dataset_id, dataset, user['id']), allow_during_repeat=True)
+                    for user in auth.reviewers() if user['role'] == 'reviewer']
+
         @staticmethod
         def parameters(query, allowed):
             if set(query) - set(allowed) or any(len(v) != 1 for v in query.values()):
@@ -362,8 +392,8 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
                 return
             if auth and url.path.startswith('/api/admin/'):
                 self.current_session(curator_only=True)
-                q = self.parameters(query, {'dataset'})
-                dataset_id = q.get('dataset', 'pilot')
+                q = self.parameters(query, {'dataset', 'id'} if url.path == '/api/admin/case' else {'dataset'})
+                dataset_id = q.get('dataset', DEFAULT_REVIEW_DATASET)
                 dataset = blind(dataset_id)
                 if url.path == '/api/admin/reviewers':
                     users = auth.reviewers()
@@ -375,7 +405,15 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
                     from .agreement import build_comparison
                     self.send(200, build_comparison(dataset.entries, self.all_reviews(dataset_id, dataset), auth.resolutions({'dataset': dataset_id, 'fingerprint': dataset.fingerprint})))
                 elif url.path == '/api/admin/export':
-                    self.send(200, {'dataset': dataset_id, 'fingerprint': dataset.fingerprint, 'events': self.all_reviews(dataset_id, dataset), 'adjudications': auth.resolutions({'dataset': dataset_id, 'fingerprint': dataset.fingerprint}), 'status': 'operational_records_not_publication_gold'})
+                    self.send(200, {'schema_version': 2, 'dataset': dataset_id, 'fingerprint': dataset.fingerprint,
+                                    'events': self.all_reviews(dataset_id, dataset),
+                                    'reviewer_exports': self.reviewer_exports(dataset_id, dataset),
+                                    'adjudications': auth.resolutions({'dataset': dataset_id, 'fingerprint': dataset.fingerprint}),
+                                    'status': 'operational_records_not_publication_gold'})
+                elif url.path == '/api/admin/quality':
+                    self.send(200, dataset.quality())
+                elif url.path == '/api/admin/case':
+                    self.send(200, dataset.curator_detail(q.get('id', '')))
                 else:
                     self.send(404, {'error': 'Not found'})
                 return
@@ -392,7 +430,7 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
                 return
             if url.path in ('/api/blind/index', '/api/blind/case'):
                 q = self.parameters(query, {'dataset', 'id'})
-                dataset_id = q.get('dataset', 'pilot')
+                dataset_id = q.get('dataset', DEFAULT_REVIEW_DATASET)
                 dataset = blind(dataset_id)
                 if auth:
                     identity = self.reviewer_id(None, session)
@@ -400,14 +438,14 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
                     if protocol['phase'] == 'repeat' and url.path.endswith('/case'):
                         raise PermissionError('Complete the shuffled repeat packet before reopening the initial cases')
                 if url.path.endswith('/index'):
-                    self.send(200, {'dataset': dataset_id, 'name': 'Revenue review pilot' if dataset_id == 'pilot' else DATASETS[dataset_id][0],
+                    self.send(200, {'dataset': dataset_id, 'name': ('Revenue review pilot v2' if dataset_id == 'pilot-v2' else 'Legacy revenue review pilot v1') if dataset_id in PILOT_DIRECTORIES else DATASETS[dataset_id][0],
                                     'fingerprint': dataset.fingerprint, 'facets': dataset.facets, 'cases': protocol['repeat_cases'] if auth and protocol['phase'] == 'repeat' else dataset.entries})
                 else:
                     self.send(200, dataset.detail(q.get('id', '')))
                 return
             if url.path in ('/api/review/history', '/api/review/export', '/api/review/protocol', '/api/review/repeat-case'):
                 q = self.parameters(query, {'dataset', 'case_id', 'reviewer_id', 'id'})
-                dataset_id = q.get('dataset', 'pilot')
+                dataset_id = q.get('dataset', DEFAULT_REVIEW_DATASET)
                 dataset = blind(dataset_id)
                 scope = self.scope(dataset_id, dataset, self.reviewer_id(q.get('reviewer_id'), session))
                 if url.path.endswith('/protocol'):
@@ -494,7 +532,7 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
                     events = [event for event in all_events if event['stage'] == 'blind' and event['case_id'] == body['case_id']]
                     for reviewer_id in {event['reviewer_id'] for event in all_events if event['stage'] == 'blind'}:
                         if reviews.protocol(self.scope(dataset_id, dataset, reviewer_id))['phase'] != 'reconciliation':
-                            raise PermissionError('Curator resolution opens after the contributing reviewers complete blind and delayed-repeat review')
+                            raise PermissionError('Curator resolution opens after every contributing reviewer completes their frozen review protocol')
                     scope = {'dataset': dataset_id, 'fingerprint': dataset.fingerprint, 'case_id': body['case_id']}
                     self.send(200, {'record': auth.resolve(scope, session['reviewer']['id'], annotation, body['reason'], [event['event_id'] for event in events])})
                 return
@@ -510,7 +548,7 @@ def handler_for(store, curator=False, reviews=None, auth=None, public_origin=Non
                 allowed |= {'reviewer_name', 'qualification', 'stage', 'annotation'}
             if set(body) - allowed:
                 raise ValueError('Unknown request field')
-            dataset_id = body.get('dataset', 'pilot')
+            dataset_id = body.get('dataset', DEFAULT_REVIEW_DATASET)
             dataset = blind(dataset_id)
             identity = self.reviewer_id(body.get('reviewer_id'), session)
             scope = reviews.identity(dataset_id, dataset.fingerprint, body.get('case_id'), identity)

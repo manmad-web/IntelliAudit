@@ -30,9 +30,13 @@ class BlindReviewTests(unittest.TestCase):
                 'statement_type': 'IncomeStatement', 'rule_id': 'SECRET_RULE'},
                 'statement_text': '[row 0]: Revenue | $500', 'transaction_data': 'Invoice total $500', 'form': 1}
         (folder / 'public_cases.jsonl').write_text(json.dumps(exam) + '\n')
+        current_folder = root / 'data/review_pilot_v2'
+        (current_folder / 'curator').mkdir(parents=True)
+        (current_folder / 'public_cases.jsonl').write_text(json.dumps(exam) + '\n')
         (folder / 'curator/proposals.jsonl').write_text(json.dumps({'exam_id': 'case_opaque',
                 'answer': {'exam_id': 'case_opaque', 'record_type': 'injected',
                 'rule_id': 'SECRET_RULE', 'corrected_statement_text': 'SECRET_CORRECTION'}}) + '\n')
+        (current_folder / 'curator/proposals.jsonl').write_bytes((folder / 'curator/proposals.jsonl').read_bytes())
         handler = handler_for(Store(root))
         handler.log_message = lambda *args: None
         self.server = ThreadingHTTPServer(('127.0.0.1', 0), handler)
@@ -77,7 +81,7 @@ class BlindReviewTests(unittest.TestCase):
     def test_default_endpoints_exclude_keys_and_direct_bypasses(self):
         for path in ('/api/blind/index', '/api/blind/case?id=case_opaque'):
             value = json.dumps(self.request(path))
-            for forbidden in ('SECRET_', 'rule_id', 'corrected_statement', 'form', 'citation_tier'):
+            for forbidden in ('SECRET_', 'rule_id', 'corrected_statement', '"form":', 'citation_tier'):
                 self.assertNotIn(forbidden, value)
         for path in ('/api/index', '/api/case?id=case_opaque', '/api/search?q=SECRET_RULE',
                      '/index.html', '/app.js', '/data/review_pilot/curator/proposals.jsonl',

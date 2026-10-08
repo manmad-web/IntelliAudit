@@ -188,12 +188,19 @@
         "model": {
           "const": "single_expert_review"
         },
+        "protocol_id": {
+          "enum": ["delayed_repeat_v1", "immediate_reconciliation_v2"],
+          "description": "Absent identifies the legacy delayed-repeat protocol. V2 discloses that independent delayed reliability was not measured."
+        },
+        "reliability_status": {
+          "enum": ["reliability_not_measured", "delayed_repeat_pending", "repeat_assessments_collected"]
+        },
         "repeat_required": {
           "type": "boolean"
         },
         "minimum_repeat_delay_days": {
           "type": "integer",
-          "minimum": 7
+          "minimum": 0
         },
         "repeat_selection_frozen_at": {
           "type": [
@@ -223,7 +230,24 @@
         "repeat_strata",
         "manual_version"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {"protocol_id": {"const": "immediate_reconciliation_v2"}},
+        "required": ["protocol_id"]
+      },
+      "then": {
+        "required": ["reliability_status"],
+        "properties": {
+          "repeat_required": {"const": false},
+          "minimum_repeat_delay_days": {"const": 0},
+          "repeat_selection_frozen_at": {"const": null},
+          "repeat_strata": {"maxItems": 0},
+          "reliability_status": {"const": "reliability_not_measured"}
+        }
+      },
+      "else": {
+        "properties": {"minimum_repeat_delay_days": {"minimum": 7}}
+      }
     },
     "leakage_checks": {
       "type": "array",
@@ -1137,7 +1161,8 @@
           "enum": [
             "student_draft",
             "expert_first_pass",
-            "expert_repeat"
+            "expert_repeat",
+            "expert_reconciliation"
           ]
         },
         "submitted_at": {

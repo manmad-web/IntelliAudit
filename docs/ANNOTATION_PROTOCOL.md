@@ -1,12 +1,61 @@
 # Protocol for an expert-reviewed financial reporting benchmark
 
-Version 0.1, 3 October 2026. **Single-expert protocol; no completed human review is asserted.**
+Version 0.2, 7 October 2026. **Single-expert publication protocol; no completed human review is asserted.**
 One accountant is available. This version must be described as single-expert
 reviewed once completed, not independently adjudicated gold or a gold-standard
 benchmark. A future second-expert study can strengthen validation.
 The accompanying empty template and fictional worked example are development
 artifacts. Passing the validator establishes record consistency and documented
 release gates; it cannot authenticate a reviewer or establish accounting truth.
+
+## Current dashboard pilot: immediate reconciliation v2
+
+The active `pilot-v2` packet contains 20 cases across five consistently
+pseudonymized companies. It uses `immediate_reconciliation_v2`: lock all 20
+initial assessments before any proposed-answer reveal, then reconcile immediately.
+There is no required delayed repeat and no seven-day waiting period for this
+version. Record `reliability_status: reliability_not_measured`; reviewing a
+proposal or revising an answer is not an independent blind reliability check.
+Frozen v1 artifacts, reviewer plans and earlier submissions retain their original
+protocol. Do not relabel or migrate them to obtain an earlier reveal.
+
+For the accountant using the dashboard:
+
+1. Sign in with a personal invitation and read the case scope and supplied
+   evidence. Statements are reconstructed illustrations, not verbatim filings;
+   component movements and period-end facts are synthetic. The dashboard uses
+   USD millions, with parentheses denoting negative values. A missing original
+   reporting/publication date remains unknown. Neither pseudonyms nor the supplied
+   numbers establish an authentic ledger or an allegation about an issuer.
+2. Record the judgement, affected rows, evidence sufficiency, authority status
+   and reasoning. Keep an uncertainty or insufficient-evidence assessment when
+   the supplied facts cannot establish control transfer or paragraph applicability.
+   Optional short notes, an error family and an ambiguity tag aid follow-up;
+   they do not supply facts missing from the packet. Select the evidence units
+   supporting each proof and retain source questions and refutations.
+3. Save each initial assessment. It becomes immutable; browser drafts are not
+   submitted records. Complete the whole queue of 20 cases independently of the
+   proposed answers, previous keys, peers and model output.
+4. Once all 20 are locked, deliberately reveal each proposal and record a separate
+   reconciliation. Preserve the original judgement and the reason for any change.
+   A recommendation can be rejected; missing source or authority evidence remains
+   unresolved rather than becoming correct by agreement.
+5. Export the workflow history for curator follow-up. Keep invitations and curator
+   access private. For the intended review claim, separately check the reviewer's
+   actual framework/assertion experience and qualification; an accounting student,
+   exam-level candidate or teammate is not automatically a licensed CPA or a
+   qualified US-GAAP expert.
+
+Dashboard event exports use an operational envelope, not the publication schema
+below. A curator must manually reconcile sources, authority versions, proof
+alternatives, qualifications and the release inventory into complete publication
+records. Do not fabricate review metadata or convert a saved UI status into gold.
+For a new publication record derived from this pilot, explicitly set
+`review_plan.protocol_id: immediate_reconciliation_v2`,
+`reliability_status: reliability_not_measured`, `repeat_required: false`,
+`minimum_repeat_delay_days: 0`, `repeat_selection_frozen_at: null` and
+`repeat_strata: []`. Preserve an exposed later review as `expert_reconciliation`,
+including truthful exposure flags, rather than calling it `expert_repeat`.
 
 ## The claim this benchmark should measure
 
@@ -126,15 +175,16 @@ A student may prepare source bundles, document transformations, and submit an
 independent provisional annotation. Preserve that draft separately as
 `student_draft`. It is not a second expert review. Hide the student recommendation,
 existing answer key and model outputs during the accountant's first-pass review.
-After the accountant submits and hashes that review, the student draft may be
-opened for error checking. Record whether any draft was actually seen and any
+After the accountant completes the frozen blind protocol (all 20 initial
+assessments in v2; initial assessments and required repeats in v1), the student
+draft may be opened for error checking. Record whether any draft was actually seen and any
 subsequent change. The case constructor cannot be presented as an independent
 reviewer of their own construction.
 
-Before the pilot, calibrate the manual with the accountant on a small separate
+Before a pilot, calibrate the manual with the accountant on a small separate
 development packet. Freeze terminology and scope; calibration cases cannot
-become final test cases. An 8–16-case blind development packet can then measure
-review effort and expose ambiguous definitions. Its inputs use newly randomized
+become final test cases. The current 20-case blind development packet can then
+measure review effort and expose ambiguous definitions. Its inputs use newly randomized
 opaque IDs, contain the actual evidence and provenance placeholders, and omit
 old answer keys, suggested citations, model answers and expected conclusions.
 The mapping back to source cases is curator-only. Random opaque identifiers
@@ -148,6 +198,14 @@ rationale. Preserve this immutable submission before showing other annotations.
 A curator can obtain missing documents without suggesting an outcome; log the
 intervention. A filesystem key next to a JSON file does not enforce blinding:
 use separate reviewer packets and an access-controlled curator workspace.
+
+### Legacy delayed-repeat protocol v1
+
+The following allocation and delay apply only to `delayed_repeat_v1`. Absence of
+`review_plan.protocol_id` identifies this legacy protocol for compatibility;
+it never opts a historical record into the immediate workflow. Existing frozen
+dashboard v1 plans keep their three repeats and seven-day delay. The v2 pilot
+instead discloses that independent delayed reliability was not measured.
 
 Select **10–20% of the intended reviewed corpus** for a delayed blind repeat,
 stratified across company, conclusion, assertion type and ambiguity level.
@@ -167,7 +225,9 @@ passes by the same person. Paired repeat stability can reveal inconsistency,
 but stable judgments may still be wrong. Memory and incomplete blinding remain
 limitations even after a week.
 
-After the first pass and any required repeat, the accountant resolves student
+### Final resolution for either protocol
+
+After the complete first pass and any required legacy repeat, the accountant resolves student
 queries and self-disagreements in an explicit `single_expert_resolution` record,
 explaining changes or retaining uncertainty. An unresolved critical source,
 contract, scope or authority issue must produce insufficient evidence or
@@ -312,7 +372,7 @@ proposal, not an already accepted methodological advance.
 Begin with 12–24 development assertions from the chosen revenue/cutoff scope,
 including supported issues, supported controls and genuinely insufficient
 evidence. This is a workload calibration target, not a powered study size or
-representative benchmark. Time sourcing, expert review and delayed repeat;
+representative benchmark. Time sourcing and expert review; include delayed-repeat effort only for the legacy protocol;
 inspect disagreement and exclusion causes. Expand only after the rubric and
 source quality stabilize. Set the final size and release claims from actual
 reviewer capacity, dependency structure and preregistered precision goals.
@@ -327,6 +387,11 @@ Canonical files in this repository:
   proof structure and unresolved authority; no real reviewer or human gold.
 - `scripts/validate_annotations.py`: standard-library structural and semantic validator
   for this schema, including batch group-split checks and optional release gates.
+
+The existing empty template retains legacy defaults for compatibility. When
+manually preparing a record for the current pilot, explicitly populate the v2
+protocol and non-measurement fields described above. Changing those fields does
+not create a review, verify a source, or make an empty draft eligible.
 
 ```bash
 python scripts/validate_annotations.py review/annotation_template.json
@@ -343,5 +408,5 @@ proof alternatives, completed leakage checks and a frozen assigned split.
 Failures must be resolved, excluded prospectively, or left in development.
 The validator never upgrades a record or supplies a human-review flag.
 An eligible record is not sufficient for a benchmark release: dataset-level
-sampling, intra-rater stability statistics, source rights, secure execution and an
+sampling, honest reliability disclosure (and legacy intra-rater stability statistics), source rights, secure execution and an
 independent tagged-release reproduction remain additional gates.

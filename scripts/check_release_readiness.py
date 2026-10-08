@@ -13,9 +13,9 @@ import json
 from pathlib import Path
 
 try:
-    from .validate_annotations import SCHEMA_PATH, validate_batch, validate_record
+    from .validate_annotations import SCHEMA_PATH, LEGACY_PROTOCOL, IMMEDIATE_PROTOCOL, validate_batch, validate_record
 except ImportError:
-    from validate_annotations import SCHEMA_PATH, validate_batch, validate_record
+    from validate_annotations import SCHEMA_PATH, LEGACY_PROTOCOL, IMMEDIATE_PROTOCOL, validate_batch, validate_record
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -41,13 +41,18 @@ def manifest_case_ids(manifest: dict) -> list[str]:
 def assess_release(annotation_dir: Path, case_manifest: Path | None, *, complete_dataset: bool = True) -> dict:
     blockers, records, file_hashes = [], [], {}
     expected = []
+    expected_protocol = None
     manifest_hash = None
     if case_manifest is None:
         blockers.append({"code": "missing_case_manifest", "detail": "An explicit frozen final case inventory is required; checking only submitted easy cases is not sufficient."})
     else:
         try:
             raw = case_manifest.read_bytes()
-            expected = manifest_case_ids(json.loads(raw))
+            manifest = json.loads(raw)
+            expected = manifest_case_ids(manifest)
+            expected_protocol = manifest.get("review_protocol", LEGACY_PROTOCOL if manifest.get("schema_version") == "review-pilot-v1" else None)
+            if expected_protocol is not None and expected_protocol not in (LEGACY_PROTOCOL, IMMEDIATE_PROTOCOL):
+                raise ValueError("case manifest declares an unsupported review protocol")
             manifest_hash = sha256(raw).hexdigest()
         except (OSError, ValueError, TypeError) as exc:
             blockers.append({"code": "invalid_case_manifest", "detail": str(exc)})
@@ -72,6 +77,11 @@ def assess_release(annotation_dir: Path, case_manifest: Path | None, *, complete
         blockers.append({"code": "cases_outside_final_inventory", "case_ids": unexpected})
     for error in validate_batch(records, release=True, complete_dataset=complete_dataset):
         blockers.append({"code": "annotation_gate_failure", "detail": error})
+    protocol_ids = sorted({record["review_plan"].get("protocol_id", LEGACY_PROTOCOL)
+                           for record in records if isinstance(record.get("review_plan"), dict)
+                           and isinstance(record["review_plan"].get("protocol_id", LEGACY_PROTOCOL), str)})
+    if records and expected_protocol is not None and protocol_ids != [expected_protocol]:
+        blockers.append({"code": "manifest_review_protocol_mismatch", "detail": "Publication records must preserve the review protocol declared by the frozen case manifest."})
     if records and not expected:
         blockers.append({"code": "coverage_not_established", "detail": "Records cannot pass without the complete frozen final inventory."})
     statuses = Counter(record.get("status", "missing_status") if isinstance(record.get("status", "missing_status"), str) else "invalid_status" for record in records)
@@ -82,13 +92,17 @@ def assess_release(annotation_dir: Path, case_manifest: Path | None, *, complete
     }
     passing_records = sum(not validate_record(record, release=True) for record in records)
     return {
-        "gate_version": "0.1.0", "checked_at": datetime.now(timezone.utc).isoformat(),
+        "gate_version": "0.2.0", "checked_at": datetime.now(timezone.utc).isoformat(),
         "release_ready": not blockers, "meaning": "Consistency of documented single-expert publication prerequisites; this does not authenticate human review or accounting correctness and does not publish anything.",
         "permitted_review_claim": "single-expert reviewed, only after actual accountant completion; never dual-expert adjudicated gold",
         "annotation_directory": str(annotation_dir), "case_manifest": str(case_manifest) if case_manifest else None,
         "expected_case_count": len(expected), "annotation_record_count": len(records), "records_passing_release_checks": passing_records,
         "status_counts": dict(statuses), "declared_qualified_expert_count": len(independently_qualified_experts),
-        "repeat_fraction_checked": complete_dataset, "blocker_count": len(blockers), "blockers": blockers,
+        "review_protocol_ids": protocol_ids, "manifest_review_protocol": expected_protocol,
+        "complete_dataset_protocol_checked": complete_dataset,
+        "repeat_fraction_checked": complete_dataset and protocol_ids == [LEGACY_PROTOCOL],
+        "reliability_status": "reliability_not_measured" if protocol_ids == [IMMEDIATE_PROTOCOL] else "not_established_by_this_gate",
+        "blocker_count": len(blockers), "blockers": blockers,
         "source_hashes": {"schema_sha256": sha256(SCHEMA_PATH.read_bytes()).hexdigest(),
                           "validator_sha256": sha256(Path(__file__).with_name("validate_annotations.py").read_bytes()).hexdigest(),
                           "gate_sha256": sha256(Path(__file__).read_bytes()).hexdigest(),
@@ -102,9 +116,9 @@ def assess_release(annotation_dir: Path, case_manifest: Path | None, *, complete
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--annotations", type=Path, default=ROOT / "review" / "annotations")
-    parser.add_argument("--case-manifest", type=Path, default=ROOT / "data" / "review_pilot" / "manifest.json")
+    parser.add_argument("--case-manifest", type=Path, default=ROOT / "data" / "review_pilot_v2" / "manifest.json")
     parser.add_argument("--output", type=Path, help="optional JSON status artifact")
-    parser.add_argument("--development-subset", action="store_true", help="skip full-corpus repeat-fraction calculation; all case-level review gates still apply")
+    parser.add_argument("--development-subset", action="store_true", help="skip complete-dataset protocol/fraction checks; all case-level gates and manifest protocol checks still apply")
     args = parser.parse_args()
     report = assess_release(args.annotations, args.case_manifest, complete_dataset=not args.development_subset)
     rendered = json.dumps(report, indent=2, ensure_ascii=False) + "\n"

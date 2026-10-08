@@ -32,10 +32,11 @@ reasoning before explicitly revealing a proposal. Reconciliation is a separate
 record; it does not overwrite the initial judgment. Export backups regularly.
 The local server stores review events in `reviews/reviews.sqlite3`.
 
-The server enforces **all 20 initial judgments before any proposal reveal**,
-followed by a frozen three-case delayed repeat subset after at least seven days.
-Repeat cases use fresh shuffled aliases; earlier assessments and reviewer exports
-are hidden during that stage. Reconciliation opens only after both blind passes.
+The current `pilot-v2` workspace enforces **all 20 locked initial judgments before
+any proposal reveal**, then opens reconciliation immediately. Generated answers
+are proposals, and feedback is saved separately from each original response.
+This feasibility protocol does not measure independent delayed repeat reliability.
+Existing frozen v1 plans retain their original seven-day, three-case repeat flow.
 Keep reviewers away from source keys, curator files and model outputs throughout
 the blind phase. The public repository still contains curator proposals, so this
 is an operational research blinding boundary.
@@ -46,7 +47,7 @@ labels. For remote accountants, use authenticated hosted mode as described in
 personal invitation accounts, revocable sessions and an exact HTTPS origin;
 it refuses public binding in local mode and temporary SQLite in hosted mode.
 The curator creates separate accountant invitations, monitors first-pass and
-repeat progress, compares preserved initial assessments, exports backups and
+reconciliation progress, compares preserved initial assessments, exports backups and
 records separate resolutions. Self-declared qualifications and descriptive
 agreement counts do not establish independent expert validation or publication gold.
 
@@ -60,11 +61,21 @@ Legacy browser-local reviews are answer-visible verification records. They canno
 be imported as independent blind judgments. The benchmark data files are not
 modified by dashboard review.
 
-![Blind review workspace](docs/assets/blind-review-preview.png)
+Read the [reviewer guide](docs/ACCOUNTANT_REVIEW_GUIDE.md), try the fictional
+practice case inside the dashboard, and use the
+[meeting guide](docs/ACCOUNTANT_MEETING_GUIDE.md) before formal collection.
+
+![Proposal comparison in a synthetic software QA account](docs/assets/expert-review-v2-comparison.jpg)
 
 ## Pilot and reproducibility
 
-`data/review_pilot/manifest.json` records selection rules, source commit and hashes.
+`data/review_pilot_v2/manifest.json` records the current packet and protocol.
+The frozen v1 packet remains intact in `data/review_pilot/` for older records.
+V2 uses Company A–E aliases, neutral transaction descriptions and readable
+financial tables. The source figures are reconstructed SEC-derived illustrations,
+with identified residual rows and synthetic scenarios, rather than verbatim filings.
+Exact original filing accessions and per-fact periods remain unverified; see the
+[case-quality audit](docs/PILOT_CASE_QUALITY.md). A mechanical check is not expert approval.
 The 20 items are ten matched-source clean/fault cases plus ten versions with one
 revenue-cutoff fact withheld. Source evidence can differ beyond the manipulated
 fact; these are **not certified minimal counterfactual pairs**. Withholding a
@@ -74,6 +85,8 @@ must assess that question. Company names anchor source figures, not real fraud.
 ```bash
 python -m unittest discover -s tests -v
 python scripts/build_review_pilot.py --help
+python scripts/build_expert_review_pilot.py --check
+python scripts/check_pilot_quality.py --pilot data/review_pilot_v2 --check-report data/review_pilot_v2/curator/quality_report.json
 python scripts/check_release_readiness.py --help
 python scripts/build_annotation_packet.py --help
 ```

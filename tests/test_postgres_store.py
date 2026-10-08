@@ -1,5 +1,6 @@
 """Hosted storage regression tests plus opt-in, isolated live PostgreSQL checks."""
 import os
+import json
 import threading
 import unittest
 import uuid
@@ -150,27 +151,56 @@ class PostgresIntegrationTests(unittest.TestCase):
         restarted.revoke(invitation['reviewer']['id'])
         self.assertIsNone(auth.session(token))
 
-    def test_full_delayed_repeat_protocol_on_postgresql(self):
+    def test_full_immediate_reconciliation_protocol_on_postgresql(self):
         now = datetime(2026, 10, 4, tzinfo=timezone.utc)
         self.store.clock = lambda: now
         entries = [{'id': f'full_case_{i}', 'company': f'Company {i // 4}'} for i in range(20)]
         self.store.register_protocol('full-pilot', 'fixed-full-fingerprint', entries)
         scope = {'dataset': 'full-pilot', 'fingerprint': 'fixed-full-fingerprint', 'reviewer_id': 'test-a'}
         annotation = {'judgement': 'insufficient_evidence', 'error_type': None, 'rows': [], 'evidence_sufficiency': 'insufficient', 'authority_disposition': 'unresolved', 'citations': [], 'authority_currency': 'unresolved', 'authority_source': '', 'proof_sets': [], 'reasoning': 'Synthetic database check only', 'confidence': 'low'}
+        for case in entries:
+            self.store.append({**scope, 'case_id': case['id']}, 'blind', 'Test A', 'Test fixture', annotation)
+        self.assertEqual(self.store.protocol(scope)['phase'], 'reconciliation')
+        self.assertEqual(self.store.protocol(scope)['plan_version'], 2)
+        self.assertEqual(self.store.protocol(scope)['reliability_status'], 'reliability_not_measured')
+        self.assertEqual(self.store.protocol(scope)['repeat_required'], 0)
+        self.store.append({**scope, 'case_id': entries[0]['id']}, 'reveal')
+        self.assertEqual(len(self.store.history(scope)['events']), 21)
+
+    def test_frozen_legacy_plan_and_partial_backup_survive_postgresql_restart(self):
+        now = datetime(2026, 10, 4, tzinfo=timezone.utc)
+        self.store.clock = lambda: now
+        entries = [{'id': f'legacy_case_{i}', 'company': f'Company {i // 4}'} for i in range(20)]
+        self.store.register_protocol('legacy-pilot', 'fixed-legacy-fingerprint', entries)
+        scope = {'dataset': 'legacy-pilot', 'fingerprint': 'fixed-legacy-fingerprint', 'reviewer_id': 'test-a'}
+        plan = {'version': 1, 'case_ids': sorted(entry['id'] for entry in entries), 'delay_days': 7,
+                'rounding': '15% rounded to nearest integer, half up; public company strata',
+                'repeats': [{'alias': f'repeat_{i:024x}', 'case_id': entry['id']} for i, entry in enumerate(entries[::4][:3])]}
+        with self.store.connect() as con:
+            con.execute('INSERT INTO protocol_plans VALUES (?,?,?,?)', (*self.store._key(scope), json.dumps(plan)))
+        annotation = {'judgement': 'insufficient_evidence', 'error_type': None, 'rows': [], 'evidence_sufficiency': 'insufficient', 'authority_disposition': 'unresolved', 'citations': [], 'authority_currency': 'unresolved', 'authority_source': '', 'proof_sets': [], 'reasoning': 'Synthetic legacy database check only', 'confidence': 'low'}
         detail = lambda case_id: {'exam': {'exam_id': case_id, 'statement_text': '[row 0]: Revenue | $500'}, 'evidence_units': []}
         for case in entries:
             self.store.append({**scope, 'case_id': case['id']}, 'blind', 'Test A', 'Test fixture', annotation)
-        self.assertEqual(self.store.protocol(scope)['phase'], 'waiting')
+        backup = self.store.history(scope, allow_during_repeat=True)
+        self.assertEqual(backup['protocol_plan'], plan)
+        restarted = PostgresReviewStore(self.database_url, schema=self.schema)
+        restarted.clock = lambda: now
+        restarted.register_protocol('legacy-pilot', 'fixed-legacy-fingerprint', entries)
+        self.assertEqual(restarted.protocol(scope)['phase'], 'waiting')
+        self.assertEqual(restarted.history(scope, allow_during_repeat=True), backup)
         with self.assertRaises(ValueError):
-            self.store.append({**scope, 'case_id': entries[0]['id']}, 'reveal')
+            restarted.append({**scope, 'case_id': entries[0]['id']}, 'reveal')
         now += timedelta(days=7)
-        repeats = self.store.protocol(scope)['repeat_cases']
-        self.assertEqual(len(repeats), 3)
+        repeats = restarted.protocol(scope)['repeat_cases']
+        self.assertEqual([entry['id'] for entry in repeats], [entry['alias'] for entry in plan['repeats']])
+        self.assertEqual(restarted.protocol(scope)['completed_case_ids'], [])
         for case in repeats:
-            self.store.append_repeat(scope, case['id'], 'Test A', 'Test fixture', annotation, detail)
-        self.assertEqual(self.store.protocol(scope)['phase'], 'reconciliation')
-        self.store.append({**scope, 'case_id': entries[0]['id']}, 'reveal')
-        self.assertEqual(len(self.store.history(scope)['events']), 24)
+            restarted.append_repeat(scope, case['id'], 'Test A', 'Test fixture', annotation, detail)
+        self.assertEqual(restarted.protocol(scope)['phase'], 'reconciliation')
+        restarted.append({**scope, 'case_id': entries[0]['id']}, 'reveal')
+        self.assertEqual(restarted.history(scope)['events'][:20], backup['events'])
+        self.assertEqual(restarted.history(scope)['protocol_plan'], plan)
 
 
 if __name__ == '__main__':

@@ -19,6 +19,8 @@ HERE = Path(__file__).resolve().parent
 SCHEMA_PATH = HERE.parent / "review" / "annotation.schema.json"
 GROUP_FIELDS = ("company_group_ids", "filing_group_ids", "event_group_ids", "pair_group_ids")
 DECISION_FIELDS = ("conclusion", "authority_disposition", "acceptable_citation_sets", "accepted_proof_ids", "missing_fact_requirements")
+LEGACY_PROTOCOL = "delayed_repeat_v1"
+IMMEDIATE_PROTOCOL = "immediate_reconciliation_v2"
 
 
 def digest(value: Any) -> str:
@@ -75,6 +77,8 @@ def structural_errors(value: Any, schema: dict, root: dict | None = None, path: 
     if isinstance(value, list):
         if len(value) < schema.get("minItems", 0):
             errors.append(f"{path}: too few items")
+        if "maxItems" in schema and len(value) > schema["maxItems"]:
+            errors.append(f"{path}: too many items")
         if schema.get("uniqueItems") and len({json.dumps(x, sort_keys=True) for x in value}) != len(value):
             errors.append(f"{path}: duplicate items")
         for index, item in enumerate(value):
@@ -98,6 +102,10 @@ def structural_errors(value: Any, schema: dict, root: dict | None = None, path: 
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         if "minimum" in schema and value < schema["minimum"]:
             errors.append(f"{path}: below minimum {schema['minimum']}")
+    if "if" in schema:
+        branch = "then" if not structural_errors(value, schema["if"], root, path) else "else"
+        if branch in schema:
+            errors.extend(structural_errors(value, schema[branch], root, path))
     return errors
 
 
@@ -168,7 +176,7 @@ def validate_record(record: dict, *, release: bool = False, schema: dict | None 
         refs([review["reviewer_id"]], "reviewers", review["review_id"])
         refs(review["support_fact_ids"] + review["refutation_fact_ids"], "facts", review["review_id"])
         reviewer = indexes["reviewers"].get(review["reviewer_id"])
-        if reviewer and review["phase"] in ("expert_first_pass", "expert_repeat"):
+        if reviewer and review["phase"] in ("expert_first_pass", "expert_repeat", "expert_reconciliation"):
             require(reviewer["role"] == "accounting_expert", f"{review['review_id']}: student/curator cannot be counted as an expert review")
         if review["submission_sha256"]:
             require(review["submission_sha256"] == review_digest(review), f"{review['review_id']}: submission digest mismatch")
@@ -176,6 +184,10 @@ def validate_record(record: dict, *, release: bool = False, schema: dict | None 
         require(record["resolution"]["gold_sha256"] == gold_digest(record), "resolution: decision-bearing state changed after gold hash")
     if record["release_status"] == "eligible":
         require(record["status"] == "expert_reviewed", "eligible records must be expert_reviewed")
+    protocol_id = record["review_plan"].get("protocol_id", LEGACY_PROTOCOL)
+    if protocol_id == IMMEDIATE_PROTOCOL:
+        require(not any(review["phase"] == "expert_repeat" for review in record["reviews"]),
+                "protocol: immediate reconciliation has no independent delayed expert_repeat; preserve later assessments as expert_reconciliation")
     if not release and record["release_status"] != "eligible":
         return errors
 
@@ -258,14 +270,17 @@ def validate_record(record: dict, *, release: bool = False, schema: dict | None 
         require(scope["assertion_family"] in expert["assertion_expertise"], "release: expert assertion coverage not documented")
     first = [review for review in record["reviews"] if review["phase"] == "expert_first_pass" and review["reviewer_id"] == expert_id]
     repeats = [review for review in record["reviews"] if review["phase"] == "expert_repeat" and review["reviewer_id"] == expert_id]
+    reconciliations = [review for review in record["reviews"] if review["phase"] == "expert_reconciliation" and review["reviewer_id"] == expert_id]
     require(len(first) == 1, "release: exactly one preserved expert first pass required")
     if record["review_plan"]["repeat_required"]:
         require(len(repeats) == 1, "release: selected case requires one preserved delayed expert repeat")
-    for review in first + repeats:
+    for review in first + repeats + reconciliations:
         for key in ("submitted_at", "bundle_sha256", "submission_sha256", "rationale"):
             require(bool(review[key]), f"release: {review['review_id']}.{key} missing")
-        for flag in ("constructed_case", "saw_peer_annotation", "saw_own_prior_annotation", "saw_student_draft", "saw_reference_key", "saw_model_output"):
-            require(not review[flag], f"release: {review['review_id']} blinding violated ({flag})")
+        require(not review["constructed_case"], f"release: {review['review_id']} blinding violated (constructed_case)")
+        if review["phase"] != "expert_reconciliation":
+            for flag in ("saw_peer_annotation", "saw_own_prior_annotation", "saw_student_draft", "saw_reference_key", "saw_model_output"):
+                require(not review[flag], f"release: {review['review_id']} blinding violated ({flag})")
         require(review["manual_version"] == record["review_plan"]["manual_version"], "release: review/manual version mismatch")
         require(bool(split["observable_bundle_sha256"]) and review["bundle_sha256"] == split["observable_bundle_sha256"], "release: expert reviewed a different/unhashed source bundle")
     if first and repeats and first[0]["submitted_at"] and repeats[0]["submitted_at"]:
@@ -273,11 +288,16 @@ def validate_record(record: dict, *, release: bool = False, schema: dict | None 
         require(elapsed >= record["review_plan"]["minimum_repeat_delay_days"], "release: repeat performed before minimum delay")
         selection_time = record["review_plan"]["repeat_selection_frozen_at"]
         require(bool(selection_time) and _time(selection_time) <= _time(repeats[0]["submitted_at"]), "release: repeat selected after repeat submission")
+    for review in reconciliations:
+        for blind_review in first + repeats:
+            if blind_review["submitted_at"] and review["submitted_at"]:
+                require(_time(blind_review["submitted_at"]) <= _time(review["submitted_at"]),
+                        "release: reconciliation precedes completion of preserved blind submissions")
     resolution = record["resolution"]
     require(resolution["mode"] == "single_expert_resolution", "release: single-expert resolution incomplete")
     for key in ("recorder_id", "completed_at", "gold_sha256"):
         require(bool(resolution[key]), f"release: resolution.{key} missing")
-    for review in first + repeats:
+    for review in first + repeats + reconciliations:
         if resolution["completed_at"] and review["submitted_at"]:
             require(_time(review["submitted_at"]) <= _time(resolution["completed_at"]), "release: final resolution precedes expert submission")
     if split["frozen_at"] and resolution["completed_at"]:
@@ -287,7 +307,7 @@ def validate_record(record: dict, *, release: bool = False, schema: dict | None 
         require(_time(selection_time) <= _time(resolution["completed_at"]), "release: repeat allocation frozen after final resolution")
     if first:
         changed = any(first[0][field] != gold[field] for field in DECISION_FIELDS)
-        changed |= any(any(first[0][field] != repeat[field] for field in DECISION_FIELDS) for repeat in repeats)
+        changed |= any(any(first[0][field] != later[field] for field in DECISION_FIELDS) for later in repeats + reconciliations)
         require(not changed or bool(resolution["resolutions"]), "release: changed/disagreed decisions require recorded resolution")
     for proof in record["proof_sets"]:
         require(proof["minimality"]["status"] != "not_reviewed" and expert_id in proof["minimality"]["reviewer_ids"],
@@ -338,18 +358,20 @@ def validate_record(record: dict, *, release: bool = False, schema: dict | None 
     require(split["assignment"] != "unassigned", "release: split unassigned")
     for key in ("freeze_id", "frozen_at", "protocol_sha256", "initial_view_sha256", "observable_bundle_sha256"):
         require(bool(split[key]), f"release: split.{key} missing")
-    require(bool(record["review_plan"]["repeat_selection_frozen_at"]), "release: repeat subset selection not frozen")
+    if protocol_id == LEGACY_PROTOCOL:
+        require(bool(record["review_plan"]["repeat_selection_frozen_at"]), "release: repeat subset selection not frozen")
     return errors
 
 
 def validate_batch(records: list[dict], *, release: bool = False, complete_dataset: bool = False) -> list[str]:
     errors = []
-    seen_cases, seen_annotations, groups = set(), set(), {}
+    seen_cases, seen_annotations, groups, valid_records = set(), set(), {}, []
     for index, record in enumerate(records):
         local = validate_record(record, release=release)
         errors.extend(f"record[{index}]: {error}" for error in local)
         if structural_errors(record, json.loads(SCHEMA_PATH.read_text())):
             continue
+        valid_records.append(record)
         for value, seen, label in ((record["case_id"], seen_cases, "case"), (record["annotation_id"], seen_annotations, "annotation")):
             if value in seen:
                 errors.append(f"batch: duplicate {label} identifier {value}")
@@ -364,10 +386,17 @@ def validate_batch(records: list[dict], *, release: bool = False, complete_datas
                 if previous != split["assignment"]:
                     errors.append(f"batch: dependency {field}:{group} crosses {previous}/{split['assignment']} splits")
     if complete_dataset:
-        eligible = [record for record in records if record.get("release_status") == "eligible" and isinstance(record.get("review_plan"), dict)]
-        repeated = sum(bool(record.get("review_plan", {}).get("repeat_required")) for record in eligible)
-        if not eligible or not 0.10 <= repeated / len(eligible) <= 0.20:
-            errors.append(f"batch: full-corpus blind-repeat fraction must be 10–20% (observed {repeated}/{len(eligible)}); tiny-pilot rounding is a reported development exception")
+        plans = [record["review_plan"] for record in valid_records]
+        protocol_ids = {plan.get("protocol_id", LEGACY_PROTOCOL) for plan in plans}
+        if not records:
+            errors.append("batch: a complete dataset requires nonempty publication records")
+        if len(protocol_ids) > 1:
+            errors.append("batch: a complete dataset cannot mix immediate reconciliation and legacy delayed-repeat protocols")
+        if protocol_ids == {LEGACY_PROTOCOL}:
+            eligible = [record for record in valid_records if record["release_status"] == "eligible"]
+            repeated = sum(bool(record["review_plan"].get("repeat_required")) for record in eligible)
+            if not eligible or not 0.10 <= repeated / len(eligible) <= 0.20:
+                errors.append(f"batch: full-corpus blind-repeat fraction must be 10–20% (observed {repeated}/{len(eligible)}); tiny-pilot rounding is a reported development exception")
     return errors
 
 
@@ -375,7 +404,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("files", nargs="+", type=Path)
     parser.add_argument("--release", action="store_true", help="require documented single-expert release gates")
-    parser.add_argument("--complete-dataset", action="store_true", help="also check full-corpus 10–20% delayed repeat allocation")
+    parser.add_argument("--complete-dataset", action="store_true", help="also require one disclosed review protocol; legacy datasets need 10–20% delayed repeats")
     parser.add_argument("--print-gold-hash", action="store_true", help="print decision-state digest without modifying records")
     parser.add_argument("--print-review-hashes", action="store_true", help="print submission digests without inventing reviews")
     args = parser.parse_args()

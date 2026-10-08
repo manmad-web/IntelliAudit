@@ -1,7 +1,7 @@
 # Review workflow and release gates
 
-The current pilot is **unreviewed development material**. One accountant is
-available. Completing the proposed workflow supports a *single-expert-reviewed*
+The current v2 pilot is **unreviewed development material**. The publication
+schema supports a single qualified expert workflow. Completing it supports a *single-expert-reviewed*
 release, not two-expert agreement, independently adjudicated gold, a guaranteed
 gold standard or a publication claim. This document does not authorize anyone
 to contact the accountant; the team arranges review itself.
@@ -52,7 +52,15 @@ controls, preserve failures, group related cases before splitting, and report
 the single-expert limitation. An analyst cannot relabel disagreements to improve
 model scores. No new paid model run is required to complete annotation tooling.
 
-## The 20-case development review sequence
+## The current 20-case development review sequence (v2)
+
+The active `pilot-v2` packet uses `immediate_reconciliation_v2`, with five
+pseudonymized companies and 20 initial assessments. It opens reconciliation
+immediately after the complete initial pass. It does not measure independent
+delayed intra-rater reliability. Retain the explicit
+`reliability_status: reliability_not_measured` disclosure in derived publication
+records and reports. Earlier `pilot` v1 artifacts and frozen participant plans
+retain their original delay and repeat subset; no automatic migration occurs.
 
 1. Confirm that the public packet contains no old answers, recommended citations,
    model responses, source-rule names or mappings to opposite-label pairs. Use
@@ -63,13 +71,12 @@ model scores. No new paid model run is required to complete annotation tooling.
    of student drafts, old keys and model outputs. Log review time and missing
    sources. Do not pretend a supplied synthetic transaction narrative is an
    authentic ledger.
-3. Freeze a delayed-repeat selection of **2–4 of the 20 cases**, spanning company,
-   outcome/ambiguity and relevant assertion strata. Use independently assigned
-   new opaque IDs and a shuffled packet at least seven days later. Keep the
-   first answer inaccessible. If the pilot cannot cover every stratum at this
-   size, report that limitation rather than claiming complete stratification.
-4. After the repeat, let the accountant resolve queries and self-disagreements.
-   Retain the original and repeated submissions and a reason for every change.
+3. Lock all 20 initial assessments before revealing any proposed answer. Then
+   let the accountant intentionally reveal each proposal for comparison. There
+   is no required delayed repeat in v2. A post-reveal assessment is reconciliation,
+   not an independent blind repeat or a reliability measurement.
+4. Let the accountant resolve queries and disagreements with the proposals.
+   Retain the original and reconciliation submissions and a reason for every change.
    Unresolved critical evidence or applicability becomes insufficient evidence
    or exclusion. Do not force one governing paragraph when multiple valid sets
    exist, and do not confuse absent retrieval with `no_governing_paragraph`.
@@ -90,13 +97,24 @@ Keep any designated new-company replication inputs uninspected by method
 developers while that comparison is active. A later fresh benchmark release
 needs a separately frozen protocol and company/event-disjoint test design.
 
+## Legacy v1 records
+
+`delayed_repeat_v1`, including older publication records without an explicit
+`review_plan.protocol_id`, retains its seven-day minimum delay, frozen repeat
+selection and full-corpus 10–20% allocation. Preserve both blind submissions,
+shuffle fresh opaque aliases, hide previous answers, and reconcile only after
+the required repeats. The dashboard's existing frozen 20-case v1 plans selected
+three cases. A mixed v1/v2 inventory must be separated into explicitly versioned
+cohorts; it cannot claim one homogeneous review protocol.
+
 ## What the machine gate enforces
 
 `scripts/validate_annotations.py` checks the portable structural schema plus
 cross-field references, hashes, chronology and group consistency. With
 `--release`, it requires the declared single-expert workflow, appropriate
 qualified-review metadata, a documented final resolution, completed repeat
-where selected, frozen provenance, and a resolved supported/insufficient state.
+where selected under v1, or explicit non-measurement disclosure and no delayed
+repeat under v2, frozen provenance, and a resolved supported/insufficient state.
 It checks full accepted ASC paragraph identifiers, authority version/effective
 date/jurisdiction/framework/entity scope, and required applicability facts.
 An accepted proof cannot rely on inaccessible post-cutoff evidence or label a
@@ -106,8 +124,11 @@ deletion checks and a refutation assessment.
 `scripts/check_release_readiness.py` also requires **every case in the explicit
 final inventory** to have a passing publication annotation. It rejects empty,
 missing, duplicate, unexpected, operational-only or incomplete records. Full
-corpus checks require 10–20% delayed-repeat allocation. Case-level review gates
-remain in effect even when a development subset skips that aggregate fraction.
+corpus checks require a homogeneous review protocol. Legacy v1 requires 10–20%
+delayed-repeat allocation; v2 requires zero repeats and an explicit statement that
+independent delayed reliability was not measured. Records must match a review
+protocol declared in the case manifest. Case-level review gates remain in effect
+even when a development subset skips aggregate checks.
 Output is JSON, and blocked readiness returns a nonzero exit code.
 
 ```bash
@@ -118,7 +139,7 @@ python scripts/validate_annotations.py review/annotation_example_unreviewed.json
 # Empty/incomplete records intentionally return exit code 1 and release_ready:false.
 python scripts/check_release_readiness.py \
   --annotations review/annotations \
-  --case-manifest data/review_pilot/manifest.json \
+  --case-manifest data/review_pilot_v2/manifest.json \
   --output review/release_readiness.json
 
 # Full publication-record checks after the accountant has actually completed work.
@@ -139,13 +160,24 @@ and a new freeze. Do not recompute hashes to conceal an unreviewed change.
 The validator cannot verify that a credential is real, that a human performed
 the stated work, or that the governing paragraph is semantically correct.
 
+Workflow exports (`schema_version: 2` envelopes containing immutable
+`schema_version: 1` events) are separate from publication annotations
+(`schema_version: 0.1.0`). The curator manually transfers and verifies the
+decision, source/authority/proof information and qualification evidence;
+neither export, invitation creation nor a completed dashboard status performs
+that work. An exposed later assessment can use `expert_reconciliation` with
+truthful exposure flags; it cannot be called `expert_repeat` in v2. Empty
+templates and operational event exports continue to fail publication readiness.
+
 ## Additional scientific gates
 
 - **Validity:** evidence genuinely supports the task; source/version fidelity,
   realistic assumptions and authority applicability have been checked by the
   accountant. Review disagreement and exclusion causes rather than hiding them.
-- **Reliability:** report delayed intra-rater stability, not inter-rater kappa
-  or independent expert consensus. Include memory/blinding and one-expert limits.
+- **Reliability:** v2 reports independent delayed reliability as not measured.
+  Legacy v1 may report delayed intra-rater stability after actual collection
+  and analysis, with memory/blinding and one-expert limits. Post-reveal changes
+  and proposal agreement do not measure blind stability or expert consensus.
 - **Leakage:** inspect actual model/reviewer payloads and access boundaries;
   measure metadata, formatting and rule-guessing controls. Keep all related
   company/filing/event/pair components together before splitting.
